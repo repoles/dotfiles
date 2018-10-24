@@ -43,8 +43,8 @@ antigen apply
 bindkey '^[[A' history-substring-search-up
 bindkey '^[[B' history-substring-search-down
 
-# PURE_GIT_DOWN_ARROW=↓
-# PURE_GIT_UP_ARROW=↑
+PURE_GIT_DOWN_ARROW=↓
+PURE_GIT_UP_ARROW=↑
 
 # Aliases
 # #######
@@ -92,12 +92,15 @@ export USER_EMAIL=repoles@gmail.com
 
 export TEMP_DIR=$HOME/Temp
 export SCRIPTS_DIR=$HOME/Code/scripts
+export DOTFILES_DIR=$HOME/Code/dotfiles
 
 export PATH=$PATH:$SCRIPTS_DIR
 
 export LANG=en_US.UTF-8
 
 cdpath=($HOME/Code/Rails $HOME/Code/Java)
+
+source $DOTFILES_DIR/rails.zsh
 
 # rbenv https://github.com/rbenv/rbenv
 if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
