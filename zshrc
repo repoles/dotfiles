@@ -1,3 +1,5 @@
+# Referência: https://carlosbecker.com/posts/speeding-up-zsh/
+
 # Autocompletion
 autoload -Uz compinit
 typeset -i updated_at=$(date +'%j' -r ~/.zcompdump 2>/dev/null || stat -f '%Sm' -t '%j' ~/.zcompdump 2>/dev/null)
@@ -7,7 +9,8 @@ else
   compinit -C -i
 fi
 
-zmodload -i zsh/complist
+# Commands menu list
+zmodload -i zsh/complist 
 
 # Commands history
 HISTFILE=$HOME/.zsh_history
@@ -30,36 +33,35 @@ zstyle ':completion:*' menu select # select completions with arrow keys
 zstyle ':completion:*' group-name '' # group results by category
 zstyle ':completion:::::' completer _expand _complete _ignored _approximate # enable approximate matches for completion
 
+export TEMP_DIR=$HOME/Temp
+export SCRIPTS_DIR=$HOME/Code/scripts
+export DOTFILES_DIR=$HOME/Code/dotfiles
+export USER_EMAIL=repoles@gmail.com
+
+export PATH=$PATH:$SCRIPTS_DIR
+export LANG=en_US.UTF-8
+
+cdpath=($HOME/Code/Rails $HOME/Code/Java)
+
 # Plugins
-source /usr/local/share/antigen/antigen.zsh
+source /usr/local/share/antigen/antigen.zsh # brew install antigen
 antigen bundle zsh-users/zsh-completions
 antigen bundle zsh-users/zsh-autosuggestions
 antigen bundle zsh-users/zsh-syntax-highlighting
 antigen bundle zsh-users/zsh-history-substring-search
-antigen bundle mafredri/zsh-async 
+antigen bundle mafredri/zsh-async
 antigen bundle sindresorhus/pure
 antigen apply
+
+source $DOTFILES_DIR/rails.plugin.zsh
+source $DOTFILES_DIR/bundler.plugin.zsh
+source $DOTFILES_DIR/aliases.zsh
 
 bindkey '^[[A' history-substring-search-up
 bindkey '^[[B' history-substring-search-down
 
 PURE_GIT_DOWN_ARROW=↓
 PURE_GIT_UP_ARROW=↑
-
-export USER_EMAIL=repoles@gmail.com
-
-export TEMP_DIR=$HOME/Temp
-export SCRIPTS_DIR=$HOME/Code/scripts
-export DOTFILES_DIR=$HOME/Code/dotfiles
-
-export PATH=$PATH:$SCRIPTS_DIR
-
-export LANG=en_US.UTF-8
-
-cdpath=($HOME/Code/Rails $HOME/Code/Java)
-
-source $DOTFILES_DIR/aliases.zsh
-source $DOTFILES_DIR/rails.zsh
 
 # rbenv https://github.com/rbenv/rbenv
 if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
