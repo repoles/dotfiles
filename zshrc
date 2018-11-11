@@ -41,7 +41,7 @@ export USER_EMAIL=repoles@gmail.com
 export PATH=$PATH:$SCRIPTS_DIR
 export LANG=en_US.UTF-8
 
-export WORDCHARS='*?_-.[]~=&;!#$%^(){}<>'
+export WORDCHARS='*?_-[]~=&;!#$%^(){}<>'
 
 cdpath=($HOME/Code/Rails $HOME/Code/Java)
 
