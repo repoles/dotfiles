@@ -1,0 +1,20 @@
+[user]
+	name = Lucas Repolês
+	email = lucas@avantsistemas.com
+[color]
+	ui = true
+[push]
+	default = simple
+[core]
+	excludesfile = ~/.gitignore
+	autocrlf = input
+[alias]
+	st = status
+	ci = commit
+	br = branch
+	co = checkout
+	lg = log --oneline --decorate
+[filter "lfs"]
+	required = true
+	clean = git-lfs clean %f
+	smudge = git-lfs smudge %f
