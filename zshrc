@@ -65,5 +65,14 @@ bindkey '^[[B' history-substring-search-down
 PURE_GIT_DOWN_ARROW=↓
 PURE_GIT_UP_ARROW=↑
 
+# prompt_pure_set_title() {}
+
+# prompt_newline='%666v'
+# PROMPT=" $PROMPT"
+
+# Corrige o título do terminal após fechar uma sessão ssh
+# https://superuser.com/a/664282/567904
+# function ssh() { command ssh "$@"; title }
+
 # rbenv https://github.com/rbenv/rbenv
 if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
