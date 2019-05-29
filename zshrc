@@ -38,7 +38,7 @@ export SCRIPTS_DIR=$HOME/Code/scripts
 export DOTFILES_DIR=$HOME/Code/dotfiles
 export USER_EMAIL=repoles@gmail.com
 
-export PATH=$PATH:$SCRIPTS_DIR
+export PATH=/usr/local/opt/mysql@5.6/bin:/usr/local/opt/python/libexec/bin:$PATH:$SCRIPTS_DIR
 export LANG=en_US.UTF-8
 
 export WORDCHARS='*?_-[]~=&;!#$%^(){}<>'
