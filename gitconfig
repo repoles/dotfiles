@@ -8,6 +8,7 @@
 [core]
 	excludesfile = ~/.gitignore
 	autocrlf = input
+	abbrev = 7
 [alias]
 	st = status
 	ci = commit
