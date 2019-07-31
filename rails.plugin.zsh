@@ -1,36 +1,36 @@
 # Referência: https://github.com/robbyrussell/oh-my-zsh/blob/master/plugins/rails/rails.plugin.zsh
 
-function _rails_command () {
-  if [ -e "bin/stubs/rails" ]; then
-    bin/stubs/rails $@
-  elif [ -e "bin/rails" ]; then
-    bin/rails $@
-  elif [ -e "script/rails" ]; then
-    ruby script/rails $@
-  elif [ -e "script/server" ]; then
-    ruby script/$@
-  else
-    command rails $@
-  fi
-}
+# function _rails_command () {
+#   if [ -e "bin/stubs/rails" ]; then
+#     bin/stubs/rails $@
+#   elif [ -e "bin/rails" ]; then
+#     bin/rails $@
+#   elif [ -e "script/rails" ]; then
+#     ruby script/rails $@
+#   elif [ -e "script/server" ]; then
+#     ruby script/$@
+#   else
+#     command rails $@
+#   fi
+# }
 
-function _rake_command () {
-  if [ -e "bin/stubs/rake" ]; then
-    bin/stubs/rake $@
-  elif [ -e "bin/rake" ]; then
-    bin/rake $@
-  elif type bundle &> /dev/null && [ -e "Gemfile" ]; then
-    bundle exec rake $@
-  else
-    command rake $@
-  fi
-}
+# function _rake_command () {
+#   if [ -e "bin/stubs/rake" ]; then
+#     bin/stubs/rake $@
+#   elif [ -e "bin/rake" ]; then
+#     bin/rake $@
+#   elif type bundle &> /dev/null && [ -e "Gemfile" ]; then
+#     bundle exec rake $@
+#   else
+#     command rake $@
+#   fi
+# }
 
-alias rails='_rails_command'
-compdef _rails_command=rails
+# alias rails='_rails_command'
+# compdef _rails_command=rails
 
-alias rake='_rake_command'
-compdef _rake_command=rake
+# alias rake='_rake_command'
+# compdef _rake_command=rake
 
 alias devlog='tail -f log/development.log'
 alias prodlog='tail -f log/production.log'
