@@ -41,7 +41,8 @@ export USER_EMAIL=repoles@gmail.com
 export PATH=/usr/local/opt/mysql@5.6/bin:/usr/local/opt/python/libexec/bin:$PATH:$SCRIPTS_DIR
 export LANG=en_US.UTF-8
 
-export WORDCHARS='*?_-[]~=&;!#$%^(){}<>'
+export WORDCHARS="*?_-.[]~=&;!#$%^(){}<>"
+export EDITOR="/usr/local/bin/code --new-window --wait"
 
 cdpath=($HOME/Code/Rails $HOME/Code/Java)
 
@@ -78,6 +79,7 @@ SPACESHIP_PROMPT_ORDER=(
 
 SPACESHIP_TIME_SHOW="true"
 SPACESHIP_GIT_STATUS_COLOR="202"
+SPACESHIP_GIT_BRANCH_PREFIX=""
 SPACESHIP_RUBY_SYMBOL="ruby "
 # SPACESHIP_GIT_STATUS_BEHIND="↓"
 # SPACESHIP_GIT_STATUS_AHEAD="↑"
