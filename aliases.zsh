@@ -27,7 +27,7 @@ alias ls='ls -h -G'                           # classify files in colour
 alias ll='ls -l'                              # long list
 alias la='ls -A'                              # all but . and ..
 
-#alias cd..='cd ../'                          # Go back 1 directory level (for fast typers)
+#alias cd..='cd ../'                          # Go back 1 directory level
 #alias ..='cd ../'                            # Go back 1 directory level
 #alias ...='cd ../../'                        # Go back 2 directory levels
 #alias .3='cd ../../../'                      # Go back 3 directory levels
@@ -37,5 +37,10 @@ alias la='ls -A'                              # all but . and ..
 
 alias qfind="find . -name "                  # qfind: Quickly search for file
 alias myip='curl ifconfig.co'                # myip: Public facing IP Address
-alias f='open -a Finder ./'                  # f: Opens current directory in Finder
+alias f='open -a Finder ./'                  # f: Opens current dir in Finder
 alias ~="cd ~"                               # ~: Go Home
+
+# nvim instead of vim
+if type nvim > /dev/null 2>&1; then
+  alias vim='nvim'
+fi
