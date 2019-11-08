@@ -23,7 +23,7 @@ setopt inc_append_history # save history entries as soon as they are entered
 setopt share_history # share history between different instances of the shell
 
 setopt auto_cd # cd by typing directory name if it's not a command
-setopt correct_all # autocorrect commands
+# setopt correct_all # autocorrect commands
 
 setopt auto_list # automatically list choices on ambiguous completion
 setopt auto_menu # automatically use menu completion
@@ -38,10 +38,12 @@ export SCRIPTS_DIR=$HOME/Code/scripts
 export DOTFILES_DIR=$HOME/Code/dotfiles
 export USER_EMAIL=repoles@gmail.com
 
-export PATH=/usr/local/opt/mysql@5.6/bin:/usr/local/opt/python/libexec/bin:$PATH:$SCRIPTS_DIR
+export PATH=/usr/local/opt/mysql@5.7/bin:/usr/local/opt/python/libexec/bin:$PATH:$SCRIPTS_DIR
 export LANG=en_US.UTF-8
 
-export WORDCHARS="*?_-.[]~=&;!#$%^(){}<>"
+# export WORDCHARS="*?_-.[]~=/&;!#$%^(){}<>" default
+export WORDCHARS=""
+
 export EDITOR="/usr/local/bin/code --new-window --wait"
 
 cdpath=($HOME/Code/Rails $HOME/Code/Java)
@@ -55,6 +57,11 @@ antigen bundle zsh-users/zsh-history-substring-search
 antigen bundle mafredri/zsh-async
 antigen theme denysdovhan/spaceship-prompt
 antigen apply
+
+ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern cursor)
+
+# To have commands starting with `rm -rf` in red:
+ZSH_HIGHLIGHT_PATTERNS+=('rm -rf *' 'fg=white,bold,bg=red')
 
 source $DOTFILES_DIR/rails.plugin.zsh
 source $DOTFILES_DIR/bundler.plugin.zsh
