@@ -14,7 +14,7 @@ zmodload -i zsh/complist
 
 # Commands history
 HISTFILE=$HOME/.zsh_history
-HISTSIZE=1000
+HISTSIZE=10000
 SAVEHIST=$HISTSIZE
 
 setopt hist_ignore_all_dups # remove older duplicate entries from history
@@ -38,7 +38,7 @@ export SCRIPTS_DIR=$HOME/Code/scripts
 export DOTFILES_DIR=$HOME/Code/dotfiles
 export USER_EMAIL=repoles@gmail.com
 
-export PATH=/usr/local/opt/mysql@5.7/bin:/usr/local/opt/python/libexec/bin:$PATH:$SCRIPTS_DIR
+export PATH=/usr/local/opt/mysql@5.7/bin:/usr/local/opt/python/libexec/bin:/usr/local/sbin:$SCRIPTS_DIR:$PATH
 export LANG=en_US.UTF-8
 
 # export WORDCHARS="*?_-.[]~=/&;!#$%^(){}<>" default
@@ -46,25 +46,25 @@ export WORDCHARS=""
 
 export EDITOR="/usr/local/bin/code --new-window --wait"
 
-cdpath=($HOME/Code/Rails $HOME/Code/Java)
+cdpath=($HOME/Code/Rails)
 
 # Plugins
 source /usr/local/share/antigen/antigen.zsh # brew install antigen
-antigen bundle zsh-users/zsh-completions
+# antigen bundle zsh-users/zsh-completions
 antigen bundle zsh-users/zsh-autosuggestions
 antigen bundle zsh-users/zsh-syntax-highlighting
 antigen bundle zsh-users/zsh-history-substring-search
-antigen bundle mafredri/zsh-async
 antigen theme denysdovhan/spaceship-prompt
+# antigen bundle mafredri/zsh-async
 antigen apply
 
-ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern cursor)
+ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern)
 
 # To have commands starting with `rm -rf` in red:
 ZSH_HIGHLIGHT_PATTERNS+=('rm -rf *' 'fg=white,bold,bg=red')
 
 source $DOTFILES_DIR/rails.plugin.zsh
-source $DOTFILES_DIR/bundler.plugin.zsh
+# source $DOTFILES_DIR/bundler.plugin.zsh
 source $DOTFILES_DIR/aliases.zsh
 
 bindkey '^[[A' history-substring-search-up
@@ -85,8 +85,9 @@ SPACESHIP_PROMPT_ORDER=(
 )
 
 SPACESHIP_TIME_SHOW="true"
-SPACESHIP_GIT_STATUS_COLOR="202"
-SPACESHIP_GIT_BRANCH_PREFIX=""
+# SPACESHIP_GIT_STATUS_COLOR="202"
+SPACESHIP_CHAR_SYMBOL="-> " # ou "❯ "
+# SPACESHIP_GIT_BRANCH_PREFIX=""
 SPACESHIP_RUBY_SYMBOL="ruby "
 # SPACESHIP_GIT_STATUS_BEHIND="↓"
 # SPACESHIP_GIT_STATUS_AHEAD="↑"
