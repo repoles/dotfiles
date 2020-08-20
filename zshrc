@@ -64,7 +64,7 @@ ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern)
 ZSH_HIGHLIGHT_PATTERNS+=('rm -rf *' 'fg=white,bold,bg=red')
 
 source $DOTFILES_DIR/rails.plugin.zsh
-# source $DOTFILES_DIR/bundler.plugin.zsh
+source $DOTFILES_DIR/bundler.plugin.zsh
 source $DOTFILES_DIR/aliases.zsh
 
 bindkey '^[[A' history-substring-search-up
