@@ -92,11 +92,13 @@ source $ZSH/oh-my-zsh.sh
 export LANG=en_US.UTF-8
 
 # Preferred editor for local and remote sessions
-if [[ -n $SSH_CONNECTION ]]; then
-  export EDITOR='vim'
-else
-  export EDITOR='code --wait'
-fi
+# if [[ -n $SSH_CONNECTION ]]; then
+#   export EDITOR='vim'
+# else
+#   export EDITOR='code --wait'
+# fi
+
+export EDITOR='vim'
 
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
@@ -125,17 +127,17 @@ alias dud='du -d 1 -h'
 alias duf='du -sh *'
 
 alias qfind="find . -name "   # qfind: Quickly search for file
-alias myip='curl ifconfig.co' # myip: Public facing IP Address
+# alias myip='curl ifconfig.co' # myip: Public facing IP Address
 
 alias path='echo -e ${PATH//:/\\n}'
 
-# nvim instead of vim
-if type nvim > /dev/null 2>&1; then
-  alias vim='nvim'
-fi
+# # nvim instead of vim
+# if type nvim > /dev/null 2>&1; then
+#   alias vim='nvim'
+# fi
 
 # Acesso direto aos subdiretórios de
-cdpath=($HOME/Code/Rails)
+cdpath=($HOME/Projects/Rails)
 
 # Corrige o título do terminal após fechar uma sessão ssh
 # https://superuser.com/a/339946/567904
@@ -144,9 +146,9 @@ function ssh() { command ssh "$@"; printf '\e]0;\a' }
 # rbenv https://github.com/rbenv/rbenv
 if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
 
-# To link Rubies to Homebrew's OpenSSL 1.1 (which is upgraded) 
-# add the following to your ~/.zshrc: (sugestão do brew info ruby-build)
-# export RUBY_CONFIGURE_OPTS="--with-openssl-dir=$(brew --prefix openssl@1.1)"
+# Usa openssl 1.1 para compilar o Ruby
+# https://github.com/rbenv/ruby-build/wiki#suggested-build-environment
+export RUBY_CONFIGURE_OPTS="--with-openssl-dir=$(brew --prefix openssl@1.1)"
 
 # Configurações do spaceship-prompt
 
@@ -188,10 +190,14 @@ ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
 ZSH_AUTOSUGGEST_USE_ASYNC=true
 
 export TMP_DIR=$HOME/Temp
-export SCRIPTS=$HOME/Code/scripts
+export SCRIPTS=$HOME/Projects/Scripts
 
-export PATH=bin:$PATH:$SCRIPTS:/usr/local/opt/mysql@5.7/bin
+export PATH=$PATH:$SCRIPTS:/usr/local/opt/mysql@5.7/bin
 
 # Para que ao excluir usando OPTION + DELETE a 
 # exclusão pare em caracteres como -, _, ., etc.
 export WORDCHARS=""
+
+# Temporariamente desliga o spring do RoR por causa do alto consumo de CPU no Big Sur.
+# Resolvido: https://github.com/rails/spring/issues/636#issuecomment-755404716
+# export DISABLE_SPRING=1
