@@ -12,9 +12,13 @@ set incsearch           " do incremental searching
 set hlsearch            " highlight search matches
 "set laststatus=2       " always display the status line
 set clipboard=unnamed   " yank to osx clipboard
-set mouse=a             " mouse enabled in vim
+"set mouse=a             " mouse enabled in vim
 set wildmenu            " enhanced command-line completion
 set wildmode=full
+
+" Somente mudando mouse=r foi que eu consegui 
+" utilizar o CMD + C para copiar textos no vim
+set mouse=r
 
 autocmd FileType text setlocal textwidth=78
 
