@@ -136,20 +136,6 @@ alias path='echo -e ${PATH//:/\\n}'
 #   alias vim='nvim'
 # fi
 
-# Acesso direto aos subdiretórios de
-cdpath=($HOME/Projects/Rails)
-
-# Corrige o título do terminal após fechar uma sessão ssh
-# https://superuser.com/a/339946/567904
-function ssh() { command ssh "$@"; printf '\e]0;\a' }
-
-# rbenv https://github.com/rbenv/rbenv
-if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
-
-# Usa openssl 1.1 para compilar o Ruby
-# https://github.com/rbenv/ruby-build/wiki#suggested-build-environment
-export RUBY_CONFIGURE_OPTS="--with-openssl-dir=$(brew --prefix openssl@1.1)"
-
 # Configurações do spaceship-prompt
 
 SPACESHIP_PROMPT_ORDER=(
@@ -189,6 +175,26 @@ ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
 # https://github.com/zsh-users/zsh-autosuggestions#enable-asynchronous-mode
 ZSH_AUTOSUGGEST_USE_ASYNC=true
 
+# Acesso direto aos subdiretórios de
+# cdpath=($HOME/Projects/Rails)
+
+# Corrige o título do terminal após fechar uma sessão ssh
+# https://superuser.com/a/339946/567904
+function ssh() { command ssh "$@"; printf '\e]0;\a' }
+
+# O Homebrew é instalado em um diretório 
+# diferente em Macs com chips ARM
+if [ $(uname -m) = "arm64" ]; then
+	export PATH=/opt/homebrew/bin:$PATH
+fi
+
+# Usa openssl 1.1 para compilar o Ruby instalado pelo rbenv
+# https://github.com/rbenv/ruby-build/wiki#suggested-build-environment
+export RUBY_CONFIGURE_OPTS="--with-openssl-dir=$(brew --prefix openssl@1.1)"
+
+# Inicia o rbenv (https://github.com/rbenv/rbenv)
+if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
+
 export TMP_DIR=$HOME/Temp
 export SCRIPTS=$HOME/Projects/Scripts
 
@@ -201,3 +207,6 @@ export WORDCHARS=""
 # Temporariamente desliga o spring do RoR por causa do alto consumo de CPU no Big Sur.
 # Resolvido: https://github.com/rails/spring/issues/636#issuecomment-755404716
 # export DISABLE_SPRING=1
+
+# Inicia o autojump (https://github.com/wting/autojump)
+[ -f /usr/local/etc/profile.d/autojump.sh ] && . /usr/local/etc/profile.d/autojump.sh
