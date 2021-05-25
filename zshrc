@@ -188,17 +188,15 @@ if [ $(uname -m) = "arm64" ]; then
 	export PATH=/opt/homebrew/bin:$PATH
 fi
 
-# Usa openssl 1.1 para compilar o Ruby instalado pelo rbenv
-# https://github.com/rbenv/ruby-build/wiki#suggested-build-environment
-export RUBY_CONFIGURE_OPTS="--with-openssl-dir=$(brew --prefix openssl@1.1)"
-
-# Inicia o rbenv (https://github.com/rbenv/rbenv)
-if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
-
 export TMP_DIR=$HOME/Temp
 export SCRIPTS=$HOME/Projects/Scripts
 
-export PATH=$PATH:$SCRIPTS:/usr/local/opt/mysql@5.7/bin
+MYSQL_PATH="$(brew --prefix mysql@5.7)/bin"
+export PATH=$PATH:$SCRIPTS:$MYSQL_PATH
+
+# Usa openssl 1.1 para compilar o Ruby instalado pelo rbenv
+# https://github.com/rbenv/ruby-build/wiki#suggested-build-environment
+export RUBY_CONFIGURE_OPTS="--with-openssl-dir=$(brew --prefix openssl@1.1)"
 
 # Para que ao excluir usando OPTION + DELETE a 
 # exclusão pare em caracteres como -, _, ., etc.
@@ -207,6 +205,9 @@ export WORDCHARS=""
 # Temporariamente desliga o spring do RoR por causa do alto consumo de CPU no Big Sur.
 # Resolvido: https://github.com/rails/spring/issues/636#issuecomment-755404716
 # export DISABLE_SPRING=1
+
+# Inicia o rbenv (https://github.com/rbenv/rbenv)
+if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
 
 # Inicia o autojump (https://github.com/wting/autojump)
 [ -f /usr/local/etc/profile.d/autojump.sh ] && . /usr/local/etc/profile.d/autojump.sh
