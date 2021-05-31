@@ -185,14 +185,17 @@ function ssh() { command ssh "$@"; printf '\e]0;\a' }
 # O Homebrew é instalado em um diretório 
 # diferente em Macs com chips ARM
 if [ $(uname -m) = "arm64" ]; then
-	export PATH=/opt/homebrew/bin:$PATH
+  HOMEBREW_PATH=/opt/homebrew
+	export PATH=$HOMEBREW_PATH/bin:$PATH
+else
+  HOMEBREW_PATH=/usr/local
 fi
 
-export TMP_DIR=$HOME/Temp
-export SCRIPTS=$HOME/Projects/Scripts
-
+SCRIPTS_PATH=$HOME/Projects/Scripts
 MYSQL_PATH="$(brew --prefix mysql@5.7)/bin"
-export PATH=$PATH:$SCRIPTS:$MYSQL_PATH
+
+export PATH=$PATH:$SCRIPTS_PATH:$MYSQL_PATH
+export TEMP_PATH=$HOME/Temp
 
 # Usa openssl 1.1 para compilar o Ruby instalado pelo rbenv
 # https://github.com/rbenv/ruby-build/wiki#suggested-build-environment
@@ -210,4 +213,4 @@ export WORDCHARS=""
 if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
 
 # Inicia o autojump (https://github.com/wting/autojump)
-[ -f /usr/local/etc/profile.d/autojump.sh ] && . /usr/local/etc/profile.d/autojump.sh
+[ -f $HOMEBREW_PATH/etc/profile.d/autojump.sh ] && . $HOMEBREW_PATH/etc/profile.d/autojump.sh
