@@ -1,0 +1,30 @@
+[user]
+	name = Lucas Repolês
+	email = lucas@avantsistemas.com
+[color]
+	ui = true
+[push]
+  default = simple
+[pull]
+  rebase = true
+[fetch]
+	prune = true
+[diff]
+	colorMoved = zebra
+[log]
+	mailmap = true
+[init]
+	defaultBranch = main
+[core]
+	autocrlf = input
+	abbrev = 7
+[alias]
+	st = status
+	ci = commit
+	br = branch
+	co = checkout
+	lg = log --oneline --decorate
+[filter "lfs"]
+	required = true
+	clean = git-lfs clean %f
+	smudge = git-lfs smudge %f
