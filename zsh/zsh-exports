@@ -7,13 +7,11 @@ export VISUAL="vim"
 
 export LANG=en_US.UTF-8
 
-SCRIPTS_DIR="$HOME/Scripts"
 MYSQL_DIR="$HOMEBREW_PREFIX/opt/mysql@5.7/bin"
 PYTHON_DIR="$HOMEBREW_PREFIX/opt/python/libexec/bin"
 
-export PATH="$PATH:$SCRIPTS_DIR:$MYSQL_DIR:$PYTHON_DIR"
-
-unset SCRIPTS_DIR MYSQL_DIR PYTHON_DIR
+export path=($path $HOME/Scripts $MYSQL_DIR $PYTHON_DIR)
+unset MYSQL_DIR PYTHON_DIR
 
 # Usa openssl 1.1 para compilar o Ruby instalado pelo rbenv
 # https://github.com/rbenv/ruby-build/wiki#suggested-build-environment
