@@ -5,7 +5,7 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-# man zshoptions
+# (man zshoptions)
 setopt auto_cd menu_complete
 
 # History command configuration
@@ -15,11 +15,15 @@ setopt hist_ignore_dups       # ignore duplicated commands history list
 setopt hist_ignore_space      # ignore commands that start with space
 setopt hist_verify            # show command with history expansion to user before running it
 setopt share_history          # share command history data
+setopt auto_pushd             # push the current directory visited on the stack.
+setopt pushd_ignore_dups      # do not store duplicates in the stack.
+setopt pushd_silent           # do not print the directory stack after pushd or popd.
 
 source "$ZDOTDIR/zsh-functions"
 source "$ZDOTDIR/zsh-exports"
 source "$ZDOTDIR/zsh-aliases"
 
+# Plugins
 zsh_add_plugin "zsh-users/zsh-autosuggestions"
 zsh_add_plugin "zsh-users/zsh-syntax-highlighting"
 zsh_add_plugin "zsh-users/zsh-history-substring-search"
