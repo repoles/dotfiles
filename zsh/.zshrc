@@ -6,7 +6,7 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
 fi
 
 # (man zshoptions)
-setopt auto_cd menu_complete
+setopt auto_cd menu_complete glob_complete
 
 # History command configuration
 setopt extended_history       # record timestamp of command in HISTFILE
@@ -22,6 +22,7 @@ setopt pushd_silent           # do not print the directory stack after pushd or 
 source "$ZDOTDIR/zsh-functions"
 source "$ZDOTDIR/zsh-exports"
 source "$ZDOTDIR/zsh-aliases"
+source "$ZDOTDIR/zsh-completions"
 
 # Plugins
 zsh_add_plugin "zsh-users/zsh-autosuggestions"

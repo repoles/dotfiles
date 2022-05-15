@@ -5,7 +5,7 @@ function zsh_stats() {
     | grep -v "./" | sort -nr | head -n 20 | column -c3 -s " " -t | nl
 }
 
-## https://github.com/Mach-OS/Machfiles
+# https://github.com/Mach-OS/Machfiles
 
 # Function to source files if they exist
 function zsh_add_file() {

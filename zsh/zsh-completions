@@ -1,0 +1,54 @@
+# https://thevaluable.dev/zsh-completion-guide-examples/
+
+autoload -U compinit; compinit
+
+# _complete - This is the main completer we need to use for our completion.
+# _approximate - This one is similar to _complete, except that it will try to correct
+#                what you've typed already (the context) if no match is found.
+# _expand_alias - Expand an alias you've typed. It needs to be declared before _complete.
+# _extensions - Complete the glob *. with the possible file extensions.
+zstyle ':completion:*' completer _extensions _complete _approximate
+
+# Using a cache for the completion can speed up some commands, like apt for example.
+zstyle ':completion:*' use-cache on
+zstyle ':completion:*' cache-path "$XDG_CACHE_HOME/zsh/.zcompcache"
+
+# Instead of going through each match blindly to add what you
+# want to your command, you can use a completion menu.
+zstyle ':completion:*' menu select
+
+# It generates descriptions depending on the type of match.
+# For example, if you have files displayed in the completion menu,
+# the description for the tag "files" will be displayed too.
+zstyle ':completion:*:*:*:*:descriptions' format '%F{green}-- %d --%f'
+
+# If you're using the completer _approximate, you can set
+# the format of the possible corrections too.
+zstyle ':completion:*:*:*:*:corrections' format '%F{yellow}!- %d (errors: %e) -!%f'
+
+zstyle ':completion:*:messages' format '%F{purple} -- %d --%f'
+
+# To format messages or warnings (for example when no match is found).
+zstyle ':completion:*:warnings' format '%F{red}-- no matches found --%f'
+
+# To group the different type of matches under their descriptions.
+zstyle ':completion:*' group-name ''
+
+# If you're not satisfied by the order these descriptions are displayed, you can modify it too.
+# zstyle ':completion:*:*:-command-:*:*' group-order alias builtins functions commands
+
+# You can set this style for the completion to first try the usual completion and,
+# if nothing matches, to try a case-insensitive completion.
+zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}'
+
+# The completion can also try to complete partial words you've typed with the following style.
+# This style would allow you, for example, to complete the file _DSC1704.JPG if you only try
+# to complete its substring 1704.
+zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
+
+# You can bind any completion style to a keystroke instead of using it with the general completion.
+# For that, you need to use the completer _generic. For example, if you want to expand aliases each
+# time you hit CTRL+a, you can add the following lines.
+zle -C alias-expension complete-word _generic
+bindkey '^a' alias-expension
+zstyle ':completion:alias-expension:*' completer _expand_alias
