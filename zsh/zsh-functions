@@ -1,10 +1,3 @@
-# https://github.com/ohmyzsh/ohmyzsh/blob/master/lib/functions.zsh
-function zsh_stats() {
-  fc -l 1 \
-    | awk '{ CMD[$2]++; count++; } END { for (a in CMD) print CMD[a] " " CMD[a]*100/count "% " a }' \
-    | grep -v "./" | sort -nr | head -n 20 | column -c3 -s " " -t | nl
-}
-
 # https://github.com/Mach-OS/Machfiles
 
 # Function to source files if they exist
@@ -21,7 +14,7 @@ function zsh_add_plugin() {
         zsh_add_file "plugins/$PLUGIN_NAME/$2"
     else
         git clone --depth=1 "https://github.com/$1.git" "$ZDOTDIR/plugins/$PLUGIN_NAME" && \
-        zsh_add_plugin $1 $2
+        zsh_add_plugin "$@"
     fi
 }
 
@@ -43,6 +36,13 @@ ex() {
         *.Z)        uncompress $1   ;;
         *)          echo "'$1' cannot be extracted" ;;
     esac
+}
+
+# https://github.com/ohmyzsh/ohmyzsh/blob/master/lib/functions.zsh
+function zsh_stats() {
+  fc -l 1 \
+    | awk '{ CMD[$2]++; count++; } END { for (a in CMD) print CMD[a] " " CMD[a]*100/count "% " a }' \
+    | grep -v "./" | sort -nr | head -n 20 | column -c3 -s " " -t | nl
 }
 
 # Corrige o título do terminal após fechar uma sessão ssh

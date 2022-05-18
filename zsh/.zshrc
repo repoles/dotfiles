@@ -44,3 +44,6 @@ eval "$(rbenv init - zsh)"
 
 # To customize prompt, run `p10k configure` or edit $ZDOTDIR/.p10k.zsh.
 [[ ! -f $ZDOTDIR/.p10k.zsh ]] || source $ZDOTDIR/.p10k.zsh
+
+# Funções necessárias somente na inicialização do ZSH
+unset -f zsh_add_file zsh_add_plugin
