@@ -14,6 +14,9 @@ export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
 # rbenv
 export RBENV_ROOT="$XDG_DATA_HOME/rbenv"
 
+# ripgrep
+export RIPGREP_CONFIG_PATH=$XDG_CONFIG_HOME/ripgrep/config
+
 # Ainda não consegui fazer o RubyGems
 # carregar .gemrc de XDG_CONFIG_HOME
 
