@@ -18,6 +18,7 @@
 [core]
 	autocrlf = input
 	abbrev = 7
+	pager = diff-so-fancy | less --tabs=4 -RFX
 [alias]
 	st = status
 	ci = commit
@@ -28,3 +29,18 @@
 	required = true
 	clean = git-lfs clean %f
 	smudge = git-lfs smudge %f
+[interactive]
+	diffFilter = diff-so-fancy --patch
+[color "diff-highlight"]
+	oldNormal = red bold
+	oldHighlight = red bold 52
+	newNormal = green bold
+	newHighlight = green bold 22
+[color "diff"]
+	meta = 11
+	frag = magenta bold
+	func = 146 bold
+	commit = yellow bold
+	old = red bold
+	new = green bold
+	whitespace = red reverse
