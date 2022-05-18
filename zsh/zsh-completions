@@ -49,6 +49,18 @@ zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 
 # You can bind any completion style to a keystroke instead of using it with the general completion.
 # For that, you need to use the completer _generic. For example, if you want to expand aliases each
 # time you hit CTRL+a, you can add the following lines.
-zle -C alias-expension complete-word _generic
-bindkey '^a' alias-expension
-zstyle ':completion:alias-expension:*' completer _expand_alias
+# zle -C alias-expension complete-word _generic
+# bindkey '^e' alias-expension
+# zstyle ':completion:alias-expension:*' completer _expand_alias
+
+# https://github.com/ohmyzsh/ohmyzsh/blob/master/lib/completion.zsh
+
+# Complete . and .. special directories
+zstyle ':completion:*' special-dirs true
+
+zstyle ':completion:*' list-colors ''
+zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-]#)*=01;34=0=01'
+zstyle ':completion:*:*:*:*:processes' command "ps -u $USERNAME -o pid,user,comm -w -w"
+
+# disable named-directories autocompletion
+# zstyle ':completion:*:cd:*' tag-order local-directories directory-stack path-directories
