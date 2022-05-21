@@ -39,6 +39,12 @@ ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern)
 bindkey '^[[A' history-substring-search-up
 bindkey '^[[B' history-substring-search-down
 
+# Source all files in $ZDOTDIR/custom that end in .zsh
+for zsh_file in "$ZDOTDIR"/custom/*.zsh; do
+  source "$zsh_file"
+done
+unset zsh_file
+
 # https://github.com/rbenv/rbenv
 eval "$(rbenv init - zsh)"
 
