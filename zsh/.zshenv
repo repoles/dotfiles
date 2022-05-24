@@ -27,7 +27,7 @@ export RIPGREP_CONFIG_PATH=$XDG_CONFIG_HOME/ripgrep/config
 # do SO para evitar a instalação de gems no contexto do Ruby padrão
 
 # bundle
-export BUNDLE_USER_CONFIG="$XDG_CONFIG_HOME/bundle"
+export BUNDLE_USER_CONFIG="$XDG_CONFIG_HOME/bundle/config"
 export BUNDLE_USER_CACHE="$XDG_CACHE_HOME/bundle"
 export BUNDLE_USER_PLUGIN="$XDG_DATA_HOME/bundle"
 
