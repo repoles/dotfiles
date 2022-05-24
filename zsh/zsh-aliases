@@ -54,3 +54,6 @@ alias tree="exa -T --level=2"
 
 # bat instead of cat
 alias cat="bat -pp"
+
+# todo-txt
+alias t="todo.sh"
