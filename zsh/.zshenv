@@ -8,32 +8,27 @@ export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_CACHE_HOME="$HOME/.cache"
 
-# zsh
 export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
 
-# rbenv
 export RBENV_ROOT="$XDG_DATA_HOME/rbenv"
+export TODOTXT_CFG_FILE="$XDG_CONFIG_HOME/todotxt"
+export RIPGREP_CONFIG_PATH="$XDG_CONFIG_HOME/ripgrep"
 
-# ripgrep
-export RIPGREP_CONFIG_PATH=$XDG_CONFIG_HOME/ripgrep/config
+export BUNDLE_USER_CONFIG="$XDG_CONFIG_HOME/bundle"
+export BUNDLE_USER_CACHE="$XDG_CACHE_HOME/bundle"
+export BUNDLE_USER_PLUGIN="$XDG_DATA_HOME/bundle"
+
+export _Z_DATA="$XDG_DATA_HOME/z"
+export _Z_CMD=j
 
 # Ainda não consegui fazer o RubyGems
 # carregar .gemrc de XDG_CONFIG_HOME
 
-# export GEM_HOME="$XDG_DATA_HOME/gem"
-# export GEM_SPEC_CACHE="$XDG_CACHE_HOME/gem"
-
 # Comentado, pois optei por deixar o RubyGems usar os locais padrão
 # do SO para evitar a instalação de gems no contexto do Ruby padrão
 
-# bundle
-export BUNDLE_USER_CONFIG="$XDG_CONFIG_HOME/bundle/config"
-export BUNDLE_USER_CACHE="$XDG_CACHE_HOME/bundle"
-export BUNDLE_USER_PLUGIN="$XDG_DATA_HOME/bundle"
-
-# z
-export _Z_DATA="$XDG_DATA_HOME/z"
-export _Z_CMD=j
+# export GEM_HOME="$XDG_DATA_HOME/gem"
+# export GEM_SPEC_CACHE="$XDG_CACHE_HOME/gem"
 
 # Desliga gerenciamento do histórico implementado
 # pelo macOS em /etc/zshrc_Apple_Terminal

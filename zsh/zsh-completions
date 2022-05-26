@@ -1,6 +1,8 @@
 # https://thevaluable.dev/zsh-completion-guide-examples/
 
-autoload -U compinit; compinit
+ZSH_COMPDUMP="${XDG_CACHE_HOME}/zcompdump-${HOST/.*/}-${ZSH_VERSION}"
+autoload -U compinit; compinit -d $ZSH_COMPDUMP
+unset ZSH_COMPDUMP
 
 # _complete - This is the main completer we need to use for our completion.
 # _approximate - This one is similar to _complete, except that it will try to correct
@@ -11,7 +13,7 @@ zstyle ':completion:*' completer _extensions _complete _approximate
 
 # Using a cache for the completion can speed up some commands, like apt for example.
 zstyle ':completion:*' use-cache on
-zstyle ':completion:*' cache-path "$XDG_CACHE_HOME/zsh/.zcompcache"
+zstyle ':completion:*' cache-path "$XDG_CACHE_HOME/zcompcache"
 
 # Instead of going through each match blindly to add what you
 # want to your command, you can use a completion menu.

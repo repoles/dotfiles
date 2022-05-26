@@ -2,18 +2,18 @@
 
 # Function to source files if they exist
 function zsh_add_file() {
-    [ -f "$ZDOTDIR/$1" ] && source "$ZDOTDIR/$1"
+    [ -f "$1" ] && source "$1"
 }
 
 function zsh_add_plugin() {
+    PLUGIN_DIR="$XDG_DATA_HOME/zsh_plugins"
     PLUGIN_NAME=$(echo $1 | cut -d "/" -f 2)
-    if [ -d "$ZDOTDIR/plugins/$PLUGIN_NAME" ]; then
-        # For plugins
-        zsh_add_file "plugins/$PLUGIN_NAME/$PLUGIN_NAME.plugin.zsh" || \
-        zsh_add_file "plugins/$PLUGIN_NAME/$PLUGIN_NAME.zsh" || \
-        zsh_add_file "plugins/$PLUGIN_NAME/$2"
+    if [ -d "$PLUGIN_DIR/$PLUGIN_NAME" ]; then
+        zsh_add_file "$PLUGIN_DIR/$PLUGIN_NAME/$PLUGIN_NAME.plugin.zsh" || \
+        zsh_add_file "$PLUGIN_DIR/$PLUGIN_NAME/$PLUGIN_NAME.zsh" || \
+        zsh_add_file "$PLUGIN_DIR/$PLUGIN_NAME/$2"
     else
-        git clone --depth=1 "https://github.com/$1.git" "$ZDOTDIR/plugins/$PLUGIN_NAME" && \
+        git clone --depth=1 "https://github.com/$1.git" "$PLUGIN_DIR/$PLUGIN_NAME" && \
         zsh_add_plugin "$@"
     fi
 }
