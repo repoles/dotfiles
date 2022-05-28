@@ -7,6 +7,10 @@ export VISUAL="vim"
 
 export LANG=en_US.UTF-8
 
+# Elimina espaço extra colocado pelo ZSH no fim da seção da direita do prompt
+# https://github.com/romkatv/powerlevel10k/issues/68#issuecomment-492010264
+export ZLE_RPROMPT_INDENT=0
+
 MYSQL_DIR="$HOMEBREW_PREFIX/opt/mysql@5.7/bin"
 PYTHON_DIR="$HOMEBREW_PREFIX/opt/python/libexec/bin"
 
