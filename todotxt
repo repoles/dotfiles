@@ -65,7 +65,7 @@ export COLOR_DONE=$LIGHT_GREY
 #
 export COLOR_PROJECT=$RED
 export COLOR_CONTEXT=$RED
-export COLOR_DATE=$YELLOW
+export COLOR_DATE=$DARK_GREY
 export COLOR_NUMBER=$BLUE
 
 # There is highlighting for metadata key:value pairs e.g.
