@@ -1,4 +1,5 @@
 # https://github.com/Mach-OS/Machfiles
+# https://www.youtube.com/watch?v=bTLYiNvRIVI
 
 # Function to source files if they exist
 function zsh_add_file() {
