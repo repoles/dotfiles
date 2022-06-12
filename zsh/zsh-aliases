@@ -17,10 +17,10 @@ alias df='df -h'
 alias du='du -h'
 
 # Some shortcuts for different directory listings
-# alias ls='ls -h -G'                          # classify files in colour
-# alias ll='ls -l'                             # long list
-# alias la='ls -A'                             # all but . and ..
-# alias ldot='ls -ld .*'                       # list only dotfiles
+alias ls='ls -h -G'                          # classify files in colour
+alias ll='ls -l'                             # long list
+alias la='ls -A'                             # all but . and ..
+alias ldot='ls -d .*'                        # list only dotfiles
 
 # alias cd..='cd ../'                          # Go back 1 directory level
 # alias ..='cd ../'                            # Go back 1 directory level
@@ -48,7 +48,6 @@ alias duf='du -sh * | sort -h'
 alias ls="exa"
 alias ll="exa -l"
 alias la="exa -a"
-alias lla="exa -la"
 alias ldot="exa -d .*"
 alias tree="exa -T --level=2"
 
@@ -56,4 +55,4 @@ alias tree="exa -T --level=2"
 alias cat="bat -pp"
 
 # todo-txt
-alias t="todo.sh"
+alias t="todo.sh -a"

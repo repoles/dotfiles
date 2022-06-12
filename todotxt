@@ -30,7 +30,7 @@ export REPORT_FILE="$TODO_DIR/report.txt"
 # export BLUE='\\033[0;34m'
 # export PURPLE='\\033[0;35m'
 # export CYAN='\\033[0;36m'
-# export LIGHT_GREY='\\033[0;37m'
+export LIGHT_GREY='\\033[1;38m'
 # export DARK_GREY='\\033[1;30m'
 # export LIGHT_RED='\\033[1;31m'
 # export LIGHT_GREEN='\\033[1;32m'
@@ -50,9 +50,9 @@ export REPORT_FILE="$TODO_DIR/report.txt"
 # Priorities can be any upper-case letter.
 # A,B,C are highlighted; you can add coloring for more.
 #
-# export PRI_A=$YELLOW        # color for A priority
-# export PRI_B=$GREEN         # color for B priority
-# export PRI_C=$LIGHT_BLUE    # color for C priority
+export PRI_A=$YELLOW          # color for A priority
+export PRI_B=$GREEN     # color for B priority
+export PRI_C=$BLUE      # color for C priority
 # export PRI_D=...            # define your own
 # export PRI_X=$WHITE         # color unless explicitly defined
 
@@ -63,10 +63,10 @@ export COLOR_DONE=$LIGHT_GREY
 
 # There is highlighting for projects, contexts, dates, and item numbers.
 #
-export COLOR_PROJECT=$RED
-export COLOR_CONTEXT=$RED
-export COLOR_DATE=$DARK_GREY
-export COLOR_NUMBER=$BLUE
+# export COLOR_PROJECT=$RED
+# export COLOR_CONTEXT=$RED
+export COLOR_DATE=$LIGHT_GREY
+export COLOR_NUMBER=$LIGHT_PURPLE
 
 # There is highlighting for metadata key:value pairs e.g.
 # DUE:2006-08-01 or note:MYNOTE
