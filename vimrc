@@ -1,0 +1,193 @@
+set nocompatible
+
+set backspace=2         " backspace in insert mode works like normal editor
+"filetype indent on     " activates indenting for files
+set autoindent          " auto indenting
+set nobackup            " get rid of anoying ~file
+"set nowritebackup
+"set noswapfile
+set ruler               " show the cursor position all the time
+set showcmd             " display incomplete commands
+set incsearch           " do incremental searching
+set hlsearch            " highlight search matches
+"set laststatus=2       " always display the status line
+set clipboard=unnamed   " yank to osx clipboard
+"set mouse=a             " mouse enabled in vim
+set wildmenu            " enhanced command-line completion
+set wildmode=full
+
+" Somente mudando mouse=r foi que eu consegui 
+" utilizar o CMD + C para copiar textos no vim
+set mouse=r
+
+autocmd FileType text setlocal textwidth=78
+
+" Switch syntax highlighting on, when the terminal has colors
+" Also switch on highlighting the last used search pattern.
+if (&t_Co > 2 || has("gui_running")) && !exists("syntax_on")
+  syntax on
+endif
+
+if filereadable(expand("~/.vimrc.bundles"))
+  source ~/.vimrc.bundles
+endif
+
+filetype plugin indent on
+
+augroup vimrcEx
+  autocmd!
+
+  " When editing a file, always jump to the last known cursor position.
+  " Don't do it for commit messages, when the position is invalid, or when
+  " inside an event handler (happens when dropping a file on gvim).
+  autocmd BufReadPost *
+    \ if &ft != 'gitcommit' && line("'\"") > 0 && line("'\"") <= line("$") |
+    \   exe "normal g`\"" |
+    \ endif
+
+  " Set syntax highlighting for specific file types
+  "autocmd BufRead,BufNewFile Appraisals set filetype=ruby
+  "autocmd BufRead,BufNewFile *.md set filetype=markdown
+  "autocmd BufRead,BufNewFile .{jscs,jshint,eslint}rc set filetype=json
+  autocmd FileType gitcommit setlocal nolist
+  autocmd FileType ruby,eruby setlocal nowrap
+augroup END
+
+" When the type of shell script is /bin/sh, assume a POSIX-compatible
+" shell for syntax highlighting purposes.
+let g:is_posix = 1
+
+" Softtabs, 2 spaces
+set tabstop=2
+set shiftwidth=2
+set shiftround
+set expandtab
+
+" Display extra whitespace
+"set list listchars=tab:»·,trail:·,nbsp:·
+
+" Use one space, not two, after punctuation.
+set nojoinspaces
+
+" Use The Silver Searcher https://github.com/ggreer/the_silver_searcher
+"if executable('ag')
+"  " Use Ag over Grep
+"  set grepprg=ag\ --nogroup\ --nocolor
+"
+"  " Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
+"  let g:ctrlp_user_command = 'ag -Q -l --nocolor --hidden -g "" %s'
+"
+"  " ag is fast enough that CtrlP doesn't need to cache
+"  let g:ctrlp_use_caching = 0
+"endif
+
+" Make it obvious where 80 characters is
+"set textwidth=80
+"set colorcolumn=+1
+
+" Numbers
+"set number
+"set numberwidth=5
+"set relativenumber
+
+" Tab completion
+" will insert tab at beginning of line,
+" will use completion if not at beginning
+set wildmode=list:longest,list:full
+function! InsertTabWrapper()
+  let col = col('.') - 1
+  if !col || getline('.')[col - 1] !~ '\k'
+    return "\<tab>"
+  else
+    return "\<c-p>"
+  endif
+endfunction
+inoremap <Tab> <c-r>=InsertTabWrapper()<cr>
+inoremap <S-Tab> <c-n>
+
+" Switch between the last two files
+nnoremap <leader><leader> <c-^>
+
+" Get off my lawn
+"nnoremap <Left> :echoe "Use h"<cr>
+"nnoremap <Right> :echoe "Use l"<cr>
+"nnoremap <Up> :echoe "Use k"<cr>
+"nnoremap <Down> :echoe "Use j"<cr>
+
+" Treat <li> and <p> tags like the block tags they are
+let g:html_indent_tags = 'li\|p'
+
+" Open new split panes to right and bottom, which feels more natural
+set splitbelow
+set splitright
+
+" Quicker window movement
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-h> <C-w>h
+nnoremap <C-l> <C-w>l
+
+nmap <leader>vr :tabe $MYVIMRC<cr>
+nmap <leader>so :so $MYVIMRC<cr>:echo "~/.vimrc reloaded"<cr>
+
+" Local config
+if filereadable($HOME . "/.vimrc.local")
+  source ~/.vimrc.local
+endif
+
+" Uncomment the following to have Vim jump to the last position when
+" reopening a file
+if has("autocmd")
+  au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+endif
+
+" Plugins (https://github.com/junegunn/vim-plug)
+"call plug#begin('~/.vim/plugged')
+
+"Plug 'ctrlpvim/ctrlp.vim'
+"Plug 'kchmck/vim-coffee-script'
+
+"Plug 'tpope/vim-fugitive'
+"Plug 'tpope/vim-surround'
+"Plug 'tpope/vim-bundler'
+"Plug 'tpope/vim-rails'
+"Plug 'thoughtbot/vim-rspec'
+"Plug 'scrooloose/nerdtree'
+
+"Plug 'nanotech/jellybeans.vim'
+"Plug 'morhetz/gruvbox'
+"Plug 'altercation/vim-colors-solarized'
+
+" Add plugins to &runtimepath
+"call plug#end()
+
+" vim-plug
+"let g:plug_window = 'new'
+
+" ctrlp
+"set wildignore+=*/tmp/*,*.so,*.swp,*.zip " MacOSX/Linux
+"let g:ctrlp_custom_ignore = '\v[\/]\.(git|hg|svn)$'
+
+" vim-rspec
+"let g:rspec_runner = "os_x_iterm2"
+"map <Leader>t :w <cr> :call RunCurrentSpecFile()<cr>
+"map <Leader>s :w <cr> :call RunNearestSpec()<cr>
+"map <Leader>l :w <cr> :call RunLastSpec()<cr>
+"map <Leader>a :w <cr> :call RunAllSpecs()<cr>
+
+" theme
+"let g:gruvbox_contrast_dark='hard'
+"set background=dark
+"colorscheme gruvbox
+"set cursorline
+"set cursorcolumn
+
+" trailing whitespace
+"fun! TrimWhiteSpace()
+"  let l:save_cursor = getpos('.')
+"  %s/\s\+$//e
+"  call setpos('.', l:save_cursor)
+"endfun
+
+"command! TrimWhiteSpace call TrimWhiteSpace()<cr>
+"noremap <Leader>w :call TrimWhiteSpace()<cr>

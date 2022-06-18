@@ -27,3 +27,7 @@ export RUBY_CONFIGURE_OPTS="--with-openssl-dir=$HOMEBREW_PREFIX/opt/openssl@1.1"
 # Para que ao excluir usando OPTION + DELETE a
 # exclusão pare em caracteres como -, _, ., etc.
 export WORDCHARS=""
+
+# https://developer.1password.com/docs/ssh/agent/compatibility
+# (ainda não funciona no DataGrip, Capistrano)
+# export SSH_AUTH_SOCK=~/.1password/agent.sock
