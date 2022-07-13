@@ -63,8 +63,8 @@ export COLOR_DONE=$LIGHT_GREY
 
 # There is highlighting for projects, contexts, dates, and item numbers.
 #
-# export COLOR_PROJECT=$RED
-# export COLOR_CONTEXT=$RED
+export COLOR_PROJECT=$RED
+export COLOR_CONTEXT=$RED
 export COLOR_DATE=$LIGHT_GREY
 export COLOR_NUMBER=$LIGHT_PURPLE
 
