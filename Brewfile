@@ -20,7 +20,6 @@ brew "fd"
 brew "ripgrep"
 brew "htop"
 brew "jq"
-brew "todo-txt"
 brew "diff-so-fancy"
 
 cask "ngrok"
