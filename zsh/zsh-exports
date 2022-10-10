@@ -12,10 +12,10 @@ export LANG=en_US.UTF-8
 # export ZLE_RPROMPT_INDENT=0
 
 MYSQL_DIR="$HOMEBREW_PREFIX/opt/mysql@5.7/bin"
-PYTHON_DIR="$HOMEBREW_PREFIX/opt/python/libexec/bin"
+# PYTHON_DIR="$HOMEBREW_PREFIX/opt/python/libexec/bin"
 
-path=($path $HOME/Code/Scripts $MYSQL_DIR $PYTHON_DIR)
-unset MYSQL_DIR PYTHON_DIR
+path=($path $HOME/Code/Scripts $MYSQL_DIR)
+unset MYSQL_DIR
 
 fpath=($ZDOTDIR/completions $HOMEBREW_PREFIX/share/zsh/site-functions $fpath)
 
