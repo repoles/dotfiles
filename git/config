@@ -1,6 +1,6 @@
 [user]
 	name = Lucas Repolês
-	email = lucas@avantsistemas.com
+	email = lucas@repoles.com
 [color]
 	ui = true
 [push]
@@ -27,8 +27,9 @@
 	lg = log --oneline --decorate
 [filter "lfs"]
 	required = true
-	clean = git-lfs clean %f
-	smudge = git-lfs smudge %f
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
 [interactive]
 	diffFilter = diff-so-fancy --patch
 [color "diff-highlight"]
