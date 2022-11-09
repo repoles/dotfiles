@@ -26,7 +26,7 @@ zsh_add_plugin "zsh-users/zsh-autosuggestions"
 zsh_add_plugin "zsh-users/zsh-syntax-highlighting"
 zsh_add_plugin "zsh-users/zsh-history-substring-search"
 zsh_add_plugin "romkatv/powerlevel10k" "powerlevel10k.zsh-theme"
-zsh_add_plugin "rupa/z" "z.sh"
+zsh_add_plugin "agkozak/zsh-z"
 
 ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
 
