@@ -3,7 +3,7 @@ export HISTSIZE=50000                          # Maximum events for internal his
 export SAVEHIST=10000                          # Maximum events in history file
 
 export EDITOR="vim"
-export VISUAL="vim"
+export VISUAL="code"
 
 export LANG=en_US.UTF-8
 
