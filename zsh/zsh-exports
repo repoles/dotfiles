@@ -2,8 +2,9 @@ export HISTFILE="${XDG_DATA_HOME}/zsh_history" # History filepath
 export HISTSIZE=50000                          # Maximum events for internal history
 export SAVEHIST=10000                          # Maximum events in history file
 
-export EDITOR="vim"
-export VISUAL="code"
+export VISUAL=vim
+export EDITOR="$VISUAL"
+export BUNDLER_EDITOR="code"
 
 export LANG=en_US.UTF-8
 

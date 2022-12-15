@@ -19,6 +19,7 @@
 	autocrlf = input
 	abbrev = 7
 	pager = diff-so-fancy | less --tabs=4 -RFX
+	editor = vim
 [alias]
 	st = status
 	ci = commit
