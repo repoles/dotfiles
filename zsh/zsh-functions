@@ -52,3 +52,20 @@ function ssh() {
   command ssh "$@"
   printf '\e]0;\a'
 }
+
+# https://github.com/ohmyzsh/ohmyzsh/blob/master/plugins/encode64/encode64.plugin.zsh
+encode64() {
+  if [[ $# -eq 0 ]]; then
+    cat | base64
+  else
+    printf '%s' $1 | base64
+  fi
+}
+
+decode64() {
+  if [[ $# -eq 0 ]]; then
+    cat | base64 --decode
+  else
+    printf '%s' $1 | base64 --decode
+  fi
+}
