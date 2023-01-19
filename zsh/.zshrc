@@ -31,7 +31,8 @@ zsh_add_plugin "agkozak/zsh-z"
 ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
 
 ZSH_HIGHLIGHT_PATTERNS+=('rm -rf *' 'fg=white,bold,bg=red')
-ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern)
+ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern) # default: main
+ZSH_HIGHLIGHT_STYLES[unknown-token]=fg=red # default: fg=red,bold
 
 bindkey '^[[A' history-substring-search-up
 bindkey '^[[B' history-substring-search-down
