@@ -32,3 +32,7 @@ export WORDCHARS=""
 # https://developer.1password.com/docs/ssh/agent/compatibility
 # (ainda não funciona no DataGrip, Capistrano)
 # export SSH_AUTH_SOCK=~/.1password/agent.sock
+
+# npm e nmv
+export NPM_CONFIG_USERCONFIG=$XDG_CONFIG_HOME/npm/npmrc
+export NVM_DIR="$XDG_DATA_HOME"/nvm

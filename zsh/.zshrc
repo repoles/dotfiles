@@ -46,6 +46,9 @@ unset zsh_file
 # https://github.com/rbenv/rbenv
 eval "$(rbenv init - zsh)"
 
+# https://github.com/nvm-sh/nvm
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
 # https://github.com/junegunn/fzf
 [ -f $ZDOTDIR/.fzf.zsh ] && source $ZDOTDIR/.fzf.zsh
 
