@@ -21,9 +21,9 @@ unset MYSQL_DIR
 fpath=($ZDOTDIR/completions $HOMEBREW_PREFIX/share/zsh/site-functions $fpath)
 
 # Usa openssl 1.1 para compilar o Ruby instalado pelo rbenv
-# https://github.com/rbenv/ruby-build/wiki#suggested-build-environment
+# https://github.com/rbenv/ruby-build/wiki#macos
 # Sem essa configuração, o openssl será baixado em cada instalação do Ruby
-export RUBY_CONFIGURE_OPTS="--with-openssl-dir=$HOMEBREW_PREFIX/opt/openssl@1.1"
+# export RUBY_CONFIGURE_OPTS="--with-openssl-dir=$HOMEBREW_PREFIX/opt/openssl@1.1"
 
 # Para que ao excluir usando OPTION + DELETE a
 # exclusão pare em caracteres como -, _, ., etc.
