@@ -29,8 +29,9 @@ fpath=($ZDOTDIR/completions $HOMEBREW_PREFIX/share/zsh/site-functions $fpath)
 # exclusão pare em caracteres como -, _, ., etc.
 export WORDCHARS=""
 
-# https://developer.1password.com/docs/ssh/agent/compatibility
-# (ainda não funciona no DataGrip, Capistrano)
+# https://developer.1password.com/docs/ssh/get-started#step-4-configure-your-ssh-or-git-client
+# mkdir -p ~/.1password && ln -s ~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock ~/.1password/agent.sock
+# 30/01/2023: ainda não consegui utilizar o 1Password como agente de forma prática
 # export SSH_AUTH_SOCK=~/.1password/agent.sock
 
 # npm e nmv
