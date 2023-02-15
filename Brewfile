@@ -1,9 +1,9 @@
-brew "openssl"
-brew "readline"
-
 brew "rbenv"
 brew "yarn"
-brew "node"
+
+# prefira instalar o node usando o nvm
+# https://github.com/nvm-sh/nvm
+# brew "node"
 
 brew "mysql@5.7"
 
