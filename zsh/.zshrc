@@ -52,6 +52,10 @@ unset zsh_file
 # https://github.com/rbenv/rbenv
 eval "$(rbenv init - zsh)"
 
+# https://github.com/pyenv/pyenv
+command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
+
 # https://github.com/nvm-sh/nvm
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
