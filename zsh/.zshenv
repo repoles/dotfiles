@@ -23,6 +23,9 @@ export ZSHZ_CMD=j
 
 export IRBRC="$XDG_CONFIG_HOME"/irb/irbrc
 
+export AWS_CONFIG_FILE="$XDG_CONFIG_HOME"/aws/config
+export AWS_SHARED_CREDENTIALS_FILE="$XDG_CONFIG_HOME"/aws/credentials
+
 # Ainda não consegui fazer o RubyGems
 # carregar .gemrc de XDG_CONFIG_HOME
 
