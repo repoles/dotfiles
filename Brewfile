@@ -21,5 +21,6 @@ brew "ripgrep"
 brew "htop"
 brew "jq"
 brew "diff-so-fancy"
+brew "httpie"
 
 cask "ngrok"
