@@ -53,3 +53,6 @@ alias tree="exa -T --level=2"
 
 # bat instead of cat
 alias cat="bat -pp"
+
+# cd to iCloud Drive
+alias icloud="cd $HOME/Library/Mobile\ Documents/com\~apple\~CloudDocs"
