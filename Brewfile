@@ -13,7 +13,7 @@ brew "ffmpeg"
 brew "tomcat@8"
 brew "ant"
 
-brew "exa"
+brew "eza"
 brew "bat"
 brew "fzf"
 brew "fd"

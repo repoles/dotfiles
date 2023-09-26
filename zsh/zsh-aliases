@@ -44,12 +44,12 @@ alias myip='curl checkip.amazonaws.com'      # Public facing IP Address
 alias dud='du -d 1 -h | sort -h'
 alias duf='du -sh * | sort -h'
 
-# exa instead of ls
-alias ls="exa"
-alias ll="exa -l"
-alias la="exa -a"
-alias ldot="exa -d .*"
-alias tree="exa -T --level=2"
+# eza instead of ls
+alias ls="eza"
+alias ll="eza --long"
+alias la="eza --all"
+alias ldot="eza --all --list-dirs .*"
+alias tree="eza --tree --level=2"
 
 # bat instead of cat
 alias cat="bat -pp"
