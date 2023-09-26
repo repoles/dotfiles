@@ -12,11 +12,7 @@ export LANG=en_US.UTF-8
 # https://github.com/romkatv/powerlevel10k/issues/68#issuecomment-492010264
 # export ZLE_RPROMPT_INDENT=0
 
-MYSQL_DIR="$HOMEBREW_PREFIX/opt/mysql@5.7/bin"
-# PYTHON_DIR="$HOMEBREW_PREFIX/opt/python/libexec/bin"
-
-path=($path $HOME/Code/Scripts $MYSQL_DIR)
-unset MYSQL_DIR
+path=($path $HOME/Code/Scripts)
 
 fpath=($ZDOTDIR/completions $HOMEBREW_PREFIX/share/zsh/site-functions $fpath)
 

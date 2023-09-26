@@ -5,7 +5,7 @@ brew "yarn"
 # https://github.com/nvm-sh/nvm
 # brew "node"
 
-brew "mysql@5.7"
+brew "mysql"
 
 brew "imagemagick"
 brew "ffmpeg"
