@@ -41,8 +41,9 @@ alias path='echo -e ${PATH//:/\\n}'          # print the PATH entries
 alias fpath='echo -e ${FPATH//:/\\n}'        # print the FPATH entries
 alias myip='curl checkip.amazonaws.com'      # Public facing IP Address
 
-alias dud='du -d 1 -h | sort -h'
-alias duf='du -sh * | sort -h'
+# Melhor usar o dua (https://lib.rs/crates/dua-cli)
+# alias dud='du -d 1 -h | sort -h'
+# alias duf='du -sh * | sort -h'
 
 # eza instead of ls
 alias ls="eza"
