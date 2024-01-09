@@ -1,5 +1,4 @@
 # https://wiki.archlinux.org/title/XDG_Base_Directory
-# https://wiki.archlinux.org/title/XDG_Base_Directory_(Português)
 
 # .zshenv é o primeiro arquivo carregado pelo ZSH e é ele
 # quem definirá o local de outros arquivos de configurações

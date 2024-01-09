@@ -1,5 +1,4 @@
 # https://wiki.archlinux.org/title/XDG_Base_Directory
-# https://wiki.archlinux.org/title/XDG_Base_Directory_(Português)
 
 export HISTFILE="$XDG_DATA_HOME"/zsh_history
 export HISTSIZE=50000
@@ -8,7 +7,6 @@ export SAVEHIST=10000
 export VISUAL=vim
 export EDITOR="$VISUAL"
 export BUNDLER_EDITOR="code"
-
 export LANG=en_US.UTF-8
 
 export RBENV_ROOT="$XDG_DATA_HOME"/rbenv
@@ -29,20 +27,11 @@ export AWS_CONFIG_FILE="$XDG_CONFIG_HOME"/aws/config
 export PYENV_ROOT="$XDG_DATA_HOME"/pyenv
 export NVM_DIR="$XDG_DATA_HOME"/nvm
 
-# Ainda não consegui fazer o RubyGems
-# carregar .gemrc de XDG_CONFIG_HOME
-
-# Comentado, pois optei por deixar o RubyGems usar os locais padrão
-# do SO para evitar a instalação de gems no contexto do Ruby padrão
-# export GEM_HOME="$XDG_DATA_HOME/gem"
-# export GEM_SPEC_CACHE="$XDG_CACHE_HOME/gem"
-
 # Elimina espaço extra colocado pelo ZSH no fim da seção da direita do prompt
 # https://github.com/romkatv/powerlevel10k/issues/68#issuecomment-492010264
 # export ZLE_RPROMPT_INDENT=0
 
 MYSQL_DIR="$HOMEBREW_PREFIX/opt/mysql@5.7/bin"
-
 path=($path $HOME/Code/Scripts $MYSQL_DIR)
 unset MYSQL_DIR
 
