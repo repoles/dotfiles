@@ -1,12 +1,41 @@
-export HISTFILE="${XDG_DATA_HOME}/zsh_history" # History filepath
-export HISTSIZE=50000                          # Maximum events for internal history
-export SAVEHIST=10000                          # Maximum events in history file
+# https://wiki.archlinux.org/title/XDG_Base_Directory
+# https://wiki.archlinux.org/title/XDG_Base_Directory_(Português)
+
+export HISTFILE="$XDG_DATA_HOME"/zsh_history
+export HISTSIZE=50000
+export SAVEHIST=10000
 
 export VISUAL=vim
 export EDITOR="$VISUAL"
 export BUNDLER_EDITOR="code"
 
 export LANG=en_US.UTF-8
+
+export RBENV_ROOT="$XDG_DATA_HOME"/rbenv
+export RIPGREP_CONFIG_PATH="$XDG_CONFIG_HOME"/ripgrep/config
+
+export BUNDLE_USER_CONFIG="$XDG_CONFIG_HOME"/bundle
+export BUNDLE_USER_CACHE="$XDG_CACHE_HOME"/bundle
+export BUNDLE_USER_PLUGIN="$XDG_DATA_HOME"/bundle
+
+export ZSHZ_DATA="$XDG_DATA_HOME"/z
+export ZSHZ_CMD=j
+
+export IRBRC="$XDG_CONFIG_HOME/irb/irbrc"
+
+export AWS_SHARED_CREDENTIALS_FILE="$XDG_CONFIG_HOME"/aws/credentials
+export AWS_CONFIG_FILE="$XDG_CONFIG_HOME"/aws/config
+
+export PYENV_ROOT="$XDG_DATA_HOME"/pyenv
+export NVM_DIR="$XDG_DATA_HOME"/nvm
+
+# Ainda não consegui fazer o RubyGems
+# carregar .gemrc de XDG_CONFIG_HOME
+
+# Comentado, pois optei por deixar o RubyGems usar os locais padrão
+# do SO para evitar a instalação de gems no contexto do Ruby padrão
+# export GEM_HOME="$XDG_DATA_HOME/gem"
+# export GEM_SPEC_CACHE="$XDG_CACHE_HOME/gem"
 
 # Elimina espaço extra colocado pelo ZSH no fim da seção da direita do prompt
 # https://github.com/romkatv/powerlevel10k/issues/68#issuecomment-492010264
@@ -32,10 +61,3 @@ export WORDCHARS=""
 # mkdir -p ~/.1password && ln -s ~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock ~/.1password/agent.sock
 # 30/01/2023: ainda não consegui utilizar o 1Password como agente de forma prática
 # export SSH_AUTH_SOCK=~/.1password/agent.sock
-
-# pyenv
-export PYENV_ROOT="$XDG_DATA_HOME"/pyenv
-
-# npm e nmv
-export NPM_CONFIG_USERCONFIG=$XDG_CONFIG_HOME/npm/npmrc
-export NVM_DIR="$XDG_DATA_HOME"/nvm
