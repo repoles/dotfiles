@@ -1,2 +1,6 @@
 # OS generated files
 .DS_Store
+
+# direnv config files
+# https://direnv.net
+.envrc
