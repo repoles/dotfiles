@@ -1,6 +1,8 @@
 # https://wiki.archlinux.org/title/XDG_Base_Directory
 
-export HISTFILE="$XDG_DATA_HOME"/zsh_history
+export HISTFILE="$XDG_STATE_HOME"/zsh/history
+create_directories_for_file "$HISTFILE"
+
 export HISTSIZE=50000
 export SAVEHIST=10000
 

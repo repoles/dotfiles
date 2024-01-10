@@ -2,11 +2,11 @@
 # https://www.youtube.com/watch?v=bTLYiNvRIVI
 
 # Function to source files if they exist
-function zsh_add_file() {
+zsh_add_file() {
     [ -f "$1" ] && source "$1"
 }
 
-function zsh_add_plugin() {
+zsh_add_plugin() {
     PLUGIN_DIR="$XDG_DATA_HOME/zsh_plugins"
     PLUGIN_NAME=$(echo $1 | cut -d "/" -f 2)
     if [ -d "$PLUGIN_DIR/$PLUGIN_NAME" ]; then
@@ -40,7 +40,7 @@ ex() {
 }
 
 # https://github.com/ohmyzsh/ohmyzsh/blob/master/lib/functions.zsh
-function zsh_stats() {
+zsh_stats() {
   fc -l 1 \
     | awk '{ CMD[$2]++; count++; } END { for (a in CMD) print CMD[a] " " CMD[a]*100/count "% " a }' \
     | grep -v "./" | sort -nr | head -n 20 | column -c3 -s " " -t | nl
@@ -48,7 +48,7 @@ function zsh_stats() {
 
 # Corrige o título do terminal após fechar uma sessão ssh
 # https://superuser.com/a/339946/567904
-function ssh() {
+ssh() {
   command ssh "$@"
   printf '\e]0;\a'
 }
@@ -68,4 +68,15 @@ decode64() {
   else
     printf '%s' $1 | base64 --decode
   fi
+}
+
+# This function will create all the necessary parent
+# directories for the given file path, but it will
+# not create the file itself. Created by ChatGPT 4.
+create_directories_for_file() {
+  # Extract the directory path from the full file path
+  dir_path=$(dirname "$1")
+
+  # Create the directory path, if it doesn't exist
+  mkdir -p "$dir_path"
 }
