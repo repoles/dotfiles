@@ -20,6 +20,7 @@ zsh_add_plugin "zsh-users/zsh-syntax-highlighting"
 zsh_add_plugin "zsh-users/zsh-history-substring-search"
 zsh_add_plugin "romkatv/powerlevel10k" "powerlevel10k.zsh-theme"
 zsh_add_plugin "agkozak/zsh-z"
+unset -f zsh_add_file zsh_add_plugin
 
 ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
 
@@ -43,10 +44,7 @@ eval "$(direnv hook zsh)"
 eval "$(rbenv init - zsh)"
 
 # https://github.com/junegunn/fzf
-[ -f $ZDOTDIR/.fzf.zsh ] && source $ZDOTDIR/.fzf.zsh
+[ -f "${XDG_CONFIG_HOME}"/fzf/fzf.zsh ] && source "${XDG_CONFIG_HOME}"/fzf/fzf.zsh
 
 # To customize prompt, run `p10k configure` or edit $ZDOTDIR/.p10k.zsh.
 [[ ! -f $ZDOTDIR/.p10k.zsh ]] || source $ZDOTDIR/.p10k.zsh
-
-# Funções necessárias somente na inicialização do ZSH
-unset -f zsh_add_file zsh_add_plugin
