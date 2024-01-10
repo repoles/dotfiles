@@ -22,10 +22,10 @@ setopt auto_pushd             # push the current directory visited on the stack.
 setopt pushd_ignore_dups      # do not store duplicates in the stack.
 setopt pushd_silent           # do not print the directory stack after pushd or popd.
 
-source "$ZDOTDIR/zsh-functions"
-source "$ZDOTDIR/zsh-exports"
-source "$ZDOTDIR/zsh-aliases"
-source "$ZDOTDIR/zsh-completions"
+source "$ZDOTDIR/functions.zsh"
+source "$ZDOTDIR/exports.zsh"
+source "$ZDOTDIR/aliases.zsh"
+source "$ZDOTDIR/completions.zsh"
 
 # Plugins
 zsh_add_plugin "zsh-users/zsh-autosuggestions"
