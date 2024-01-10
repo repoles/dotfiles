@@ -24,9 +24,6 @@ export IRBRC="$XDG_CONFIG_HOME/irb/irbrc"
 export AWS_SHARED_CREDENTIALS_FILE="$XDG_CONFIG_HOME"/aws/credentials
 export AWS_CONFIG_FILE="$XDG_CONFIG_HOME"/aws/config
 
-export PYENV_ROOT="$XDG_DATA_HOME"/pyenv
-export NVM_DIR="$XDG_DATA_HOME"/nvm
-
 # Elimina espaço extra colocado pelo ZSH no fim da seção da direita do prompt
 # https://github.com/romkatv/powerlevel10k/issues/68#issuecomment-492010264
 # export ZLE_RPROMPT_INDENT=0

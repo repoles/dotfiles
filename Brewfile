@@ -1,10 +1,6 @@
 brew "rbenv"
 brew "yarn"
 
-# prefira instalar o node usando o nvm
-# https://github.com/nvm-sh/nvm
-# brew "node"
-
 brew "mysql"
 
 brew "imagemagick"
