@@ -27,6 +27,8 @@ mkdir -p "$XDG_STATE_HOME"/irb
 export AWS_SHARED_CREDENTIALS_FILE="$XDG_CONFIG_HOME"/aws/credentials
 export AWS_CONFIG_FILE="$XDG_CONFIG_HOME"/aws/config
 
+export VIMINIT="set nocp | source ${XDG_CONFIG_HOME}/vim/vimrc"
+
 # Elimina espaço extra colocado pelo ZSH no fim da seção da direita do prompt
 # https://github.com/romkatv/powerlevel10k/issues/68#issuecomment-492010264
 # export ZLE_RPROMPT_INDENT=0
