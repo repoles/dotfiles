@@ -40,8 +40,8 @@ unset zsh_file
 # https://direnv.net
 eval "$(direnv hook zsh)"
 
-# https://github.com/rbenv/rbenv
-eval "$(rbenv init - zsh)"
+# https://asdf-vm.com
+. /opt/homebrew/opt/asdf/libexec/asdf.sh
 
 # https://github.com/junegunn/fzf
 [ -f "${XDG_CONFIG_HOME}"/fzf/fzf.zsh ] && source "${XDG_CONFIG_HOME}"/fzf/fzf.zsh

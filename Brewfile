@@ -1,4 +1,4 @@
-brew "rbenv"
+brew "asdf"
 brew "yarn"
 
 brew "mysql"
