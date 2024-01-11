@@ -1,8 +1,7 @@
 # https://wiki.archlinux.org/title/XDG_Base_Directory
 
 export HISTFILE="$XDG_STATE_HOME"/zsh/history
-create_directories_for_file "$HISTFILE"
-
+mkdir -p $(dirname "$HISTFILE")
 export HISTSIZE=50000
 export SAVEHIST=10000
 
@@ -18,10 +17,12 @@ export BUNDLE_USER_CONFIG="$XDG_CONFIG_HOME"/bundle
 export BUNDLE_USER_CACHE="$XDG_CACHE_HOME"/bundle
 export BUNDLE_USER_PLUGIN="$XDG_DATA_HOME"/bundle
 
-export ZSHZ_DATA="$XDG_DATA_HOME"/z
+export ZSHZ_DATA="$XDG_STATE_HOME"/z/history
+mkdir -p $(dirname "$ZSHZ_DATA")
 export ZSHZ_CMD=j
 
-export IRBRC="$XDG_CONFIG_HOME/irb/irbrc"
+export IRBRC="$XDG_CONFIG_HOME"/irb/irbrc
+mkdir -p "$XDG_STATE_HOME"/irb
 
 export AWS_SHARED_CREDENTIALS_FILE="$XDG_CONFIG_HOME"/aws/credentials
 export AWS_CONFIG_FILE="$XDG_CONFIG_HOME"/aws/config
