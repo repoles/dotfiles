@@ -33,6 +33,9 @@ export VIMINIT="set nocp | source ${XDG_CONFIG_HOME}/vim/vimrc"
 # https://github.com/romkatv/powerlevel10k/issues/68#issuecomment-492010264
 # export ZLE_RPROMPT_INDENT=0
 
+export MYSQL_HISTFILE="$XDG_STATE_HOME"/mysql/history
+mkdir -p $(dirname "$MYSQL_HISTFILE")
+
 MYSQL_DIR="$HOMEBREW_PREFIX/opt/mysql@5.7/bin"
 path=($path $HOME/Code/Scripts $MYSQL_DIR)
 unset MYSQL_DIR

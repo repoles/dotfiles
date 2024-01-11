@@ -9,5 +9,5 @@ Estando no diretório `dotfiles`:
 ```sh
 ln -s "$(pwd)" ~/.config
 ln -s ~/.config/zsh/.zshenv ~/.zshenv
-ln -s ~/.config/gemrc ~/.gemrc
+ln -s ~/.config/gem/gemrc ~/.gemrc
 ```
