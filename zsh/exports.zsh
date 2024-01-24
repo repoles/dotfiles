@@ -26,7 +26,7 @@ export ZSHZ_CMD=j
 export IRBRC="$XDG_CONFIG_HOME"/irb/irbrc
 mkdir -p "$XDG_STATE_HOME"/irb
 
-export AWS_SHARED_CREDENTIALS_FILE="$XDG_CONFIG_HOME"/aws/credentials
+export AWS_SHARED_CREDENTIALS_FILE="$XDG_DATA_HOME"/aws/credentials
 export AWS_CONFIG_FILE="$XDG_CONFIG_HOME"/aws/config
 
 export VIMINIT="set nocp | source ${XDG_CONFIG_HOME}/vim/vimrc"
