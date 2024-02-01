@@ -17,10 +17,10 @@ alias df='df -h'
 alias du='du -h'
 
 # Some shortcuts for different directory listings
-alias ls='ls -h -G'                          # classify files in colour
-alias ll='ls -l'                             # long list
-alias la='ls -A'                             # all but . and ..
-alias ldot='ls -d .*'                        # list only dotfiles
+# alias ls='ls -h -G'                          # classify files in colour
+# alias ll='ls -l'                             # long list
+# alias la='ls -A'                             # all but . and ..
+# alias ldot='ls -d .*'                        # list only dotfiles
 
 # alias cd..='cd ../'                          # Go back 1 directory level
 # alias ..='cd ../'                            # Go back 1 directory level
@@ -48,8 +48,8 @@ alias myip='curl checkip.amazonaws.com'      # Public facing IP Address
 # eza instead of ls
 alias ls="eza"
 alias ll="eza --long"
-alias la="eza --all"
-alias ldot="eza --all --list-dirs .*"
+alias la="eza --long --all"
+alias lh="eza --long --all --list-dirs .*"
 alias tree="eza --tree --level=2"
 
 # bat instead of cat
