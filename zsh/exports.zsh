@@ -34,11 +34,8 @@ export VIMINIT="set nocp | source ${XDG_CONFIG_HOME}/vim/vimrc"
 export MYSQL_HISTFILE="$XDG_STATE_HOME"/mysql/history
 mkdir -p $(dirname "$MYSQL_HISTFILE")
 
-MYSQL_DIR="$HOMEBREW_PREFIX/opt/mysql@5.7/bin"
-path=($path $HOME/Code/Scripts $MYSQL_DIR)
-unset MYSQL_DIR
-
 fpath=($ZDOTDIR/completions $HOMEBREW_PREFIX/share/zsh/site-functions $fpath)
+path=($path $HOME/Code/Scripts)
 
 # Usa openssl 1.1 para compilar o Ruby instalado pelo rbenv
 # https://github.com/rbenv/ruby-build/wiki#macos
