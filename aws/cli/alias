@@ -2,4 +2,4 @@
 whoami = sts get-caller-identity
 
 [command ec2]
-list-instances = describe-instances --query "Reservations[].Instances[].{id: InstanceId, name: Tags[0].Value, type: InstanceType, status: State.Name}" --output table
+list-instances = describe-instances --query "Reservations[].Instances[].{id: InstanceId, name: Tags[0].Value, type: InstanceType, status: State.Name}"
