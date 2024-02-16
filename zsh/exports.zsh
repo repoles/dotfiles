@@ -10,8 +10,8 @@ export EDITOR="$VISUAL"
 export BUNDLER_EDITOR="code"
 export LANG=en_US.UTF-8
 
-export ASDF_CONFIG_FILE="${XDG_CONFIG_HOME}/asdf/asdfrc"
-export ASDF_DATA_DIR="${XDG_DATA_HOME}/asdf"
+export ASDF_CONFIG_FILE="${XDG_CONFIG_HOME}"/asdf/asdfrc
+export ASDF_DATA_DIR="${XDG_DATA_HOME}"/asdf
 
 export RIPGREP_CONFIG_PATH="$XDG_CONFIG_HOME"/ripgrep/config
 

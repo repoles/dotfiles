@@ -41,7 +41,7 @@ unset zsh_file
 eval "$(direnv hook zsh)"
 
 # https://asdf-vm.com
-. /opt/homebrew/opt/asdf/libexec/asdf.sh
+. "$HOMEBREW_PREFIX"/opt/asdf/libexec/asdf.sh
 
 # https://github.com/junegunn/fzf
 [ -f "${XDG_CONFIG_HOME}"/fzf/fzf.zsh ] && source "${XDG_CONFIG_HOME}"/fzf/fzf.zsh
