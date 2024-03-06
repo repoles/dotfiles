@@ -32,10 +32,10 @@ bindkey '^[[A' history-substring-search-up
 bindkey '^[[B' history-substring-search-down
 
 # Source all files in $ZDOTDIR/custom that end in .zsh
-for zsh_file in "$ZDOTDIR"/custom/*.zsh; do
-  source "$zsh_file"
-done
-unset zsh_file
+# for zsh_file in "$ZDOTDIR"/custom/*.zsh; do
+#   source "$zsh_file"
+# done
+# unset zsh_file
 
 # https://direnv.net
 eval "$(direnv hook zsh)"

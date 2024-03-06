@@ -30,8 +30,8 @@ alias du='du -h'
 # alias .5='cd ../../../../../'                # Go back 5 directory levels
 # alias .6='cd ../../../../../../'             # Go back 6 directory levels
 
-alias d='dirs -v'
-for index ({1..9}) alias "$index"="cd +${index}"; unset index
+# alias d='dirs -v'
+# for index ({1..9}) alias "$index"="cd +${index}"; unset index
 
 # Misc :)
 alias less='less -r'                         # raw control characters
@@ -54,6 +54,27 @@ alias tree="eza --tree --level=2"
 
 # bat instead of cat
 alias cat="bat -pp"
+
+# Rails aliases
+alias devlog='tail -f log/development.log'
+alias prodlog='tail -f log/production.log'
+alias testlog='tail -f log/test.log'
+
+alias -g RED='RAILS_ENV=development'
+alias -g REP='RAILS_ENV=production'
+alias -g RET='RAILS_ENV=test'
+
+alias rc='bin/rails console'
+alias rcs='bin/rails console --sandbox'
+
+alias rdm='bin/rails db:migrate'
+alias rdr='bin/rails db:rollback'
+
+alias rds='bin/rails db:seed'
+alias rs='bin/rails server'
+
+alias rdb='bin/rails dbconsole'
+
 
 # cd to iCloud Drive
 alias icloud="cd $HOME/Library/Mobile\ Documents/com\~apple\~CloudDocs"
