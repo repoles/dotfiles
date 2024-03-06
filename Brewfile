@@ -20,4 +20,7 @@ brew "jq"
 brew "diff-so-fancy"
 brew "httpie"
 
-cask "ngrok"
+brew "neofetch"
+brew "onefetch"
+
+# cask "ngrok"
