@@ -48,8 +48,3 @@ eval "$(direnv hook zsh)"
 
 # To customize prompt, run `p10k configure` or edit $ZDOTDIR/.p10k.zsh.
 [[ ! -f $ZDOTDIR/.p10k.zsh ]] || source $ZDOTDIR/.p10k.zsh
-
-# neofetch
-if [[ $(who | wc -l) -eq 2 ]]; then
-  neofetch
-fi
