@@ -55,6 +55,9 @@ alias tree="eza --icons --tree --level=2"
 # bat instead of cat
 alias cat="bat -pp"
 
+# display free disk space
+alias storage="df -H /System/Volumes/Data"
+
 # Rails aliases
 alias devlog='tail -f log/development.log'
 alias prodlog='tail -f log/production.log'
@@ -74,7 +77,6 @@ alias rds='bin/rails db:seed'
 alias rs='bin/rails server'
 
 alias rdb='bin/rails dbconsole'
-
 
 # cd to iCloud Drive
 alias icloud="cd $HOME/Library/Mobile\ Documents/com\~apple\~CloudDocs"
