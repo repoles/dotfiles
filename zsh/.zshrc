@@ -18,7 +18,7 @@ source "$ZDOTDIR/completions.zsh"
 zsh_add_plugin "zsh-users/zsh-autosuggestions"
 zsh_add_plugin "zsh-users/zsh-syntax-highlighting"
 zsh_add_plugin "zsh-users/zsh-history-substring-search"
-zsh_add_plugin "romkatv/powerlevel10k" "powerlevel10k.zsh-theme"
+zsh_add_plugin "romkatv/powerlevel10k"
 zsh_add_plugin "agkozak/zsh-z"
 unset -f zsh_add_file zsh_add_plugin
 

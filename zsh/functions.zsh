@@ -12,7 +12,7 @@ zsh_add_plugin() {
   if [ -d "$PLUGIN_DIR/$PLUGIN_NAME" ]; then
     zsh_add_file "$PLUGIN_DIR/$PLUGIN_NAME/$PLUGIN_NAME.plugin.zsh" || \
     zsh_add_file "$PLUGIN_DIR/$PLUGIN_NAME/$PLUGIN_NAME.zsh" || \
-    zsh_add_file "$PLUGIN_DIR/$PLUGIN_NAME/$2"
+    zsh_add_file "$PLUGIN_DIR/$PLUGIN_NAME/$PLUGIN_NAME.zsh-theme"
   else
     git clone --depth=1 "https://github.com/$1.git" "$PLUGIN_DIR/$PLUGIN_NAME" && \
     zsh_add_plugin "$@"
