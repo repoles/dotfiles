@@ -1,0 +1,6 @@
+# OS generated files
+.DS_Store
+
+# https://mise.jdx.dev/configuration.html
+.mise.local.toml
+.mise.*.local.toml

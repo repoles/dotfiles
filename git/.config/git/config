@@ -1,0 +1,50 @@
+[user]
+	name = Lucas Repolês
+	email = lucas@repoles.com
+[color]
+	ui = true
+[push]
+  default = simple
+[pull]
+  rebase = true
+[fetch]
+	prune = true
+[diff]
+	colorMoved = zebra
+[log]
+	mailmap = true
+[init]
+	defaultBranch = main
+[core]
+	autocrlf = input
+	abbrev = 7
+	pager = diff-so-fancy | less --tabs=4 -RFX
+	editor = vim
+[alias]
+	st = status
+	ci = commit
+	br = branch
+	co = checkout
+	lg = log --oneline --decorate
+[filter "lfs"]
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+[interactive]
+	diffFilter = diff-so-fancy --patch
+[color "diff-highlight"]
+	oldNormal = red bold
+	oldHighlight = red bold 52
+	newNormal = green bold
+	newHighlight = green bold 22
+[color "diff"]
+	meta = 11
+	frag = magenta bold
+	func = 146 bold
+	commit = yellow bold
+	old = red bold
+	new = green bold
+	whitespace = red reverse
+[diff "rails_credentials"]
+	textconv = bin/rails credentials:diff
