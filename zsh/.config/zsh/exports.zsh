@@ -5,6 +5,9 @@ WORDCHARS=""
 export IRBRC="$XDG_CONFIG_HOME"/irb/irbrc.rb
 mkdir -p "$XDG_STATE_HOME"/irb # to put irb history
 
+export PRYRC="$XDG_CONFIG_HOME"/pry/pryrc.rb
+mkdir -p "$XDG_STATE_HOME"/pry
+
 export MYSQL_HISTFILE="$XDG_STATE_HOME"/mysql/history
 mkdir -p "$MYSQL_HISTFILE:h"
 
