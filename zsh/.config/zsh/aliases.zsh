@@ -17,7 +17,7 @@ alias mv='mv -iv'
 alias rm='rm -i'
 
 # eza instead of ls
-alias ls='eza --icons'
+alias ls='eza --icons --grid'
 alias ll='eza --icons --long'
 alias la='eza --icons --all'
 alias ldot='eza --icons --all --list-dirs .*'
@@ -50,11 +50,7 @@ alias rdb='bin/rails dbconsole'
 alias path='echo -e ${PATH//:/\\n}'          # print the PATH entries
 alias fpath='echo -e ${FPATH//:/\\n}'        # print the FPATH entries
 alias grep='grep --ignore-case --color'      # show differences in colour
+alias hhistory='fc -i -l 1'                  # all history with timestamp
 
 # Storage information on macOS
 alias storage='df -H /System/Volumes/Data | awk "NR==1 || NR==2 {print \$1,\$2,\$3,\$4,\$5}" | column -t'
-alias hhistory='fc -i -l 1'
-
-# Server admin tasks
-alias emive_logs="ssh emive-franquia-worker 'bin/logs'"
-alias emive_console="ssh -t emive-franquia-worker 'bin/console'"
