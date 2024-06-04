@@ -5,6 +5,8 @@ WORDCHARS=""
 export IRBRC="$XDG_CONFIG_HOME"/irb/irbrc.rb
 mkdir -p "$XDG_STATE_HOME"/irb # to put irb history
 
+export BUNDLE_USER_CACHE=$XDG_CACHE_HOME/bundle
+
 export PRYRC="$XDG_CONFIG_HOME"/pry/pryrc.rb
 mkdir -p "$XDG_STATE_HOME"/pry
 
