@@ -23,6 +23,15 @@ ZSH_HIGHLIGHT_STYLES[unknown-token]=fg=red # default: fg=red,bold
 
 setopt autocd   # change directories by simply typing the directory name without the cd command
 setopt correct  # suggests command corrections if you mistype a command
+set -o emacs    # sets the command line editing mode to Emacs style.
+
+# Skip forward/back a word with opt-arrow
+bindkey '[D' backward-word
+bindkey '[C' forward-word
+
+# Move to start/end of line with home/end keys
+bindkey '^[[H' beginning-of-line
+bindkey '^[[F' end-of-line
 
 path=($path $HOME/Code/Scripts)
 
