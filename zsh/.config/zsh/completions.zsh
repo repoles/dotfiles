@@ -154,3 +154,6 @@ zstyle ':completion:*:(ssh|scp|rsync):*:hosts-ipaddr' ignored-patterns '^(<->.<-
 # zstyle ':completion:*:' menu no
 # # preview directory's content with eza when completing cd
 # zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always --icons $realpath'
+
+# Make Shift+Tab go back in the list of autocomplete suggestions
+bindkey '^[[Z' reverse-menu-complete
