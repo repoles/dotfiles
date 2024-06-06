@@ -1,8 +1,8 @@
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.config/zsh/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r "${XDG_CACHE_HOME}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME}/p10k-instant-prompt-${(%):-%n}.zsh"
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
 source "${ZDOTDIR}/functions.zsh"
@@ -14,6 +14,7 @@ source "${ZDOTDIR}/completions.zsh"
 zsh_add_plugin "romkatv/powerlevel10k"
 zsh_add_plugin "zsh-users/zsh-autosuggestions"
 zsh_add_plugin "zsh-users/zsh-syntax-highlighting"
+zsh_add_plugin "zsh-users/zsh-history-substring-search"
 # zsh_add_plugin "zsh-users/zsh-completions"
 # zsh_add_plugin "Aloxaf/fzf-tab"
 
@@ -25,13 +26,17 @@ setopt autocd   # change directories by simply typing the directory name without
 setopt correct  # suggests command corrections if you mistype a command
 set -o emacs    # sets the command line editing mode to Emacs style.
 
+# Bind up/down keys to zsh-history-substring-search
+bindkey '^[[A' history-substring-search-up
+bindkey '^[[B' history-substring-search-down
+
 # Skip forward/back a word with opt-arrow
-bindkey '[D' backward-word
-bindkey '[C' forward-word
+# bindkey '[D' backward-word
+# bindkey '[C' forward-word
 
 # Move to start/end of line with home/end keys
-bindkey '^[[H' beginning-of-line
-bindkey '^[[F' end-of-line
+# bindkey '^[[H' beginning-of-line
+# bindkey '^[[F' end-of-line
 
 path=($path $HOME/Code/Scripts)
 

@@ -18,5 +18,6 @@ setopt hist_verify             # show command with history expansion to user bef
 # setopt hist_reduce_blanks    # removes excessive blanks from each command before saving it to the history file
 # setopt inc_append_history    # writes each command to the history file as soon as it is executed
 
-bindkey '^[[A' history-search-backward
-bindkey '^[[B' history-search-forward
+# up/down keys are being used by zsh-history-substring-search
+# bindkey '^[[A' history-search-backward
+# bindkey '^[[B' history-search-forward
