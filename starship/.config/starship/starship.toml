@@ -1,0 +1,53 @@
+format = """
+$username\
+$hostname\
+$localip\
+$directory\
+$git_branch\
+$git_commit\
+$git_state\
+$git_metrics\
+$git_status\
+$ruby\
+$memory_usage\
+$aws\
+$cmd_duration\
+$line_break\
+$jobs\
+$battery\
+$time\
+$container\
+$character"""
+
+[directory]
+style = "cyan"
+read_only = " \uf023"
+repo_root_style = "bold cyan"
+# truncate_to_repo = false
+# before_repo_root_style = "bold black"
+# fish_style_pwd_dir_length = 1
+truncation_symbol = "…/"
+
+[git_branch]
+symbol = "\uF126 "
+
+# [git_metrics]
+# disabled = false
+
+[git_status]
+ahead = "\u2191"
+behind = "\u2193"
+
+[jobs]
+symbol = "\uf46a"
+
+[nodejs]
+disabled = true
+
+[ruby]
+symbol = "\ueb48 " # \ue21e
+style = "bold red"
+detect_extensions = []
+
+[aws]
+symbol = "\uf270 "

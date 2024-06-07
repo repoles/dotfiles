@@ -13,6 +13,8 @@ mkdir -p "$XDG_STATE_HOME"/pry
 export MYSQL_HISTFILE="$XDG_STATE_HOME"/mysql/history
 mkdir -p "$MYSQL_HISTFILE:h"
 
+export STARSHIP_CONFIG="$XDG_CONFIG_HOME"/starship/starship.toml
+
 export LANG=en_US.UTF-8
 export EDITOR="vim"
 export VISUAL="vim"
