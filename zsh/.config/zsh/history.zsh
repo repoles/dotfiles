@@ -17,7 +17,3 @@ setopt hist_expire_dups_first  # makes the history mechanism delete duplicates f
 setopt hist_verify             # show command with history expansion to user before running it
 # setopt hist_reduce_blanks    # removes excessive blanks from each command before saving it to the history file
 # setopt inc_append_history    # writes each command to the history file as soon as it is executed
-
-# up/down keys are being used by zsh-history-substring-search
-# bindkey '^[[A' history-search-backward
-# bindkey '^[[B' history-search-forward

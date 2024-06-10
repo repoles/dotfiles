@@ -2,6 +2,7 @@ source "${ZDOTDIR}/functions.zsh"
 source "${ZDOTDIR}/history.zsh"
 source "${ZDOTDIR}/exports.zsh"
 source "${ZDOTDIR}/aliases.zsh"
+source "${ZDOTDIR}/bindings.zsh"
 source "${ZDOTDIR}/completions.zsh"
 
 # zsh_add_plugin "romkatv/powerlevel10k"
@@ -18,18 +19,6 @@ ZSH_HIGHLIGHT_STYLES[unknown-token]=fg=red # default: fg=red,bold
 setopt autocd   # change directories by simply typing the directory name without the cd command
 setopt correct  # suggests command corrections if you mistype a command
 set -o emacs    # sets the command line editing mode to Emacs style.
-
-# Bind up/down keys to zsh-history-substring-search
-bindkey '^[[A' history-substring-search-up
-bindkey '^[[B' history-substring-search-down
-
-# Skip forward/back a word with opt-arrow
-# bindkey '[D' backward-word
-# bindkey '[C' forward-word
-
-# Move to start/end of line with home/end keys
-# bindkey '^[[H' beginning-of-line
-# bindkey '^[[F' end-of-line
 
 path=($path $HOME/Code/Scripts)
 
