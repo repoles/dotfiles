@@ -53,4 +53,4 @@ alias grep='grep --ignore-case --color'      # show differences in colour
 alias hhistory='fc -i -l 1'                  # all history with timestamp
 
 # Storage information on macOS
-alias storage='df -H /System/Volumes/Data | awk "NR==1 || NR==2 {print \$1,\$2,\$3,\$4,\$5}" | column -t'
+alias storage='df -H /System/Volumes/Data | awk "{print \$1,\$2,\$3,\$4,\$5}" | column -t'
