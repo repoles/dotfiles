@@ -18,10 +18,29 @@ zsh_add_file() {
 }
 
 # https://github.com/ohmyzsh/ohmyzsh/blob/master/lib/functions.zsh
-function zsh_stats() {
+zsh_stats() {
   fc -l 1 \
     | awk '{ CMD[$2]++; count++; } END { for (a in CMD) print CMD[a] " " CMD[a]*100/count "% " a }' \
     | grep -v "./" | sort -nr | head -n 20 | column -c3 -s " " -t | nl
+}
+
+# https://github.com/Phantas0s/.dotfiles
+ex() {
+  case $1 in
+    *.tar.bz2)  tar xjf $1      ;;
+    *.tar.gz)   tar xzf $1      ;;
+    *.bz2)      bunzip2 $1      ;;
+    *.gz)       gunzip $1       ;;
+    *.tar)      tar xf $1       ;;
+    *.tbz2)     tar xjf $1      ;;
+    *.tgz)      tar xzf $1      ;;
+    *.zip)      unzip $1        ;;
+    *.7z)       7z x $1         ;; # require p7zip
+    *.rar)      7z x $1         ;; # require p7zip
+    *.iso)      7z x $1         ;; # require p7zip
+    *.Z)        uncompress $1   ;;
+    *)          echo "'$1' cannot be extracted" ;;
+  esac
 }
 
 # Fix macOS Terminal title after a SSH session
