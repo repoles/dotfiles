@@ -9,7 +9,7 @@ setopt append_history           # commands are added to the history file increme
 setopt share_history            # commands entered in one session are instantly available in another
 setopt extended_history         # adds information such as the date and time each command was executed
 setopt hist_ignore_space        # commands that begin with a space character are not saved in the history
-setopt hist_ignore_all_dups     # if an identical command already exists in the history, it won't save the new entry
+# setopt hist_ignore_all_dups   # if an identical command already exists in the history, it won't save the new entry
 # setopt hist_save_no_dups      # duplicated commands are discarded when saving history to the history file
 # setopt hist_ignore_dups       # when a command is repeated, the previous occurrence of the command is deleted from the history
 # setopt hist_find_no_dups      # while performing history searches, duplicate entries are skipped
