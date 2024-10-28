@@ -19,9 +19,7 @@ zsh_add_file() {
 
 # https://github.com/ohmyzsh/ohmyzsh/blob/master/lib/functions.zsh
 zsh_stats() {
-  fc -l 1 \
-    | awk '{ CMD[$2]++; count++; } END { for (a in CMD) print CMD[a] " " CMD[a]*100/count "% " a }' \
-    | grep -v "./" | sort -nr | head -n 20 | column -c3 -s " " -t | nl
+  history -n 1 | awk '{gsub(/^sudo /, "")}1' | awk '{print $1}' | sort | uniq -c | sort -rn | awk '{sum+=$1} {lines[NR]=$0} END {for(i=1;i<=20;i++) {split(lines[i],a," "); printf "%2d. %5d %6.2f%% %s\n", i, a[1], (a[1]/sum)*100, a[2]}}'
 }
 
 # https://github.com/Phantas0s/.dotfiles
