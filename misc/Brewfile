@@ -21,5 +21,3 @@ brew "dua-cli"
 brew "httpie"
 brew "awscli"
 brew "diff-so-fancy"
-
-brew "1password-cli"

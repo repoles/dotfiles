@@ -24,9 +24,6 @@ path=($path $HOME/Code/Scripts)
 
 # Shell integrations
 
-# https://developer.1password.com/docs/cli/
-source "$XDG_CONFIG_HOME"/op/plugins.sh
-
 # https://mise.jdx.dev
 eval "$(mise activate zsh)"
 
