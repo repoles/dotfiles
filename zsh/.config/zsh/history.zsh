@@ -12,7 +12,7 @@ setopt hist_ignore_space        # commands that begin with a space character are
 # setopt hist_ignore_all_dups   # if an identical command already exists in the history, it won't save the new entry
 # setopt hist_save_no_dups      # duplicated commands are discarded when saving history to the history file
 # setopt hist_ignore_dups       # when a command is repeated, the previous occurrence of the command is deleted from the history
-# setopt hist_find_no_dups      # while performing history searches, duplicate entries are skipped
+setopt hist_find_no_dups        # while performing history searches, duplicate entries are skipped
 # setopt hist_expire_dups_first # makes the history mechanism delete duplicates first when it needs to expire old entries from the history file
 setopt hist_verify              # show command with history expansion to user before running it
 # setopt hist_reduce_blanks     # removes excessive blanks from each command before saving it to the history file
