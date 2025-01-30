@@ -19,6 +19,6 @@ export AWS_CONFIG_FILE="$XDG_CONFIG_HOME"/aws/config
 
 export LANG=en_US.UTF-8
 export EDITOR="vim"
-export VISUAL="vim"
+export VISUAL="code"
 
 export VIMINIT="set nocp | source ${XDG_CONFIG_HOME}/vim/vimrc"

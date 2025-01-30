@@ -18,7 +18,6 @@
 [core]
 	autocrlf = input
 	abbrev = 7
-	pager = diff-so-fancy | less --tabs=4 -RFX
 	editor = vim
 [alias]
 	st = status
@@ -26,25 +25,13 @@
 	br = branch
 	co = checkout
 	lg = log --oneline --decorate
+	# https://difftastic.wilfred.me.uk/git.html#regular-usage
+	dshow = -c diff.external=difft show --ext-diff
+	ddiff = -c diff.external=difft diff
 [filter "lfs"]
 	required = true
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
-[interactive]
-	diffFilter = diff-so-fancy --patch
-[color "diff-highlight"]
-	oldNormal = red bold
-	oldHighlight = red bold 52
-	newNormal = green bold
-	newHighlight = green bold 22
-[color "diff"]
-	meta = 11
-	frag = magenta bold
-	func = 146 bold
-	commit = yellow bold
-	old = red bold
-	new = green bold
-	whitespace = red reverse
 [diff "rails_credentials"]
 	textconv = bin/rails credentials:diff
