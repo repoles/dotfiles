@@ -16,9 +16,10 @@ mkdir -p "$MYSQL_HISTFILE:h"
 export STARSHIP_CONFIG="$XDG_CONFIG_HOME"/starship/starship.toml
 
 export AWS_CONFIG_FILE="$XDG_CONFIG_HOME"/aws/config
+export AWS_SHARED_CREDENTIALS_FILE="$XDG_CONFIG_HOME"/aws/credentials
 
 export LANG=en_US.UTF-8
 export EDITOR="vim"
-export VISUAL="code"
+export VISUAL="code --wait"
 
 export VIMINIT="set nocp | source ${XDG_CONFIG_HOME}/vim/vimrc"
