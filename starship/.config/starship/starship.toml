@@ -1,3 +1,5 @@
+# https://starship.rs/config/
+
 format = """
 $username\
 $hostname\
@@ -53,15 +55,17 @@ repo_root_style = 'bold cyan'
 truncation_symbol = '…/'
 
 [git_branch]
-symbol = "\uF126 "
+symbol = "\uf126 "
 format = '[$symbol$branch(:$remote_branch)]($style) '
 
 # [git_metrics]
 # disabled = false
 
-[git_status]
-ahead = "\u2191"
-behind = "\u2193"
+# [git_status]
+# format = '([$ahead_behind]($style) )'
+# ahead = "\u2191$count"  # \u2191
+# behind = "\u21e3$count" # \u2193
+# style = "bold blue"
 
 [jobs]
 symbol = "\uf46a"
@@ -70,14 +74,14 @@ symbol = "\uf46a"
 disabled = true
 
 [ruby]
-symbol = "\ueb48 "
-# symbol = "\ue21e "
-version_format = "${raw}"
+symbol = "\ueb48 " # "\ue21e "
+version_format = '${raw}'
 format = '[$symbol($version )]($style)'
 detect_extensions = []
 
 [aws]
 symbol = "\uf270 "
+format = '[$symbol($profile )(\($region\) )(\[$duration\] )]($style)'
 
 [cmd_duration]
 format = "[\uf252 $duration]($style) "
