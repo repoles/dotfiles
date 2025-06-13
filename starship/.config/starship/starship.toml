@@ -42,7 +42,7 @@ $character"""
 format = '[$user]($style)'
 
 [hostname]
-ssh_symbol = "@"
+ssh_symbol = '@'
 format = '[$ssh_symbol$hostname]($style) '
 
 [directory]
@@ -82,6 +82,7 @@ detect_extensions = []
 [aws]
 symbol = "\uf270 "
 format = '[$symbol($profile )(\($region\) )(\[$duration\] )]($style)'
+expiration_symbol = "\u00D7"
 
 [cmd_duration]
 format = "[\uf252 $duration]($style) "

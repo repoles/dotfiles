@@ -21,6 +21,7 @@ brew "dua-cli" # View disk space usage and delete unwanted data, fast
 brew "httpie" # User-friendly cURL replacement (command-line HTTP client)
 brew "difftastic" # Diff that understands syntax
 brew "awscli" # Official Amazon AWS command-line interface
+brew "aws-vault" # Securely store and access AWS credentials
 
 brew "mysql@8.4" # Open source relational database management system
 brew "tomcat@8" # Implementation of Java Servlet and JavaServer Pages
