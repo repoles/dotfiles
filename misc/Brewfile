@@ -1,23 +1,26 @@
-# brew bundle --verbose
+# https://docs.brew.sh/Brew-Bundle-and-Brewfile#brew-bundle-upgrade-and-homebrew_bundle_no_upgrade1
+# brew bundle --no-upgrade --verbose
 
-brew "mise"
-brew "yarn"
+brew "mise" # Polyglot runtime manager (asdf rust clone)
+brew "yarn" # JavaScript package manager
 
-brew "mysql"
+brew "imagemagick" # Tools and libraries to manipulate images in many formats
+brew "ffmpeg" # Play, record, convert, and stream audio and video
 
-brew "imagemagick"
-brew "ffmpeg"
+brew "starship" # Cross-shell prompt for astronauts
 
-brew "starship"
+brew "eza" # Modern, maintained replacement for ls
+brew "bat" # Clone of cat with syntax highlighting and Git integration
+brew "fzf" # Command-line fuzzy finder written in Go
+brew "fd" # Simple, fast and user-friendly alternative to find
+brew "jq" # Lightweight and flexible command-line JSON processor
+brew "pv" # Monitor data's progress through a pipe
+brew "htop" # Improved top (interactive process viewer)
+brew "ripgrep" # Search tool like grep and The Silver Searcher
+brew "dua-cli" # View disk space usage and delete unwanted data, fast
+brew "httpie" # User-friendly cURL replacement (command-line HTTP client)
+brew "difftastic" # Diff that understands syntax
+brew "awscli" # Official Amazon AWS command-line interface
 
-brew "eza"
-brew "bat"
-brew "fzf"
-brew "fd"
-brew "jq"
-brew "htop"
-brew "ripgrep"
-brew "dua-cli"
-brew "httpie"
-brew "awscli"
-brew "difftastic"
+brew "mysql@8.4" # Open source relational database management system
+brew "tomcat@8" # Implementation of Java Servlet and JavaServer Pages
