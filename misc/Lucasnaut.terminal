@@ -309,10 +309,10 @@
 	<data>
 	YnBsaXN0MDDUAQIDBAUGBwpYJHZlcnNpb25ZJGFyY2hpdmVyVCR0b3BYJG9iamVjdHMS
 	AAGGoF8QD05TS2V5ZWRBcmNoaXZlctEICVRyb290gAGkCwwVFlUkbnVsbNQNDg8QERIT
-	FFZOU1NpemVYTlNmRmxhZ3NWTlNOYW1lViRjbGFzcyNAMgAAAAAAABAQgAKAA18QGUpl
-	dEJyYWluc01vbm9OTE5GLVJlZ3VsYXLSFxgZGlokY2xhc3NuYW1lWCRjbGFzc2VzVk5T
-	Rm9udKIZG1hOU09iamVjdAgRGiQpMjdJTFFTWF5nbnd+hY6QkpSwtcDJ0NMAAAAAAAAB
-	AQAAAAAAAAAcAAAAAAAAAAAAAAAAAAAA3A==
+	FFZOU1NpemVYTlNmRmxhZ3NWTlNOYW1lViRjbGFzcyNAMgAAAAAAABAQgAKAA18QF0Nh
+	c2theWRpYUNvdmVORi1SZWd1bGFy0hcYGRpaJGNsYXNzbmFtZVgkY2xhc3Nlc1ZOU0Zv
+	bnSiGRtYTlNPYmplY3QIERokKTI3SUxRU1heZ253foWOkJKUrrO+x87RAAAAAAAAAQEA
+	AAAAAAAAHAAAAAAAAAAAAAAAAAAAANo=
 	</data>
 	<key>FontAntialias</key>
 	<true/>
@@ -495,7 +495,7 @@
 	<key>name</key>
 	<string>Lucasnaut</string>
 	<key>rowCount</key>
-	<integer>24</integer>
+	<integer>25</integer>
 	<key>shellExitAction</key>
 	<integer>1</integer>
 	<key>type</key>
