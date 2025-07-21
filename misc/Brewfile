@@ -25,3 +25,6 @@ brew "aws-vault" # Securely store and access AWS credentials
 
 brew "mysql@8.4" # Open source relational database management system
 brew "tomcat@8" # Implementation of Java Servlet and JavaServer Pages
+
+# https://derflounder.wordpress.com/2025/04/06/rsync-replaced-with-openrsync-on-macos-sequoia/
+brew "rsync" # since macOS Sequoia is now using openrsync
