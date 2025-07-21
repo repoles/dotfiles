@@ -20,7 +20,7 @@ setopt autocd   # change directories by simply typing the directory name without
 setopt correct  # suggests command corrections if you mistype a command
 set -o emacs    # sets the command line editing mode to Emacs style.
 
-path=($path $HOME/Code/Scripts)
+path=($path $HOMEBREW_PREFIX/opt/mysql@8.4/bin $HOME/Code/Scripts)
 
 # Shell integrations
 
