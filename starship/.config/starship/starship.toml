@@ -1,5 +1,8 @@
 # https://starship.rs/config/
 
+# Get editor completions based on the config schema
+"$schema" = 'https://starship.rs/config-schema.json'
+
 format = """
 $username\
 $hostname\
@@ -61,7 +64,7 @@ format = '[$symbol$branch(:$remote_branch)]($style) '
 # [git_metrics]
 # disabled = false
 
-# [git_status]
+[git_status]
 # format = '([$ahead_behind]($style) )'
 # ahead = "\u2191$count"  # \u2191
 # behind = "\u21e3$count" # \u2193
@@ -87,6 +90,14 @@ expiration_symbol = "\u00D7"
 [cmd_duration]
 format = "[\uf252 $duration]($style) "
 min_time = 5000
+
+[[battery.display]]
+threshold = 10
+style = 'bold red'
+
+[[battery.display]]
+threshold = 30
+style = 'bold yellow'
 
 [time]
 disabled = false
