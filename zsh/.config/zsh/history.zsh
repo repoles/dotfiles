@@ -2,7 +2,7 @@ HISTSIZE=10000      # controls the maximum number of commands stored in memory d
 SAVEHIST=$HISTSIZE  # controls how many commands are written to the history file for future sessions
 HISTDUP=erase       # all duplicate history entries are erased as new commands are entered
 
-HISTFILE="${XDG_STATE_HOME}/zsh/history"
+HISTFILE="${XDG_DATA_HOME}/zsh/history"
 mkdir -p "$HISTFILE:h"
 
 setopt append_history           # commands are added to the history file incrementally

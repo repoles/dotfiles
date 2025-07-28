@@ -3,14 +3,14 @@
 WORDCHARS=""
 
 export IRBRC="$XDG_CONFIG_HOME"/irb/irbrc.rb
-mkdir -p "$XDG_STATE_HOME"/irb # to put irb history
+mkdir -p "$XDG_DATA_HOME"/irb # to put irb history
 
 export BUNDLE_USER_CACHE=$XDG_CACHE_HOME/bundle
 
 export PRYRC="$XDG_CONFIG_HOME"/pry/pryrc.rb
-mkdir -p "$XDG_STATE_HOME"/pry
+mkdir -p "$XDG_DATA_HOME"/pry
 
-export MYSQL_HISTFILE="$XDG_STATE_HOME"/mysql/history
+export MYSQL_HISTFILE="$XDG_DATA_HOME"/mysql/history
 mkdir -p "$MYSQL_HISTFILE:h"
 
 export STARSHIP_CONFIG="$XDG_CONFIG_HOME"/starship/starship.toml

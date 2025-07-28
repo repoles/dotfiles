@@ -1,4 +1,4 @@
-Pry.config.history.file = File.join(ENV["XDG_STATE_HOME"], "pry", "history_#{File.basename(Dir.pwd)}")
+Pry.config.history.file = File.join(ENV["XDG_DATA_HOME"], "pry", "history_#{File.basename(Dir.pwd)}")
 
 if defined?(PryByebug)
   Pry.commands.alias_command 'c', 'continue'
