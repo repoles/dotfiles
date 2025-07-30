@@ -1,13 +1,12 @@
 # https://docs.brew.sh/Brew-Bundle-and-Brewfile#brew-bundle-upgrade-and-homebrew_bundle_no_upgrade1
 # brew bundle --no-upgrade --verbose
 
+brew "fish" # Friendly interactive shell
+brew "tmux" # Terminal multiplexer
+brew "starship" # Cross-shell prompt for astronauts
+
 brew "mise" # Polyglot runtime manager (asdf rust clone)
 brew "yarn" # JavaScript package manager
-
-brew "imagemagick" # Tools and libraries to manipulate images in many formats
-brew "ffmpeg" # Play, record, convert, and stream audio and video
-
-brew "starship" # Cross-shell prompt for astronauts
 
 brew "eza" # Modern, maintained replacement for ls
 brew "bat" # Clone of cat with syntax highlighting and Git integration
@@ -22,6 +21,9 @@ brew "httpie" # User-friendly cURL replacement (command-line HTTP client)
 brew "difftastic" # Diff that understands syntax
 brew "awscli" # Official Amazon AWS command-line interface
 brew "aws-vault" # Securely store and access AWS credentials
+
+brew "imagemagick" # Tools and libraries to manipulate images in many formats
+brew "ffmpeg" # Play, record, convert, and stream audio and video
 
 brew "mysql@8.4" # Open source relational database management system
 brew "tomcat@8" # Implementation of Java Servlet and JavaServer Pages
