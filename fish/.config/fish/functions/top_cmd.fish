@@ -13,6 +13,7 @@ function top_cmd
     # Process and format output
     history \
         | awk '{print $1}' \
+        | sed 's|.*/||' \
         | sort \
         | uniq -c \
         | sort -nr \
