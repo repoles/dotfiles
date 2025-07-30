@@ -1,3 +1,5 @@
+font-family = MonoLisa
+
 font-size = 18
 font-thicken = true
 font-feature = -calt, -liga, -dlig
@@ -9,8 +11,9 @@ theme = Argonaut
 
 # background = #000000
 
+# cursor-style = underline
 cursor-color = #666666
-# cursor-text = #ffffff
+cursor-text = #ffffff
 # cursor-style-blink = false
 
 adjust-cursor-thickness = 4
@@ -22,9 +25,16 @@ adjust-cursor-thickness = 4
 
 # window-decoration = none
 # macos-titlebar-style = tabs
+macos-option-as-alt = true
 
 # window-title-font-family = "JetBrains Mono"
 # shell-integration-features = no-cursor
+
+window-width = 80
+window-height = 25
+
+window-padding-x = 0
+window-padding-y = 0
 
 # macos-icon = xray
 
