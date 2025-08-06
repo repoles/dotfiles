@@ -8,6 +8,8 @@ if status is-interactive
     set -g fish_color_command blue
     # set -g fish_color_param normal
 
+    fzf --fish | source
+
     zoxide init fish --cmd j | source
 
     set -x STARSHIP_CONFIG $XDG_CONFIG_HOME/starship/starship.toml
