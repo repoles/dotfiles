@@ -15,3 +15,6 @@ abbr --add testlog "tail -f log/test.log"
 abbr --position anywhere --add RED "RAILS_ENV=development"
 abbr --position anywhere --add REP "RAILS_ENV=production"
 abbr --position anywhere --add RET "RAILS_ENV=test"
+
+# tmux
+abbr --add tclear "clear; tmux clear-history"
