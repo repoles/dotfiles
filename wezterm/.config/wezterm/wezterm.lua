@@ -17,6 +17,7 @@ config.font_size = 18
 -- config.color_scheme = 'Gruvbox Dark (Gogh)'
 
 config.colors = require('colors.tailwind_neutral_dark')
+-- config.colors = require('colors.tailwind_gray_dark')
 -- config.colors = require('colors.tailwind_slate_dark')
 -- config.color_scheme = 'Tailwind Slate Dark'
 
