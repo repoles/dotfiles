@@ -9,7 +9,7 @@ if status is-interactive
     set -g fish_color_command green
     # set -g fish_color_param normal
     set -g fish_color_cwd blue --bold
-    # set -g fish_color_comment purple --italics
+    set -g fish_color_comment purple --italics
 
     # https://fishshell.com/docs/current/cmds/fish_git_prompt.html
     # set -g __fish_git_prompt_show_informative_status true
