@@ -14,3 +14,5 @@ mkdir -p (dirname $MYSQL_HISTFILE)
 set -x AWS_CONFIG_FILE $XDG_CONFIG_HOME/aws/config
 # I'm using aws-vault now (https://github.com/99designs/aws-vault)
 # set -x AWS_SHARED_CREDENTIALS_FILE $XDG_CONFIG_HOME/aws/credentials
+
+set -x FZF_DEFAULT_OPTS '--tmux center,90%,70% --layout reverse'
