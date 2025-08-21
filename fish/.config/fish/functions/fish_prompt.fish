@@ -8,6 +8,8 @@ function fish_prompt --description 'Write out the prompt'
     set -q fish_color_status
     or set -g fish_color_status red
 
+    # echo "$(date +'%Y-%m-%d %H:%M:%S') fish_prompt" >> $TMPDIR/git_status.log
+
     # Color the prompt differently when we're root
     set -l color_cwd $fish_color_cwd
     set -l suffix '>'
@@ -37,10 +39,10 @@ function fish_prompt --description 'Write out the prompt'
     end
 
     # Don't show git info in TMUX sessions
-    set -l git_info ''
-    if not set -q TMUX
-        set git_info (fish_git_prompt)
-    end
+    # set -l git_info ''
+    # if not set -q TMUX
+    #     set git_info (fish_git_prompt)
+    # end
 
     set -l cmd_duration ''
     if test $CMD_DURATION -gt 5000
@@ -55,5 +57,5 @@ function fish_prompt --description 'Write out the prompt'
         set cmd_duration (set_color yellow) (string join ' ' $cmd_duration)
     end
 
-    echo -n -s $login_info (set_color $color_cwd) (prompt_pwd) $normal $git_info $cmd_duration $normal ' '$prompt_status $suffix ' '
+    echo -n -s $login_info (set_color $color_cwd) (prompt_pwd) $normal (fish_git_prompt) $cmd_duration $normal ' '$prompt_status $suffix ' '
 end
