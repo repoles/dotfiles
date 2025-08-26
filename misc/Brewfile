@@ -17,6 +17,7 @@ brew "jq" # Lightweight and flexible command-line JSON processor
 brew "jless" # Command-line JSON viewer
 brew "pv" # Monitor data's progress through a pipe
 
+brew "fastfetch" # Fast system information tool
 brew "htop" # Improved top (interactive process viewer)
 brew "btop" # A monitor of resources
 
