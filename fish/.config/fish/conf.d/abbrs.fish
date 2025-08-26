@@ -16,5 +16,9 @@ abbr --position anywhere --add RED "RAILS_ENV=development"
 abbr --position anywhere --add REP "RAILS_ENV=production"
 abbr --position anywhere --add RET "RAILS_ENV=test"
 
+# git
+abbr --add gs "git status"
+abbr --add gl "git log"
+
 # tmux
 abbr --add tclear "clear; tmux clear-history"

@@ -1,37 +1,16 @@
 [user]
 	name = Lucas Repolês
 	email = lucas@repoles.com
-[color]
-	ui = true
-[push]
-  default = simple
-[pull]
-  rebase = true
-[fetch]
-	prune = true
-[diff]
-	colorMoved = zebra
-[log]
-	mailmap = true
 [init]
 	defaultBranch = main
 [core]
-	autocrlf = input
-	abbrev = 7
-	editor = vim
+	pager = delta
 [alias]
 	st = status
-	ci = commit
-	br = branch
-	co = checkout
 	lg = log --oneline --decorate
-	# https://difftastic.wilfred.me.uk/git.html#regular-usage
-	dshow = -c diff.external=difft show --ext-diff
-	ddiff = -c diff.external=difft diff
-[filter "lfs"]
-	required = true
-	clean = git-lfs clean -- %f
-	smudge = git-lfs smudge -- %f
-	process = git-lfs filter-process
+  diff-side-by-side = -c delta.features=side-by-side diff
+	diff-line-numbers = -c delta.line-numbers=true diff
+[bash]
+	showInformativeStatus = true
 [diff "rails_credentials"]
 	textconv = bin/rails credentials:diff

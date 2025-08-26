@@ -18,7 +18,7 @@ brew "htop" # Improved top (interactive process viewer)
 brew "ripgrep" # Search tool like grep and The Silver Searcher
 brew "dua-cli" # View disk space usage and delete unwanted data, fast
 brew "httpie" # User-friendly cURL replacement (command-line HTTP client)
-brew "difftastic" # Diff that understands syntax
+brew "git-delta" # A syntax-highlighting pager for git, diff, grep, and blame output
 brew "awscli" # Official Amazon AWS command-line interface
 brew "aws-vault" # Securely store and access AWS credentials
 
