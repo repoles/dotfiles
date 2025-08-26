@@ -13,12 +13,18 @@ brew "bat" # Clone of cat with syntax highlighting and Git integration
 brew "fzf" # Command-line fuzzy finder written in Go
 brew "fd" # Simple, fast and user-friendly alternative to find
 brew "jq" # Lightweight and flexible command-line JSON processor
+
+brew "jless" # Command-line JSON viewer
 brew "pv" # Monitor data's progress through a pipe
+
 brew "htop" # Improved top (interactive process viewer)
+brew "btop" # A monitor of resources
+
 brew "ripgrep" # Search tool like grep and The Silver Searcher
 brew "dua-cli" # View disk space usage and delete unwanted data, fast
 brew "httpie" # User-friendly cURL replacement (command-line HTTP client)
 brew "git-delta" # A syntax-highlighting pager for git, diff, grep, and blame output
+
 brew "awscli" # Official Amazon AWS command-line interface
 brew "aws-vault" # Securely store and access AWS credentials
 
@@ -30,3 +36,9 @@ brew "tomcat@8" # Implementation of Java Servlet and JavaServer Pages
 
 # https://derflounder.wordpress.com/2025/04/06/rsync-replaced-with-openrsync-on-macos-sequoia/
 brew "rsync" # since macOS Sequoia is now using openrsync
+
+# Fonts
+
+# Maple Mono
+cask "font-maple-mono"
+cask "font-maple-mono-nf"
