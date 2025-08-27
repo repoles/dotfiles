@@ -1,13 +1,14 @@
-font-family = MonoLisa
+font-family = Maple Mono
 
 font-size = 18
 font-thicken = true
-font-feature = -calt, -liga, -dlig
+# font-feature = -calt, -liga, -dlig
 
-theme = Argonaut
+# theme = Argonaut
 # theme = Dracula
 # theme = GitHub Dark
 # theme = Monokai Classic
+theme = ayu
 
 # background = #000000
 
@@ -17,15 +18,15 @@ cursor-text = #ffffff
 # cursor-style-blink = false
 
 adjust-cursor-thickness = 4
-
-# split-divider-color = #222222
+split-divider-color = green
 
 # unfocused-split-fill = #000000
 # unfocused-split-opacity = 1
 
 # window-decoration = none
-# macos-titlebar-style = tabs
 macos-option-as-alt = true
+# macos-titlebar-style = tabs
+macos-titlebar-proxy-icon = hidden
 
 # window-title-font-family = "JetBrains Mono"
 # shell-integration-features = no-cursor
@@ -33,8 +34,8 @@ macos-option-as-alt = true
 window-width = 80
 window-height = 25
 
-window-padding-x = 0
-window-padding-y = 0
+# window-padding-x = 0
+# window-padding-y = 0
 
 # macos-icon = xray
 
