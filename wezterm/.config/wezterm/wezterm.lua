@@ -5,18 +5,34 @@ local config = wezterm.config_builder()
 config.initial_cols = 80
 config.initial_rows = 24
 
-config.font = wezterm.font('JetBrains Mono', { weight = 'Medium' })
+-- config.font = wezterm.font('JetBrains Mono', { weight = 'Medium' })
+-- config.harfbuzz_features = { 'calt=0', 'clig=0', 'liga=0' }
+
+config.font = wezterm.font('Maple Mono', { weight = 'Medium' })
+-- config.harfbuzz_features = { 'cv01=1' }
+
 -- config.font = wezterm.font('MonoLisa', { weight = 'Medium' })
-config.harfbuzz_features = { 'calt=0', 'clig=0', 'liga=0' }
+
 config.font_size = 18
 
 -- config.color_scheme = 'Dracula'
 -- config.color_scheme = 'Argonaut'
 -- config.color_scheme = 'GitHub Dark'
--- config.color_scheme = 'Ayu Dark (Gogh)'
+config.color_scheme = 'Ayu Dark (Gogh)'
 -- config.color_scheme = 'Gruvbox Dark (Gogh)'
 
-config.colors = require('colors.tailwind_neutral_dark')
+config.colors = {
+  -- background = '#171717',     -- neutral-900
+
+  -- cursor_bg = '#404040',      -- neutral-700
+  -- cursor_fg = '#f5f5f5',      -- neutral-100
+  -- cursor_border = '#404040',  -- neutral-700
+
+  -- selection_fg = '#f5f5f5',   -- neutral-100
+  -- selection_bg = '#262626'    -- neutral-800
+}
+
+-- config.colors = require('colors.tailwind_neutral_dark')
 -- config.colors = require('colors.tailwind_gray_dark')
 -- config.colors = require('colors.tailwind_slate_dark')
 -- config.color_scheme = 'Tailwind Slate Dark'
