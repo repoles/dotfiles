@@ -3,15 +3,15 @@ local wezterm = require 'wezterm'
 local config = wezterm.config_builder()
 
 config.initial_cols = 80
-config.initial_rows = 24
+config.initial_rows = 25
 
 -- config.font = wezterm.font('JetBrains Mono', { weight = 'Medium' })
 -- config.harfbuzz_features = { 'calt=0', 'clig=0', 'liga=0' }
 
-config.font = wezterm.font('Maple Mono', { weight = 'Medium' })
+-- config.font = wezterm.font('Maple Mono', { weight = 'Medium' })
 -- config.harfbuzz_features = { 'cv01=1' }
 
--- config.font = wezterm.font('MonoLisa', { weight = 'Medium' })
+config.font = wezterm.font('MonoLisa', { weight = 'Medium' })
 
 config.font_size = 18
 
