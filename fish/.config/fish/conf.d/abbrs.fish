@@ -3,7 +3,7 @@ abbr --add rdm "bin/rails db:migrate"
 abbr --add rdr "bin/rails db:rollback"
 abbr --add rds "bin/rails db:seed"
 
-abbr --add rc  "bin/rails console"
+abbr --add rc "bin/rails console"
 abbr --add rs "bin/rails server"
 
 abbr --add rcs "bin/rails console --sandbox"
@@ -22,3 +22,10 @@ abbr --add gl "git log"
 
 # tmux
 abbr --add tclear "clear; tmux clear-history"
+
+# misc
+abbr --add cp "cp -iv"
+abbr --add mv "mv -iv"
+abbr --add rm "rm -i"
+
+abbr --add --position anywhere G "| rg -n"
