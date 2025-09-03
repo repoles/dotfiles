@@ -1,4 +1,5 @@
 # Ruby on Rails
+abbr --add rdc "bin/rails db:create"
 abbr --add rdm "bin/rails db:migrate"
 abbr --add rdr "bin/rails db:rollback"
 abbr --add rds "bin/rails db:seed"
