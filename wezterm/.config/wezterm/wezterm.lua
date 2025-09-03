@@ -12,6 +12,7 @@ config.initial_rows = 25
 -- config.harfbuzz_features = { 'cv01=1' }
 
 config.font = wezterm.font('MonoLisa', { weight = 'Medium' })
+config.harfbuzz_features = { 'liga=0' }
 
 config.font_size = 18
 
