@@ -5,14 +5,14 @@ local config = wezterm.config_builder()
 config.initial_cols = 80
 config.initial_rows = 25
 
--- config.font = wezterm.font('JetBrains Mono', { weight = 'Medium' })
--- config.harfbuzz_features = { 'calt=0', 'clig=0', 'liga=0' }
+config.font = wezterm.font('JetBrains Mono', { weight = 'Medium' })
+config.harfbuzz_features = { 'calt=0', 'clig=0', 'liga=0' }
 
 -- config.font = wezterm.font('Maple Mono', { weight = 'Medium' })
 -- config.harfbuzz_features = { 'cv01=1' }
 
-config.font = wezterm.font('MonoLisa', { weight = 'Medium' })
-config.harfbuzz_features = { 'liga=0' }
+-- config.font = wezterm.font('MonoLisa', { weight = 'Medium' })
+-- config.harfbuzz_features = { 'liga=0' }
 
 config.font_size = 18
 
@@ -23,14 +23,14 @@ config.color_scheme = 'Ayu Dark (Gogh)'
 -- config.color_scheme = 'Gruvbox Dark (Gogh)'
 
 config.colors = {
-  -- background = '#171717',     -- neutral-900
+    -- background = '#171717',     -- neutral-900
 
-  -- cursor_bg = '#404040',      -- neutral-700
-  -- cursor_fg = '#f5f5f5',      -- neutral-100
-  -- cursor_border = '#404040',  -- neutral-700
+    -- cursor_bg = '#404040',      -- neutral-700
+    -- cursor_fg = '#f5f5f5',      -- neutral-100
+    -- cursor_border = '#404040',  -- neutral-700
 
-  -- selection_fg = '#f5f5f5',   -- neutral-100
-  -- selection_bg = '#262626'    -- neutral-800
+    -- selection_fg = '#f5f5f5',   -- neutral-100
+    -- selection_bg = '#262626'    -- neutral-800
 }
 
 -- config.colors = require('colors.tailwind_neutral_dark')
@@ -53,10 +53,10 @@ config.cursor_blink_rate = 600
 -- config.macos_window_background_blur = 30
 
 config.window_padding = {
-  left = 0,
-  right = 0,
-  top = 0,
-  bottom = 0
+    left = 0,
+    right = 0,
+    top = 0,
+    bottom = 0
 }
 
 config.window_decorations = 'RESIZE | TITLE' -- MACOS_FORCE_ENABLE_SHADOW
@@ -67,18 +67,18 @@ config.hyperlink_rules = {}
 
 -- For OPT + Left/Right Arrow to work in SSH sessions
 config.keys = {
-  -- Option + Left Arrow
-  {
-    key = 'LeftArrow',
-    mods = 'OPT',
-    action = wezterm.action.SendString '\x1bb'
-  },
-  -- Option + Right Arrow
-  {
-    key = 'RightArrow',
-    mods = 'OPT',
-    action = wezterm.action.SendString '\x1bf'
-  },
+    -- Option + Left Arrow
+    {
+        key = 'LeftArrow',
+        mods = 'OPT',
+        action = wezterm.action.SendString '\x1bb'
+    },
+    -- Option + Right Arrow
+    {
+        key = 'RightArrow',
+        mods = 'OPT',
+        action = wezterm.action.SendString '\x1bf'
+    },
 }
 
 return config
