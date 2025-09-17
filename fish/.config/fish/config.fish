@@ -5,6 +5,8 @@ end
 if status is-interactive
     set -g fish_greeting
 
+    set -g fish_pager_color_progress black --background=cyan
+
     # https://fishshell.com/docs/current/interactive.html#syntax-highlighting-variables
     # set -g fish_color_command green
     # set -g fish_color_param normal
