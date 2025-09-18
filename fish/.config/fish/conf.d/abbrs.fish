@@ -1,5 +1,6 @@
 # Ruby on Rails
 abbr --add rdc "bin/rails db:create"
+abbr --add rdd "bin/rails db:drop"
 abbr --add rdm "bin/rails db:migrate"
 abbr --add rdr "bin/rails db:rollback"
 abbr --add rds "bin/rails db:seed"
@@ -30,4 +31,4 @@ abbr --add mv "mv -iv"
 abbr --add rm "rm -i"
 
 abbr --add --position anywhere G "| rg -n"
-abbr --add --position anywhere icloud ~/Library/Mobile\ Documents/com~apple~CloudDocs
+abbr --add --position anywhere icloud "~/Library/Mobile\ Documents/com\~apple\~CloudDocs"
