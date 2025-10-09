@@ -101,6 +101,6 @@ disabled = false
 format = '[$time]($style) ' # \uf017
 time_range = '20:00:00-8:00:00'
 
-[status]
-disabled = false
-format = '[\[$common_meaning$signal_name$maybe_int\]]($style) '
+# [status]
+# disabled = false
+# format = '[\[$common_meaning$signal_name$maybe_int\]]($style) '
