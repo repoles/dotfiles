@@ -23,14 +23,16 @@ config.color_scheme = 'Ayu Dark (Gogh)'
 -- config.color_scheme = 'Gruvbox Dark (Gogh)'
 
 config.colors = {
-    -- background = '#171717',     -- neutral-900
+  -- background = '#171717',     -- neutral-900
 
-    -- cursor_bg = '#404040',      -- neutral-700
-    -- cursor_fg = '#f5f5f5',      -- neutral-100
-    -- cursor_border = '#404040',  -- neutral-700
+  -- cursor_bg = '#404040',      -- neutral-700
+  -- cursor_fg = 'inverted',      -- neutral-100
+  -- cursor_border = '#404040',  -- neutral-700
 
-    -- selection_fg = '#f5f5f5',   -- neutral-100
-    -- selection_bg = '#262626'    -- neutral-800
+  -- selection_fg = '#f5f5f5',   -- neutral-100
+  -- selection_bg = '#262626'    -- neutral-800
+
+  -- cursor_fg = 'black'
 }
 
 -- config.colors = require('colors.tailwind_neutral_dark')
@@ -44,19 +46,19 @@ config.show_tab_index_in_tab_bar = true
 config.use_fancy_tab_bar = false
 config.tab_max_width = 25
 
-config.default_cursor_style = 'BlinkingBlock'
-config.cursor_blink_ease_out = 'Constant'
-config.cursor_blink_ease_in = 'Constant'
-config.cursor_blink_rate = 600
+config.default_cursor_style = 'SteadyBlock' -- 'BlinkingBlock'
+-- config.cursor_blink_ease_out = 'Constant'
+-- config.cursor_blink_ease_in = 'Constant'
+-- config.cursor_blink_rate = 600
 
 -- config.window_background_opacity = 0.9
 -- config.macos_window_background_blur = 30
 
 config.window_padding = {
-    left = 0,
-    right = 0,
-    top = 0,
-    bottom = 0
+  left = 0,
+  right = 0,
+  top = 0,
+  bottom = 0
 }
 
 config.window_decorations = 'RESIZE | TITLE' -- MACOS_FORCE_ENABLE_SHADOW
@@ -65,20 +67,31 @@ config.enable_scroll_bar = false
 -- Disable hyperlinks
 config.hyperlink_rules = {}
 
+local act = wezterm.action
+
+config.mouse_bindings = {
+  {
+    -- Select text on triple click
+    event = { Down = { streak = 3, button = 'Left' } },
+    action = wezterm.action.SelectTextAtMouseCursor 'SemanticZone',
+    mods = 'NONE',
+  },
+}
+
 -- For OPT + Left/Right Arrow to work in SSH sessions
 config.keys = {
-    -- Option + Left Arrow
-    {
-        key = 'LeftArrow',
-        mods = 'OPT',
-        action = wezterm.action.SendString '\x1bb'
-    },
-    -- Option + Right Arrow
-    {
-        key = 'RightArrow',
-        mods = 'OPT',
-        action = wezterm.action.SendString '\x1bf'
-    },
+  -- Option + Left Arrow
+  {
+    key = 'LeftArrow',
+    mods = 'OPT',
+    action = wezterm.action.SendString '\x1bb'
+  },
+  -- Option + Right Arrow
+  {
+    key = 'RightArrow',
+    mods = 'OPT',
+    action = wezterm.action.SendString '\x1bf'
+  },
 }
 
 return config
