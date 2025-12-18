@@ -1,24 +1,25 @@
-font-family = Maple Mono
+# font-family = Maple Mono
 
 font-size = 18
 font-thicken = true
-# font-feature = -calt, -liga, -dlig
+font-feature = -calt, -liga, -dlig
 
 # theme = Argonaut
 # theme = Dracula
 # theme = GitHub Dark
 # theme = Monokai Classic
-theme = ayu
+# theme = Gruvbox Material
+theme = Ayu
 
 # background = #000000
 
 # cursor-style = underline
-cursor-color = #666666
-cursor-text = #ffffff
+# cursor-color = #666666
+# cursor-text = #ffffff
 # cursor-style-blink = false
 
 adjust-cursor-thickness = 4
-split-divider-color = green
+# split-divider-color = green
 
 # unfocused-split-fill = #000000
 # unfocused-split-opacity = 1
@@ -34,8 +35,8 @@ macos-titlebar-proxy-icon = hidden
 window-width = 80
 window-height = 25
 
-# window-padding-x = 0
-# window-padding-y = 0
+window-padding-x = 0
+window-padding-y = 0
 
 # macos-icon = xray
 
