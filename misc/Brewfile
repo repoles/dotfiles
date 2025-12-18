@@ -1,47 +1,83 @@
 # https://docs.brew.sh/Brew-Bundle-and-Brewfile#brew-bundle-upgrade-and-homebrew_bundle_no_upgrade1
 # brew bundle --no-upgrade --verbose
 
-brew "fish" # Friendly interactive shell
-brew "tmux" # Terminal multiplexer
-brew "starship" # Cross-shell prompt for astronauts
+brew 'fish' # Friendly interactive shell
+brew 'tmux' # Terminal multiplexer
+brew 'starship' # Cross-shell prompt for astronauts
 
-brew "mise" # Polyglot runtime manager (asdf rust clone)
-brew "yarn" # JavaScript package manager
+brew 'mise' # Polyglot runtime manager (asdf rust clone)
+brew 'yarn' # JavaScript package manager
+brew 'node' # Platform built on V8 to build network applications
 
-brew "eza" # Modern, maintained replacement for ls
-brew "bat" # Clone of cat with syntax highlighting and Git integration
-brew "fzf" # Command-line fuzzy finder written in Go
-brew "fd" # Simple, fast and user-friendly alternative to find
-brew "jq" # Lightweight and flexible command-line JSON processor
+brew 'eza' # Modern, maintained replacement for ls
+brew 'bat' # Clone of cat with syntax highlighting and Git integration
+brew 'fzf' # Command-line fuzzy finder written in Go
+brew 'fd' # Simple, fast and user-friendly alternative to find
+brew 'zoxide' # Shell extension to navigate your filesystem faster
 
-brew "jless" # Command-line JSON viewer
-brew "pv" # Monitor data's progress through a pipe
+brew 'jless' # Command-line JSON viewer
+brew 'jq' # Lightweight and flexible command-line JSON processor
 
-brew "fastfetch" # Fast system information tool
-brew "htop" # Improved top (interactive process viewer)
-brew "btop" # A monitor of resources
+brew 'pv' # Monitor data's progress through a pipe
+brew 'stow' # Organize software neatly under a single directory tree
 
-brew "ripgrep" # Search tool like grep and The Silver Searcher
-brew "dua-cli" # View disk space usage and delete unwanted data, fast
-brew "httpie" # User-friendly cURL replacement (command-line HTTP client)
-brew "git-delta" # A syntax-highlighting pager for git, diff, grep, and blame output
+brew 'fastfetch' # Fast system information tool
+brew 'htop' # Improved top (interactive process viewer)
+brew 'btop' # A monitor of resources
 
-brew "awscli" # Official Amazon AWS command-line interface
-brew "aws-vault" # Securely store and access AWS credentials
+brew 'ripgrep' # Search tool like grep and The Silver Searcher
+brew 'dua-cli' # View disk space usage and delete unwanted data, fast
+brew 'httpie' # User-friendly cURL replacement (command-line HTTP client)
+brew 'git-delta' # A syntax-highlighting pager for git, diff, grep, and blame output
 
-brew "imagemagick" # Tools and libraries to manipulate images in many formats
-brew "ffmpeg" # Play, record, convert, and stream audio and video
+brew 'awscli' # Official Amazon AWS command-line interface
+brew 'aws-vault' # Securely store and access AWS credentials
 
-brew "mysql@8.4" # Open source relational database management system
-brew "tomcat@8" # Implementation of Java Servlet and JavaServer Pages
+brew 'imagemagick' # Tools and libraries to manipulate images in many formats
+brew 'ffmpeg' # Play, record, convert, and stream audio and video
 
-brew "nvim" # Ambitious Vim-fork focused on extensibility and agility
+brew 'mysql@8.4' # Open source relational database management system
+brew 'tomcat@8' # Implementation of Java Servlet and JavaServer Pages
+
+brew 'nvim' # Ambitious Vim-fork focused on extensibility and agility
+brew 'mas' # Mac App Store command-line interface
 
 # https://derflounder.wordpress.com/2025/04/06/rsync-replaced-with-openrsync-on-macos-sequoia/
-brew "rsync" # since macOS Sequoia is now using openrsync
+brew 'rsync' # since macOS Sequoia is now using openrsync
+
+# Some compiler dependencies
+brew 'libyaml' # YAML Parser
+brew 'pkg-config' # Package configuration tool
+
+# Casks
+cask 'raycast'
+cask 'basecamp'
+cask 'wezterm'
+cask 'ghostty'
+cask 'whatsapp'
+cask 'keyboard-maestro'
+cask 'jetbrains-toolbox'
+cask 'microsoft-excel'
+cask 'docker-desktop'
+cask 'google-chrome'
+cask 'cleanshot'
+cask 'transmit'
+cask 'chatgpt'
+cask 'itsycal'
+cask 'postman'
+cask 'hazel'
+cask 'zed'
+cask 'arq'
 
 # Fonts
+cask 'font-fira-code'
+cask 'font-jetbrains-mono'
+cask 'font-symbols-only-nerd-font'
+# cask 'font-maple-mono'
+# cask 'font-maple-mono-nf'
 
-# Maple Mono
-cask "font-maple-mono"
-cask "font-maple-mono-nf"
+# App Store
+mas 'Things', id: 904280696
+mas '1Blocker', id: 1365531024
+mas 'Toggl', id: 1291898086
+mas 'Soulver', id: 1508732804
