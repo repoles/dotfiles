@@ -3,13 +3,15 @@
 	email = lucas@repoles.com
 [init]
 	defaultBranch = main
+[pull]
+	rebase = true
 [core]
 	pager = delta
 	autocrlf = input
 [alias]
 	st = status
 	lg = log --oneline --decorate
-    diff-side-by-side = -c delta.features=side-by-side diff
+  diff-side-by-side = -c delta.features=side-by-side diff
 	diff-line-numbers = -c delta.line-numbers=true diff
 [bash]
 	showInformativeStatus = true
