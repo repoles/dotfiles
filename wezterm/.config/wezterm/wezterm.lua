@@ -23,16 +23,12 @@ config.color_scheme = 'Ayu Dark (Gogh)'
 -- config.color_scheme = 'Gruvbox Dark (Gogh)'
 
 config.colors = {
-  -- background = '#171717',     -- neutral-900
-
-  -- cursor_bg = '#404040',      -- neutral-700
-  -- cursor_fg = 'inverted',      -- neutral-100
-  -- cursor_border = '#404040',  -- neutral-700
-
-  -- selection_fg = '#f5f5f5',   -- neutral-100
-  -- selection_bg = '#262626'    -- neutral-800
-
-  -- cursor_fg = 'black'
+  -- background = '#171717', -- neutral-900
+  -- cursor_bg = '#404040', -- neutral-700
+  -- cursor_fg = 'transparent', -- neutral-100
+  -- cursor_border = '#404040', -- neutral-700
+  -- selection_fg = '#f5f5f5', -- neutral-100
+  -- selection_bg = '#262626', -- neutral-800
 }
 
 -- config.colors = require('colors.tailwind_neutral_dark')
@@ -46,10 +42,10 @@ config.show_tab_index_in_tab_bar = true
 config.use_fancy_tab_bar = false
 config.tab_max_width = 25
 
-config.default_cursor_style = 'SteadyBlock' -- 'BlinkingBlock'
--- config.cursor_blink_ease_out = 'Constant'
--- config.cursor_blink_ease_in = 'Constant'
--- config.cursor_blink_rate = 600
+config.default_cursor_style = 'BlinkingBlock' -- 'BlinkingBlock'
+config.cursor_blink_ease_out = 'Constant'
+config.cursor_blink_ease_in = 'Constant'
+config.cursor_blink_rate = 600
 
 -- config.window_background_opacity = 0.9
 -- config.macos_window_background_blur = 30
