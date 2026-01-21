@@ -31,4 +31,3 @@ abbr --add mv "mv -iv"
 abbr --add rm "rm -i"
 
 abbr --add --position anywhere G "| rg -n"
-abbr --add --position anywhere icloud "~/Library/Mobile\ Documents/com\~apple\~CloudDocs"

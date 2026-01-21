@@ -37,6 +37,8 @@ if status is-interactive
     fish_add_path $HOMEBREW_PREFIX/opt/mysql@8.4/bin $HOME/Code/Scripts
     [ "$TERM_PROGRAM" = "Apple_Terminal" ] && function fish_title; end
 
+    set icloud ~/Library/Mobile\ Documents/com\~apple\~CloudDocs
+
     # enable_transience # does not work well with tmux
 
     # function starship_transient_prompt_func
