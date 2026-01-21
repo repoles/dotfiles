@@ -31,18 +31,13 @@ config.colors = {
   -- selection_bg = '#262626', -- neutral-800
 }
 
--- config.colors = require('colors.tailwind_neutral_dark')
--- config.colors = require('colors.tailwind_gray_dark')
--- config.colors = require('colors.tailwind_slate_dark')
--- config.color_scheme = 'Tailwind Slate Dark'
-
 -- config.window_close_confirmation = 'NeverPrompt'
 config.hide_tab_bar_if_only_one_tab = true
 config.show_tab_index_in_tab_bar = true
 config.use_fancy_tab_bar = false
 config.tab_max_width = 25
 
-config.default_cursor_style = 'BlinkingBlock' -- 'BlinkingBlock'
+config.default_cursor_style = 'BlinkingBlock' -- 'SteadyBlock'
 config.cursor_blink_ease_out = 'Constant'
 config.cursor_blink_ease_in = 'Constant'
 config.cursor_blink_rate = 600
@@ -87,6 +82,12 @@ config.keys = {
     key = 'RightArrow',
     mods = 'OPT',
     action = wezterm.action.SendString '\x1bf'
+  },
+  -- Shift + Enter to insert newline
+  {
+    key = 'Enter',
+    mods = 'SHIFT',
+    action = wezterm.action.SendString '\n'
   },
 }
 
