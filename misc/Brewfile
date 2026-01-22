@@ -50,25 +50,33 @@ brew 'libyaml' # YAML Parser
 brew 'pkg-config' # Package configuration tool
 
 # Casks
+
+cask 'arq'
+cask 'hazel'
 cask 'raycast'
-cask 'basecamp'
-cask 'wezterm'
-cask 'ghostty'
-cask 'whatsapp'
 cask 'keyboard-maestro'
+
 cask 'jetbrains-toolbox'
+
 cask 'microsoft-excel'
 cask 'microsoft-word'
-cask 'docker-desktop'
+
 cask 'google-chrome'
+cask 'docker-desktop'
+
+cask 'wezterm'
+cask 'ghostty'
+
+cask 'whatsapp'
+cask 'basecamp'
 cask 'cleanshot'
 cask 'transmit'
-cask 'chatgpt'
 cask 'itsycal'
-cask 'postman'
-cask 'hazel'
+
 cask 'zed'
-cask 'arq'
+cask 'postman'
+
+cask 'chatgpt'
 
 # Fonts
 cask 'font-fira-code'
