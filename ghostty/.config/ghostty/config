@@ -1,4 +1,5 @@
-# font-family = Maple Mono
+font-family = JetBrains Mono
+font-family = Symbols Nerd Font Mono
 
 font-size = 18
 font-thicken = true
@@ -37,6 +38,8 @@ window-height = 25
 
 window-padding-x = 0
 window-padding-y = 0
+
+keybind = shift+enter=text:\x1b\r
 
 # macos-icon = xray
 
