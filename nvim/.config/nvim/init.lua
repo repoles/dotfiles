@@ -19,3 +19,13 @@ vim.api.nvim_create_autocmd("BufReadPost", {
         end
     end,
 })
+
+-- Set text width and color column for gitcommit filetype
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = "gitcommit",
+    callback = function()
+        vim.opt_local.textwidth = 72 -- Set text width to 72
+        vim.opt_local.colorcolumn = "72" -- Highlight column 72
+        vim.fn.cursor(1, 1) -- Move cursor to the beginning of the file
+    end
+})
