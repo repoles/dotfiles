@@ -4,7 +4,6 @@ set -x XDG_DATA_HOME $HOME/.local/share
 set -x XDG_STATE_HOME $HOME/.local/state
 
 set -x EDITOR nvim
-set -x VISUAL code --wait
 
 # We use mise to manage Ruby installations. However,
 # we want to keep the Ruby that comes installed on

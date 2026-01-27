@@ -30,4 +30,6 @@ abbr --add cp "cp -iv"
 abbr --add mv "mv -iv"
 abbr --add rm "rm -i"
 
+abbr --add vim "nvim"
+
 abbr --add --position anywhere G "| rg -n"
