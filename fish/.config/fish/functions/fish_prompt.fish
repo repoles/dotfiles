@@ -25,15 +25,7 @@ function fish_prompt --description 'Write out the prompt'
 
     # duration
     if test $CMD_DURATION -gt 5000
-        set -l secs (math --scale=0 $CMD_DURATION/1000 % 60)
-        set -l mins (math --scale=0 $CMD_DURATION/60000 % 60)
-        set -l hours (math --scale=0 $CMD_DURATION/3600000)
-
-        test $hours -gt 0 && set -a duration_part $hours'h'
-        test $mins -gt 0 && set -a duration_part $mins'm'
-        test $secs -gt 0 && set -a duration_part $secs's'
-
-        set duration_part (set_color yellow) (string join ' ' $duration_part) $normal
+        set duration_part (set_color yellow) ' ' (humanize_duration) $normal
     end
 
     # date
