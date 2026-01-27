@@ -1345,7 +1345,7 @@ tab_separator "┇"
 #: The separator between tabs in the tab bar when using separator as
 #: the tab_bar_style.
 
-tab_powerline_style round
+# tab_powerline_style slanted
 
 #: The powerline separator style between tabs in the tab bar when
 #: using powerline as the tab_bar_style, can be one of: angled,
@@ -2143,7 +2143,7 @@ macos_option_as_alt yes
 #: Use the macOS traditional full-screen transition, that is faster,
 #: but less pretty.
 
-macos_show_window_title_in window
+# macos_show_window_title_in all
 
 #: Control where the window title is displayed on macOS. A value of
 #: window will show the title of the currently active window at the
@@ -3024,6 +3024,5 @@ map cmd+9 goto_tab 9
 map alt+left send_text all \x1b\x62
 map alt+right send_text all \x1b\x66
 
-include ayu-theme.conf
-# include rose-pine-theme.conf
-# include afterglow-theme.conf
+# include ayu-theme.conf
+include rose-pine-theme.conf
