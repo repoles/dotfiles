@@ -1,0 +1,11 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/jesseduffield/lazygit/master/schema/config.json
+
+gui:
+  theme:
+    selectedLineBgColor:
+      - '#222222'
+
+git:
+  pagers:
+    # https://github.com/jesseduffield/lazygit/blob/master/docs/Custom_Pagers.md#delta
+    - pager: delta --dark --paging=never
