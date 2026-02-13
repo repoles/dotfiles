@@ -8,14 +8,16 @@ config.initial_rows = 25
 -- WezTerm bundles JetBrains Mono, Nerd Font Symbols and Noto Color Emoji
 -- https://wezterm.org/config/fonts.html
 
+-- config.font = wezterm.font('Berkeley Mono')
+
 -- config.font = wezterm.font('JetBrains Mono', { weight = 'Medium' })
-config.harfbuzz_features = { 'calt=0', 'clig=0', 'liga=0' }
+-- config.harfbuzz_features = { 'calt=0', 'clig=0', 'liga=0' }
 
 -- config.font = wezterm.font('Maple Mono', { weight = 'Medium' })
 -- config.harfbuzz_features = { 'cv01=1' }
 
--- config.font = wezterm.font('MonoLisa', { weight = 'Medium' })
--- config.harfbuzz_features = { 'liga=0' }
+config.font = wezterm.font('MonoLisa', { weight = 'Medium' })
+-- config.harfbuzz_features = { 'calt=0', 'liga=0' }
 
 config.font_size = 18
 
@@ -69,17 +71,17 @@ config.mouse_bindings = {
     event = { Down = { streak = 1, button = 'Right' } },
     action = act.SelectTextAtMouseCursor 'SemanticZone',
     mods = 'CMD',
-  },
+  }
 }
 
 config.keys = {
-  -- Option + Left Arrow (to work in SSH)
+  -- Option + Left Arrow
   {
     key = 'LeftArrow',
     mods = 'OPT',
     action = act.SendString '\x1bb'
   },
-  -- Option + Right Arrow (to work in SSH)
+  -- Option + Right Arrow
   {
     key = 'RightArrow',
     mods = 'OPT',
