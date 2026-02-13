@@ -21,7 +21,10 @@ function fish_prompt --description 'Write out the prompt'
     set cwd_part (set_color $fish_color_cwd) (prompt_pwd) $normal
 
     # vcs
-    set vcs_part (fish_git_prompt) $normal
+    set -l git_info (fish_git_prompt)
+    if test -n "$git_info"
+        set vcs_part ' ' $git_info $normal
+    end
 
     # duration
     if test $CMD_DURATION -gt 5000
