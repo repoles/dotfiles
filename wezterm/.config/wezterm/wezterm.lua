@@ -8,16 +8,18 @@ config.initial_rows = 25
 -- WezTerm bundles JetBrains Mono, Nerd Font Symbols and Noto Color Emoji
 -- https://wezterm.org/config/fonts.html
 
--- config.font = wezterm.font('Berkeley Mono')
-
 -- config.font = wezterm.font('JetBrains Mono', { weight = 'Medium' })
 -- config.harfbuzz_features = { 'calt=0', 'clig=0', 'liga=0' }
 
 -- config.font = wezterm.font('Maple Mono', { weight = 'Medium' })
 -- config.harfbuzz_features = { 'cv01=1' }
 
-config.font = wezterm.font('MonoLisa', { weight = 'Medium' })
--- config.harfbuzz_features = { 'calt=0', 'liga=0' }
+config.font = wezterm.font('MonoLisa')
+config.harfbuzz_features = { 'calt=0', 'liga=0' }
+
+-- config.font = wezterm.font('Berkeley Mono')
+
+-- config.font = wezterm.font('Fira Code', { weight = 'Medium' })
 
 config.font_size = 18
 
@@ -94,15 +96,15 @@ config.keys = {
     action = act.SendString '\n'
   },
   -- Shift + Up/Down Arrow to scroll to prompt
-  { key = 'UpArrow',
-    mods = 'SHIFT',
-    action = act.ScrollToPrompt(-1)
-  },
-  {
-    key = 'DownArrow',
-    mods = 'SHIFT',
-    action = act.ScrollToPrompt(1)
-  }
+  -- { key = 'UpArrow',
+  --   mods = 'SHIFT',
+  --   action = act.ScrollToPrompt(-1)
+  -- },
+  -- {
+  --   key = 'DownArrow',
+  --   mods = 'SHIFT',
+  --   action = act.ScrollToPrompt(1)
+  -- }
 }
 
 return config
