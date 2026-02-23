@@ -21,8 +21,8 @@ if status is-interactive
     # set -g __fish_git_prompt_use_informative_chars true
 
     # set -g __fish_git_prompt_showcolorhints true
-    # set -g __fish_git_prompt_color purple
     # set -g __fish_git_prompt_color_branch purple
+    # set -g __fish_git_prompt_color cyan
 
     set -g __fish_git_prompt_char_upstream_ahead ↑
     set -g __fish_git_prompt_char_upstream_behind ↓
@@ -37,6 +37,4 @@ if status is-interactive
 
     fish_add_path $HOMEBREW_PREFIX/opt/mysql@8.4/bin $HOME/.local/bin
     [ "$TERM_PROGRAM" = "Apple_Terminal" ] && function fish_title; end
-
-    set icloud ~/"Library/Mobile Documents/com~apple~CloudDocs"
 end

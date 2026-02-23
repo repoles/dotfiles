@@ -29,3 +29,5 @@ set -x AWS_CONFIG_FILE $XDG_CONFIG_HOME/aws/config
 # set -x AWS_SHARED_CREDENTIALS_FILE $XDG_CONFIG_HOME/aws/credentials
 
 set -x FZF_DEFAULT_OPTS '--tmux center,90%,70% --layout reverse'
+
+set -x ICLOUD ~/"Library/Mobile Documents/com~apple~CloudDocs"
