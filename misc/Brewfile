@@ -14,6 +14,7 @@ brew 'bat' # Clone of cat with syntax highlighting and Git integration
 brew 'fzf' # Command-line fuzzy finder written in Go
 brew 'fd' # Simple, fast and user-friendly alternative to find
 brew 'zoxide' # Shell extension to navigate your filesystem faster
+brew 'glow' # Markdown reader for the CLI
 
 brew 'jless' # Command-line JSON viewer
 brew 'jq' # Lightweight and flexible command-line JSON processor
@@ -66,6 +67,7 @@ cask 'docker-desktop'
 
 cask 'wezterm'
 cask 'ghostty'
+cask 'kitty'
 
 cask 'whatsapp'
 cask 'basecamp'
@@ -77,6 +79,12 @@ cask 'zed'
 cask 'postman'
 
 cask 'chatgpt'
+cask 'codex'
+cask 'claude'
+
+# A instalação do Homebrew não se atualiza automaticamente
+# Instalação nativa: https://code.claude.com/docs/en/quickstart
+# cask 'claude-code'
 
 # Fonts
 cask 'font-fira-code'
