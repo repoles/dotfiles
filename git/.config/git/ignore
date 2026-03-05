@@ -4,3 +4,5 @@
 # https://mise.jdx.dev/configuration.html
 .mise.local.toml
 .mise.*.local.toml
+
+**/.claude/settings.local.json
