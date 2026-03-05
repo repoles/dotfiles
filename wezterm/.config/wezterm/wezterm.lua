@@ -24,7 +24,7 @@ config.harfbuzz_features = { 'calt=0', 'liga=0' }
 config.font_size = 18
 
 -- config.color_scheme = 'Dracula'
--- config.color_scheme = 'Argonaut'
+-- config.color_scheme = 'Argonaut (Gogh)'
 -- config.color_scheme = 'GitHub Dark'
 config.color_scheme = 'Ayu Dark (Gogh)'
 -- config.color_scheme = 'Gruvbox Dark (Gogh)'
@@ -34,8 +34,8 @@ config.colors = {
   -- cursor_bg = '#404040', -- neutral-700
   -- cursor_fg = 'transparent', -- neutral-100
   -- cursor_border = '#404040', -- neutral-700
-  selection_fg = '#f5f5f5', -- neutral-100
-  selection_bg = '#262626', -- neutral-800
+  -- selection_fg = '#f5f5f5', -- neutral-100
+  -- selection_bg = '#262626', -- neutral-800
 }
 
 -- config.window_close_confirmation = 'NeverPrompt'
