@@ -56,7 +56,7 @@ function fish_git_prompt --description 'Custom git prompt'
 
     # Build output
     set -l result ''
-    set -l icon \uf126
+    set -l icon \uf126 # 
 
     set result "$color_branch$icon $branch$dirty$color_reset"
 
