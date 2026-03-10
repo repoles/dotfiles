@@ -20,9 +20,9 @@ if status is-interactive
     set -g __fish_git_prompt_showupstream informative
     # set -g __fish_git_prompt_use_informative_chars true
 
-    # set -g __fish_git_prompt_showcolorhints true
-    # set -g __fish_git_prompt_color_branch purple
-    # set -g __fish_git_prompt_color cyan
+    set -g __fish_git_prompt_showcolorhints true
+    set -g __fish_git_prompt_color_branch brmagenta
+    set -g __fish_git_prompt_color brblack
 
     set -g __fish_git_prompt_char_upstream_ahead ↑
     set -g __fish_git_prompt_char_upstream_behind ↓

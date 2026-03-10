@@ -1,4 +1,4 @@
-function fish_git_prompt --description 'Custom git prompt'
+function custom_git_prompt --description 'Custom git prompt'
     # Check if we're in a git repo
     set -l branch (command git symbolic-ref --short HEAD 2>/dev/null)
     or set -l branch (command git describe --tags --exact-match HEAD 2>/dev/null)

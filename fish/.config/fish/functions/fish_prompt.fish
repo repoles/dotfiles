@@ -1,9 +1,6 @@
-# name: My Simple Prompt
-# author: Lucas Repolês
-
-function fish_prompt --description 'Write out the prompt'
+function fish_prompt --description 'Custom fish prompt'
     set -l last_status $status
-    set -l normal (set_color normal)
+    set -l color_reset (set_color normal)
 
     set -l login_part ''
     set -l cwd_part ''
@@ -18,27 +15,27 @@ function fish_prompt --description 'Write out the prompt'
     end
 
     # cwd
-    set cwd_part (set_color $fish_color_cwd) (prompt_pwd) $normal
+    set cwd_part (custom_pwd_prompt)
 
     # vcs
-    set -l git_info (fish_git_prompt)
+    set -l git_info (custom_git_prompt)
     if test -n "$git_info"
-        set vcs_part ' ' $git_info $normal
+        set vcs_part ' ' $git_info
     end
 
     # duration
     if test $CMD_DURATION -gt 5000
-        set duration_part (set_color yellow) ' ' (humanize_duration) $normal
+        set duration_part (set_color yellow) ' ' (humanize_duration) $color_reset
     end
 
     # date
-    set date_part (set_color brblack) (date '+%H:%M:%S') $normal
+    set date_part (set_color brblack) (date '+%H:%M:%S') $color_reset
 
     # suffix
     if test $last_status -ne 0
-        set suffix (set_color $fish_color_error) $suffix $normal
+        set suffix (set_color $fish_color_error) $suffix $color_reset
     else
-        set suffix (set_color $fish_color_command) $suffix $normal
+        set suffix (set_color $fish_color_command) $suffix $color_reset
     end
 
     set -l line1 $login_part $cwd_part $vcs_part $duration_part
