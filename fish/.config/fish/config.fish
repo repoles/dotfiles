@@ -30,7 +30,9 @@ if status is-interactive
     /opt/homebrew/bin/brew shellenv | source
 
     zoxide init fish --cmd j | source
-    fzf --fish | source
+
+    # https://junegunn.github.io/fzf/shell-integration/#setting-up-shell-integration
+    fzf --fish | FZF_ALT_C_COMMAND= FZF_CTRL_T_COMMAND= source
 
     # set -x STARSHIP_CONFIG $XDG_CONFIG_HOME/starship/starship.toml
     # starship init fish | source

@@ -30,4 +30,13 @@ set -x AWS_CONFIG_FILE $XDG_CONFIG_HOME/aws/config
 
 set -x FZF_DEFAULT_OPTS '--tmux center,90%,70% --layout reverse'
 
+set -l fzf_prompt \u276f # ❯
+set -x FZF_DEFAULT_OPTS "--tmux center,90%,70% --layout reverse"\
+" --prompt='$fzf_prompt ' --marker='$fzf_prompt'"\
+" --color=hl:bright-yellow --color=hl+:bright-yellow"\
+" --color=info:cyan,border:bright-black,prompt:green"\
+" --color=pointer:red,marker:yellow,spinner:yellow,header:blue"\
+
+set -x FZF_CTRL_R_OPTS "--with-nth=2.."
+
 set -x ICLOUD ~/"Library/Mobile Documents/com~apple~CloudDocs"
