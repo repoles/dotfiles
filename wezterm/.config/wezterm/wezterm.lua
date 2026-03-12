@@ -26,8 +26,8 @@ config.font_size = 18
 -- config.color_scheme = 'Dracula'
 -- config.color_scheme = 'Argonaut (Gogh)'
 -- config.color_scheme = 'GitHub Dark'
--- config.color_scheme = 'Ayu Dark (Gogh)'
-config.color_scheme = 'Gruvbox Dark (Gogh)'
+config.color_scheme = 'Ayu Dark (Gogh)'
+-- config.color_scheme = 'Gruvbox Dark (Gogh)'
 
 config.colors = {
   -- background = '#171717', -- neutral-900
