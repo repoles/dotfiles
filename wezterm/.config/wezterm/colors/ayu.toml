@@ -1,0 +1,38 @@
+[colors]
+foreground = "#bfbdb6"
+background = "#0b0e14"
+
+cursor_bg = "#e6b450"
+cursor_fg = "#0b0e14"
+cursor_border = "#e6b450"
+
+selection_fg = "#0b0e14"
+selection_bg = "#409fff"
+
+ansi = [
+  "#11151c", # black
+  "#ea6c73", # red
+  "#7fd962", # green
+  "#f9af4f", # yellow
+  "#53bdfa", # blue
+  "#cda1fa", # magenta
+  "#90e1c6", # cyan
+  "#c7c7c7", # white
+]
+
+brights = [
+  "#686868", # bright black
+  "#f07178", # bright red
+  "#aad94c", # bright green
+  "#ffb454", # bright yellow
+  "#59c2ff", # bright blue
+  "#d2a6ff", # bright magenta
+  "#95e6cb", # bright cyan
+  "#ffffff", # bright white
+]
+
+[metadata]
+name = "Ayu Ghostty"
+author = "Lucas Repolês"
+# Ayu theme palette ported from Ghostty
+# /Applications/Ghostty.app/Contents/Resources/ghostty/themes/Ayu
