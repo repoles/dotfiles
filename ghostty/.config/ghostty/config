@@ -1,16 +1,16 @@
-font-family = MonoLisa
+font-family = JetBrains Mono
 font-family = Symbols Nerd Font Mono
 
 font-size = 18
-font-thicken = true
+# font-thicken = true
 font-feature = -calt, -liga, -dlig
 
+theme = Ayu
 # theme = Argonaut
 # theme = Dracula
 # theme = GitHub Dark
 # theme = Monokai Classic
-# theme = Gruvbox Material
-theme = Ayu
+# theme = Gruvbox Dark Hard
 
 # background = #000000
 
@@ -27,7 +27,7 @@ adjust-cursor-thickness = 4
 
 # window-decoration = none
 macos-option-as-alt = true
-# macos-titlebar-style = tabs
+macos-titlebar-style = tabs
 macos-titlebar-proxy-icon = hidden
 
 # window-title-font-family = MonoLisa
@@ -48,4 +48,4 @@ keybind = shift+enter=text:\x1b\r
 # macos-icon-screen-color = 000000
 
 # bell-features = no-title
-# shell-integration-features = ssh-terminfo,ssh-env
+shell-integration-features = ssh-terminfo,ssh-env
