@@ -58,8 +58,8 @@ config.font_size = 18
 
 -- config.color_scheme = 'Dracula'
 -- config.color_scheme = 'Argonaut (Gogh)'
--- config.color_scheme = 'GitHub Dark'
-config.color_scheme = 'Ayu Dark (Gogh)'
+-- config.color_scheme = 'Ayu Dark (Gogh)'
+-- config.color_scheme = 'Ayu Mirage (Gogh)'
 -- config.color_scheme = 'Gruvbox Dark (Gogh)'
 
 config.colors = {
@@ -69,6 +69,41 @@ config.colors = {
   -- cursor_border = '#404040', -- neutral-700
   -- selection_fg = '#f5f5f5', -- neutral-100
   -- selection_bg = '#262626', -- neutral-800
+
+  -- Ayu (theme copied from Ghostty)
+  -- /Applications/Ghostty.app/Contents/Resources/ghostty/themes/Ayu
+
+  foreground = "#bfbdb6",
+  background = "#0b0e14",
+
+  cursor_bg = "#e6b450",
+  cursor_fg = "#0b0e14",
+  cursor_border = "#e6b450",
+
+  selection_fg = "#0b0e14",
+  selection_bg = "#409fff",
+
+  ansi = {
+    "#11151c", -- black
+    "#ea6c73", -- red
+    "#7fd962", -- green
+    "#f9af4f", -- yellow
+    "#53bdfa", -- blue
+    "#cda1fa", -- magenta
+    "#90e1c6", -- cyan
+    "#c7c7c7", -- white
+  },
+
+  brights = {
+    "#686868", -- bright black
+    "#f07178", -- bright red
+    "#aad94c", -- bright green
+    "#ffb454", -- bright yellow
+    "#59c2ff", -- bright blue
+    "#d2a6ff", -- bright magenta
+    "#95e6cb", -- bright cyan
+    "#ffffff", -- bright white
+  }
 }
 
 -- config.window_close_confirmation = 'NeverPrompt'
