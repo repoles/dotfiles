@@ -1,45 +1,55 @@
-function fish_prompt --description 'Custom fish prompt'
+function fish_prompt
     set -l last_status $status
-    set -l color_reset (set_color normal)
+    set -l last_duration $CMD_DURATION
 
-    set -l login_part ''
-    set -l cwd_part ''
-    set -l vcs_part ''
-    set -l duration_part ''
-    set -l date_part ''
-    set -l suffix \u276f # ❯
+    # Line 1: directory | git info | command duration
+    set -l line1 (custom_prompt_pwd)
 
-    # login
-    if set -q SSH_CLIENT; or set -q SSH_TTY; or set -q SSH_CONNECTION
-        set login_part (prompt_login) ' '
-    end
-
-    # cwd
-    set cwd_part (custom_pwd_prompt)
-
-    # vcs
-    set -l git_info (custom_git_prompt)
+    set -l git_info (custom_prompt_git)
     if test -n "$git_info"
-        set vcs_part ' ' $git_info
+        set line1 "$line1 $git_info"
     end
 
-    # duration
-    if test $CMD_DURATION -gt 5000
-        set duration_part (set_color yellow) ' ' (humanize_duration) $color_reset
+    set -l duration_threshold 5000
+    set -q custom_prompt_command_duration_threshold
+        and set duration_threshold $custom_prompt_command_duration_threshold
+
+    if test "$last_duration" -ge "$duration_threshold"
+        set -l duration_str (humanize_duration $last_duration)
+        if set -q custom_prompt_command_duration_color
+            set line1 "$line1 "(set_color $custom_prompt_command_duration_color)"$duration_str"(set_color normal)
+        else
+            set line1 "$line1 $duration_str"
+        end
     end
 
-    # date
-    set date_part (set_color brblack) (date '+%H:%M:%S') $color_reset
-
-    # suffix
-    if test $last_status -ne 0
-        set suffix (set_color $fish_color_error) $suffix $color_reset
+    # Line 2: time | prompt symbol
+    set -l time_str (date '+%H:%M:%S')
+    set -l time_output
+    if set -q custom_prompt_time_color
+        set time_output (set_color $custom_prompt_time_color)"$time_str"(set_color normal)
     else
-        set suffix (set_color $fish_color_command) $suffix $color_reset
+        set time_output $time_str
     end
 
-    set -l line1 $login_part $cwd_part $vcs_part $duration_part
-    set -l line2 $date_part ' ' $suffix ' '
+    set -l symbol '>'
+    set -q custom_prompt_symbol; and set symbol $custom_prompt_symbol
 
-    string join '' -- \n $line1 \n $line2
+    set -l symbol_output
+    if test $last_status -eq 0
+        if set -q custom_prompt_symbol_success_color
+            set symbol_output (set_color $custom_prompt_symbol_success_color)"$symbol"(set_color normal)
+        else
+            set symbol_output $symbol
+        end
+    else
+        if set -q custom_prompt_symbol_failure_color
+            set symbol_output (set_color $custom_prompt_symbol_failure_color)"$symbol"(set_color normal)
+        else
+            set symbol_output $symbol
+        end
+    end
+
+    echo -s \n $line1
+    echo -s "$time_output $symbol_output "
 end
