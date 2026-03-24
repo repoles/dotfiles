@@ -7,6 +7,7 @@ abbr --add rds "bin/rails db:seed"
 
 abbr --add rc "bin/rails console"
 abbr --add rs "bin/rails server"
+abbr --add rt "bin/rails test"
 
 abbr --add rcs "bin/rails console --sandbox"
 
@@ -18,9 +19,15 @@ abbr --position anywhere --add RED "RAILS_ENV=development"
 abbr --position anywhere --add REP "RAILS_ENV=production"
 abbr --position anywhere --add RET "RAILS_ENV=test"
 
+abbr --add rubodiff "git diff --cached --name-only --diff-filter=AM | xargs bin/rubocop"
+
+abbr --add emivec "ssh -t emive-franquia-worker 'bin/rc'"
+
 # git
 abbr --add gs "git status"
 abbr --add gl "git log"
+abbr --add --command git st "status --short"
+abbr --add --command git lg "log --oneline --decorate"
 
 # tmux
 abbr --add tclear "clear; tmux clear-history"
@@ -29,6 +36,9 @@ abbr --add tclear "clear; tmux clear-history"
 abbr --add cp "cp -iv"
 abbr --add mv "mv -iv"
 abbr --add rm "rm -i"
+
+abbr --add --command ls dot -- "--list-dirs .*"
+abbr --add --command ll dot -- "--list-dirs .*"
 
 abbr --add vim "nvim"
 
