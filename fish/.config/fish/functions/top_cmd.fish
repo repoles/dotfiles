@@ -1,10 +1,10 @@
-function top_cmd
+function top_cmd --description "Show the 20 most used commands in fish history"
     # Get total number of commands in history
-    set total (history | wc -l)
+    set -l total (history | count)
 
     # Prevent division by zero
     if test $total -eq 0
-        echo "No history available."
+        echo "No history available"
         return 1
     end
 
