@@ -81,15 +81,13 @@ cask 'postman'
 cask 'chatgpt'
 cask 'codex'
 cask 'claude'
-
-# A instalação do Homebrew não se atualiza automaticamente
-# Instalação nativa: https://code.claude.com/docs/en/quickstart
-# cask 'claude-code'
+cask 'claude-code'
+brew 'opencode'
 
 # Fonts
-cask 'font-fira-code'
 cask 'font-jetbrains-mono'
 cask 'font-symbols-only-nerd-font'
+# cask 'font-fira-code'
 # cask 'font-maple-mono'
 # cask 'font-maple-mono-nf'
 
