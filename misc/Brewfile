@@ -37,7 +37,7 @@ brew 'aws-vault' # Securely store and access AWS credentials
 brew 'imagemagick' # Tools and libraries to manipulate images in many formats
 brew 'ffmpeg' # Play, record, convert, and stream audio and video
 
-brew 'mysql@8.4' # Open source relational database management system
+brew 'mysql' # Open source relational database management system
 brew 'tomcat@8' # Implementation of Java Servlet and JavaServer Pages
 
 brew 'nvim' # Ambitious Vim-fork focused on extensibility and agility
@@ -78,11 +78,14 @@ cask 'itsycal'
 cask 'zed'
 cask 'postman'
 
+brew 'opencode'
 cask 'chatgpt'
 cask 'codex'
 cask 'claude'
-cask 'claude-code'
-brew 'opencode'
+
+# cask 'claude-code'
+# Homebrew installation does not update automatically
+# Native installation: https://code.claude.com/docs/en/quickstart
 
 # Fonts
 cask 'font-jetbrains-mono'
