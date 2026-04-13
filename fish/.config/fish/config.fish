@@ -43,6 +43,6 @@ if status is-interactive
     # set -x STARSHIP_CONFIG $XDG_CONFIG_HOME/starship/starship.toml
     # starship init fish | source
 
-    fish_add_path $HOMEBREW_PREFIX/opt/mysql@8.4/bin $HOME/.local/bin
+    fish_add_path $HOME/.local/bin
     [ "$TERM_PROGRAM" = "Apple_Terminal" ] && function fish_title; end
 end
