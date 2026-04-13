@@ -12,7 +12,7 @@ config.font = wezterm.font {
   family = 'JetBrains Mono',
   weight = 'Regular',
   style = 'Normal',
-  -- harfbuzz_features = { 'calt=0', 'clig=0', 'liga=0' }
+  harfbuzz_features = { 'calt=0', 'clig=0', 'liga=0' }
 }
 
 config.font_rules = {
@@ -89,7 +89,7 @@ config.window_decorations = 'RESIZE | TITLE' -- MACOS_FORCE_ENABLE_SHADOW
 config.enable_scroll_bar = false
 
 -- Disable hyperlinks
--- config.hyperlink_rules = {}
+config.hyperlink_rules = {}
 
 local act = wezterm.action
 
