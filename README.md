@@ -1,25 +1,48 @@
 # My dotfiles
 
-This directory contains the dotfiles for my system
+This directory contains the dotfiles for my system.
 
-## Requirements
+## Setup on a fresh macOS
 
-Ensure you have the following installed on your system
-
-* git
-* stow
-
-## Instalation
-
-First, check out the dotfiles repo using `git`
+### 1. Clone the repository
 
 ```sh
-git clone https://github.com/repoles/dotfiles.git
-cd dotfiles
+git clone https://github.com/repoles/dotfiles.git ~/Code/Dotfiles
+cd ~/Code/Dotfiles
 ```
 
-then use GNU `stow` to create symlinks
+### 2. Install [Homebrew](https://brew.sh)
 
 ```sh
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+After installation, follow the instructions printed in the terminal to add Homebrew to your PATH.
+
+### 3. Install stow and create symlinks
+
+```sh
+brew install stow
 stow --verbose --target=$HOME */
+```
+
+### 4. Set up fish as the default shell
+
+```sh
+brew install fish
+```
+
+Add fish to the list of allowed shells and set it as default:
+
+```sh
+echo "$(which fish)" | sudo tee -a /etc/shells
+chsh -s "$(which fish)"
+```
+
+### 5. Install remaining programs
+
+Open a new terminal (now running fish) and install everything from the Brewfile:
+
+```sh
+brew bundle --file=~/Code/Dotfiles/misc/Brewfile --no-upgrade --verbose
 ```
