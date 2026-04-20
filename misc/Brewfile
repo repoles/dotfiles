@@ -15,6 +15,7 @@ brew 'fzf' # Command-line fuzzy finder written in Go
 brew 'fd' # Simple, fast and user-friendly alternative to find
 brew 'zoxide' # Shell extension to navigate your filesystem faster
 brew 'glow' # Markdown reader for the CLI
+brew 'atuin' # Shell history reimagined
 
 brew 'jless' # Command-line JSON viewer
 brew 'jq' # Lightweight and flexible command-line JSON processor

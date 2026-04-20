@@ -38,7 +38,9 @@ if status is-interactive
     zoxide init fish --cmd j | source
 
     # https://junegunn.github.io/fzf/shell-integration/#setting-up-shell-integration
-    fzf --fish | FZF_ALT_C_COMMAND= FZF_CTRL_T_COMMAND= source
+    # fzf --fish | FZF_ALT_C_COMMAND= FZF_CTRL_T_COMMAND= source
+
+    atuin init fish --disable-up-arrow | source
 
     # set -x STARSHIP_CONFIG $XDG_CONFIG_HOME/starship/starship.toml
     # starship init fish | source
