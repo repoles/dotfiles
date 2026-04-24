@@ -4,6 +4,14 @@ vim.cmd('colorscheme lunaperche')
 -- Use system clipboard
 vim.opt.clipboard:append("unnamedplus")
 
+-- Auto-copy mouse selection to clipboard
+vim.api.nvim_create_autocmd("TextYankPost", {
+    callback = function()
+        vim.highlight.on_yank({ timeout = 150 })
+    end,
+})
+vim.keymap.set("v", "<LeftRelease>", '"+y', { silent = true })
+
 -- Show line numbers
 vim.opt.number = true
 
