@@ -2,7 +2,7 @@ font-family = JetBrains Mono
 font-family = Symbols Nerd Font Mono
 
 font-size = 18
-# font-thicken = true
+font-thicken = false
 font-feature = -calt, -liga, -dlig
 
 theme = Ayu
@@ -19,6 +19,8 @@ theme = Ayu
 # cursor-text = #ffffff
 # cursor-style-blink = false
 
+custom-shader = shaders/cursor_warp.glsl
+
 adjust-cursor-thickness = 4
 # split-divider-color = green
 
@@ -27,18 +29,18 @@ adjust-cursor-thickness = 4
 
 # window-decoration = none
 macos-option-as-alt = true
-macos-titlebar-style = tabs
+# macos-titlebar-style = tabs
 macos-titlebar-proxy-icon = hidden
 
-# window-title-font-family = MonoLisa
+# window-title-font-family = JetBrains Mono
 
 window-width = 80
 window-height = 25
 
 window-padding-x = 0
 window-padding-y = 0
-
-keybind = shift+enter=text:\x1b\r
+# window-padding-balance = true
+# window-padding-color = extend-always
 
 # macos-icon = xray
 
@@ -48,4 +50,10 @@ keybind = shift+enter=text:\x1b\r
 # macos-icon-screen-color = 000000
 
 # bell-features = no-title
-shell-integration-features = ssh-terminfo,ssh-env
+# shell-integration-features = ssh-terminfo,ssh-env
+
+notify-on-command-finish = unfocused
+notify-on-command-finish-action = bell,notify
+notify-on-command-finish-after = 5m
+
+# keybind = shift+enter=text:\x1b\r
