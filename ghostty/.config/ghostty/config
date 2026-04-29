@@ -2,7 +2,7 @@ font-family = JetBrains Mono
 font-family = Symbols Nerd Font Mono
 
 font-size = 18
-font-thicken = false
+font-thicken = true
 font-feature = -calt, -liga, -dlig
 
 theme = Ayu
@@ -13,13 +13,15 @@ theme = Ayu
 # theme = Gruvbox Dark Hard
 
 # background = #000000
+# background-opacity = 0
+# background-blur = macos-glass-regular
 
 # cursor-style = underline
 # cursor-color = #666666
 # cursor-text = #ffffff
 # cursor-style-blink = false
 
-custom-shader = shaders/cursor_warp.glsl
+# custom-shader = shaders/cursor_warp.glsl
 
 adjust-cursor-thickness = 4
 # split-divider-color = green
@@ -37,10 +39,10 @@ macos-titlebar-proxy-icon = hidden
 window-width = 80
 window-height = 25
 
-window-padding-x = 0
+window-padding-x = 1
 window-padding-y = 0
-# window-padding-balance = true
-# window-padding-color = extend-always
+window-padding-balance = true
+window-padding-color = extend
 
 # macos-icon = xray
 
@@ -49,11 +51,11 @@ window-padding-y = 0
 # macos-icon-ghost-color = ffffff
 # macos-icon-screen-color = 000000
 
-# bell-features = no-title
+bell-features = no-title
 # shell-integration-features = ssh-terminfo,ssh-env
 
 notify-on-command-finish = unfocused
 notify-on-command-finish-action = bell,notify
 notify-on-command-finish-after = 5m
 
-# keybind = shift+enter=text:\x1b\r
+keybind = shift+enter=text:\x1b\r
