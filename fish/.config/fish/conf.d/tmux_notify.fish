@@ -23,6 +23,6 @@ if set -q TMUX
         set -l duration (humanize_duration $CMD_DURATION)
 
         # -d 0 to show the message until dismissed
-        tmux display-message -d 0 -t $TMUX_PANE "[#S] #I:#W $symbol $short_cmd ($duration)"
+        tmux display-message -t $TMUX_PANE "[#S] #I:#W $symbol $short_cmd ($duration)"
     end
 end
