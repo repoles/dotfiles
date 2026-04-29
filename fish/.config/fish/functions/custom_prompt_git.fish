@@ -38,6 +38,7 @@ function custom_prompt_git
         if test "$behind" -gt 0
             set -l behind_symbol "<"
             set -q custom_prompt_git_status_behind_symbol; and set behind_symbol $custom_prompt_git_status_behind_symbol
+            test -n "$status_str"; and set status_str "$status_str "
             set status_str "$status_str$behind_symbol$behind"
         end
     end
