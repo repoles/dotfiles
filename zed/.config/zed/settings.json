@@ -1,0 +1,15 @@
+{
+  "autosave": "on_window_change",
+  // "ui_font_family": "JetBrains Mono",
+  // "buffer_font_family": "JetBrains Mono",
+  "buffer_font_fallbacks": ["Symbols Nerd Font Mono"],
+  // "buffer_font_size": 16,
+  // "theme": {
+  //   "mode": "system",
+  //   "light": "Ayu Light",
+  //   "dark": "Ayu Dark",
+  // },
+  "file_types": {
+    "Shell Script": ["conf"],
+  },
+}
