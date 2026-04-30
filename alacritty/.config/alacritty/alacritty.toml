@@ -1,28 +1,18 @@
-# gruvbox
-# ayu_dark
-# argonaut
-# tokyo_night
-# tomorrow_night_bright
+# [env]
+# TERM = "xterm-256color"
 
-import = [
-  "~/.config/alacritty/themes/themes/argonaut.toml"
-]
-
-[env]
-TERM = "xterm-256color"
-
-[colors.primary]
-background = '#000000'
+# [colors.primary]
+# background = '#000000'
 # background = '#0d0d0d'
 
-[colors.cursor]
-text = 'CellForeground'
-cursor = '#424242'
+# [colors.cursor]
+# text = 'CellForeground'
+# cursor = '#424242'
 
 [window]
 # opacity = 0.8
 # blur = true
-decorations = "Buttonless"
+# decorations = "Buttonless"
 # startup_mode = "Maximized"
 
 dynamic_padding = true
@@ -35,11 +25,21 @@ option_as_alt = "Both"
 style.blinking = "On"
 
 [font]
-normal.family = "MesloLGS NF"
+normal.family = "JetBrains Mono"
 size = 18
 
-[keyboard]
-bindings = [
-  { key = "Right", mods = "Alt", chars = "\u001BF" }, # Skip word left
-  { key = "Left",  mods = "Alt", chars = "\u001BB" }  # Skip word right
+[general]
+import = [
+  "~/.config/alacritty/themes/ayu_dark.toml"
 ]
+# gruvbox
+# ayu_dark
+# argonaut
+# tokyo_night
+# tomorrow_night_bright
+
+# [keyboard]
+# bindings = [
+#   { key = "Right", mods = "Alt", chars = "\u001BF" }, # Skip word left
+#   { key = "Left",  mods = "Alt", chars = "\u001BB" }  # Skip word right
+# ]
