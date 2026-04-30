@@ -73,7 +73,7 @@ config.tab_max_width = 25
 -- config.cursor_blink_ease_out = 'Constant'
 -- config.cursor_blink_ease_in = 'Constant'
 -- config.cursor_blink_rate = 600
-config.cursor_thickness = 4
+-- config.cursor_thickness = 4
 
 -- config.window_background_opacity = 0.9
 -- config.macos_window_background_blur = 30
