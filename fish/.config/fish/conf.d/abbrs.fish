@@ -15,6 +15,10 @@ abbr --add devlog  "tail -f log/development.log"
 abbr --add prodlog "tail -f log/production.log"
 abbr --add testlog "tail -f log/test.log"
 
+abbr --add hdevlog "tmux split-window -v -d \"exec tail -f log/development.log\""
+abbr --add hprodlog "tmux split-window -v -d \"exec tail -f log/production.log\""
+abbr --add htestlog "tmux split-window -v -d \"exec tail -f log/test.log\""
+
 abbr --position anywhere --add RED "RAILS_ENV=development"
 abbr --position anywhere --add REP "RAILS_ENV=production"
 abbr --position anywhere --add RET "RAILS_ENV=test"
