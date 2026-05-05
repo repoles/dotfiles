@@ -39,7 +39,7 @@ brew 'imagemagick' # Tools and libraries to manipulate images in many formats
 brew 'ffmpeg' # Play, record, convert, and stream audio and video
 
 brew 'mysql' # Open source relational database management system
-brew 'tomcat@8' # Implementation of Java Servlet and JavaServer Pages
+brew 'tomcat@9' # Implementation of Java Servlet and JavaServer Pages
 
 brew 'nvim' # Ambitious Vim-fork focused on extensibility and agility
 brew 'mas' # Mac App Store command-line interface
