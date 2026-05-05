@@ -21,7 +21,7 @@ function ts --wraps="tmux list-sessions" --description "Select an open tmux sess
 
             echo "$parts[2]: $parts[3] windows [$parts[4]]$alerts ("(string join ', ' $session_status)")"
         end \
-        | fzf --tmux center,70%,50%)
+        | fzf --exact --tmux center,70%,50%)
 
     if test -z "$selected"
         return
