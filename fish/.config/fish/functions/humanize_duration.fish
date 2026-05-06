@@ -12,11 +12,13 @@ function humanize_duration --description 'Convert duration in milliseconds to hu
     else
         set -l secs (math --scale=0 "$duration/1000 % 60")
         set -l mins (math --scale=0 "$duration/60000 % 60")
-        set -l hours (math --scale=0 "$duration/3600000")
+        set -l hours (math --scale=0 "$duration/3600000 % 24")
+        set -l days (math --scale=0 "$duration/86400000")
 
         # Initialize local result variable
         set -l result
 
+        test $days -gt 0 && set -a result $days'd'
         test $hours -gt 0 && set -a result $hours'h'
         test $mins -gt 0 && set -a result $mins'm'
         test $secs -gt 0 && set -a result $secs's'
