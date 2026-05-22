@@ -13,6 +13,12 @@ for _, lhs in ipairs({ "<M-Left>", "<M-b>" }) do
     vim.keymap.set("i", lhs, "<C-o>b")
 end
 
+-- Jump to start/end of line with CTRL+a/CTRL+e (readline/VSCode-style).
+vim.keymap.set({ "n", "v" }, "<C-a>", "0")
+vim.keymap.set({ "n", "v" }, "<C-e>", "$")
+vim.keymap.set("i", "<C-a>", "<Home>")
+vim.keymap.set("i", "<C-e>", "<End>")
+
 -- Use system clipboard
 vim.opt.clipboard:append("unnamedplus")
 
