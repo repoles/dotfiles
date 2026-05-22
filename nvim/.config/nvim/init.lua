@@ -1,6 +1,18 @@
 -- Set color scheme
 vim.cmd('colorscheme lunaperche')
 
+-- Move by word with OPT+Left/Right (macOS-style).
+-- WezTerm sends Alt+b/Alt+f (<M-b>/<M-f>); Ghostty sends <M-Left>/<M-Right>.
+for _, lhs in ipairs({ "<M-Right>", "<M-f>" }) do
+    vim.keymap.set({ "n", "v" }, lhs, "w")
+    -- In insert mode, land just after the last char of the word (VSCode-style).
+    vim.keymap.set("i", lhs, "<C-o>e<Right>")
+end
+for _, lhs in ipairs({ "<M-Left>", "<M-b>" }) do
+    vim.keymap.set({ "n", "v" }, lhs, "b")
+    vim.keymap.set("i", lhs, "<C-o>b")
+end
+
 -- Use system clipboard
 vim.opt.clipboard:append("unnamedplus")
 
