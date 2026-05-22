@@ -60,5 +60,11 @@ notify-on-command-finish-after = 5m
 
 keybind = shift+enter=text:\x1b\r
 
+# Cmd + Left Arrow -> Shift+Home (first non-blank char in nvim)
+keybind = cmd+left=csi:1;2H
+
+# Cmd + Right Arrow -> Shift+End (end of line in nvim)
+keybind = cmd+right=csi:1;2F
+
 shell-integration-features = no-cursor
 # shell-integration-features = ssh-terminfo,ssh-env

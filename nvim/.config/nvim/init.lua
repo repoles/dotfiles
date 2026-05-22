@@ -19,6 +19,16 @@ vim.keymap.set({ "n", "v" }, "<C-e>", "$")
 vim.keymap.set("i", "<C-a>", "<Home>")
 vim.keymap.set("i", "<C-e>", "<End>")
 
+-- CMD+Left -> first non-blank char (VSCode-style). The terminals (WezTerm/Ghostty)
+-- send Shift+Home (\x1b[1;2H) for CMD+Left, which Neovim parses as <S-Home>.
+vim.keymap.set({ "n", "v" }, "<S-Home>", "^")
+vim.keymap.set("i", "<S-Home>", "<C-o>^")
+
+-- CMD+Right -> end of line (VSCode-style). The terminals send Shift+End
+-- (\x1b[1;2F) for CMD+Right, which Neovim parses as <S-End>.
+vim.keymap.set({ "n", "v" }, "<S-End>", "$")
+vim.keymap.set("i", "<S-End>", "<End>")
+
 -- Use system clipboard
 vim.opt.clipboard:append("unnamedplus")
 

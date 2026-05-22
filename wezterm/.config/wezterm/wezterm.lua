@@ -115,6 +115,18 @@ config.keys = {
     mods = 'OPT',
     action = act.SendString '\x1bf'
   },
+  -- Cmd + Left Arrow -> Shift+Home (first non-blank char in nvim)
+  {
+    key = 'LeftArrow',
+    mods = 'CMD',
+    action = act.SendString '\x1b[1;2H'
+  },
+  -- Cmd + Right Arrow -> Shift+End (end of line in nvim)
+  {
+    key = 'RightArrow',
+    mods = 'CMD',
+    action = act.SendString '\x1b[1;2F'
+  },
   -- Shift + Enter to insert newline
   {
     key = 'Enter',
