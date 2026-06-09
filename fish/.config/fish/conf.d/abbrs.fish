@@ -26,6 +26,7 @@ abbr --position anywhere --add RET "RAILS_ENV=test"
 abbr --add rubodiff "git diff --cached --name-only --diff-filter=AM | xargs bin/rubocop"
 
 abbr --add emivec "ssh -t emive-franquia-worker 'bin/rc'"
+abbr --add solarc "ssh -t solar 'bin/rc'"
 
 # git
 abbr --add gs "git status"
