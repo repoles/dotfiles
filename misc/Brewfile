@@ -7,7 +7,6 @@ brew 'starship' # Cross-shell prompt for astronauts
 
 brew 'mise' # Polyglot runtime manager (asdf rust clone)
 brew 'gnupg' # GPG, so mise can verify release signatures
-brew 'yarn' # JavaScript package manager
 
 brew 'eza' # Modern, maintained replacement for ls
 brew 'bat' # Clone of cat with syntax highlighting and Git integration

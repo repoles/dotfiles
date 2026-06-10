@@ -7,3 +7,4 @@ ruby.compile=false
 ruby = "4"
 python = "3"
 node = "lts"
+"npm:yarn" = "latest"
