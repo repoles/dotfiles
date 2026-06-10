@@ -1,0 +1,90 @@
+{
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+  "model": "opus",
+  "hooks": {
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$XDG_CONFIG_HOME/tmux/claude-tmux-status.sh notify"
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$XDG_CONFIG_HOME/tmux/claude-tmux-status.sh waiting"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$XDG_CONFIG_HOME/tmux/claude-tmux-status.sh busy"
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$XDG_CONFIG_HOME/tmux/claude-tmux-status.sh error"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$XDG_CONFIG_HOME/tmux/claude-tmux-status.sh idle"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$XDG_CONFIG_HOME/tmux/claude-tmux-status.sh idle"
+          }
+        ]
+      }
+    ],
+    "StopFailure": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$XDG_CONFIG_HOME/tmux/claude-tmux-status.sh error"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$XDG_CONFIG_HOME/tmux/claude-tmux-status.sh busy"
+          }
+        ]
+      }
+    ]
+  },
+  "inputNeededNotifEnabled": true
+}
