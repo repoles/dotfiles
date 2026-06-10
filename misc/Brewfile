@@ -7,7 +7,6 @@ brew 'starship' # Cross-shell prompt for astronauts
 
 brew 'mise' # Polyglot runtime manager (asdf rust clone)
 brew 'yarn' # JavaScript package manager
-brew 'node' # Platform built on V8 to build network applications
 
 brew 'eza' # Modern, maintained replacement for ls
 brew 'bat' # Clone of cat with syntax highlighting and Git integration
@@ -75,7 +74,6 @@ cask 'itsycal'
 cask 'zed'
 cask 'postman'
 
-brew 'opencode'
 cask 'chatgpt'
 cask 'codex'
 cask 'claude'
