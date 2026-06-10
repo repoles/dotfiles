@@ -47,10 +47,6 @@ brew 'mas' # Mac App Store command-line interface
 # https://derflounder.wordpress.com/2025/04/06/rsync-replaced-with-openrsync-on-macos-sequoia/
 brew 'rsync' # since macOS Sequoia is now using openrsync
 
-# Some compiler dependencies
-brew 'libyaml' # YAML Parser
-brew 'pkg-config' # Package configuration tool
-
 # Casks
 
 cask 'arq'
