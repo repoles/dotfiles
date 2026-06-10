@@ -4,7 +4,7 @@
       {
         "hooks": [
           {
-            "command": "[ -n \"$TMUX_PANE\" ] && tmux set -w -t \"$TMUX_PANE\" window-status-style 'fg=yellow'",
+            "command": "$XDG_CONFIG_HOME/tmux/scripts/agent-tmux-status.sh waiting",
             "type": "command"
           }
         ]
@@ -14,7 +14,7 @@
       {
         "hooks": [
           {
-            "command": "[ -n \"$TMUX_PANE\" ] && tmux set -w -t \"$TMUX_PANE\" window-status-style 'fg=green'",
+            "command": "$XDG_CONFIG_HOME/tmux/scripts/agent-tmux-status.sh busy",
             "type": "command"
           }
         ]
@@ -24,7 +24,7 @@
       {
         "hooks": [
           {
-            "command": "[ -n \"$TMUX_PANE\" ] && tmux set -w -t \"$TMUX_PANE\" window-status-style 'fg=green'",
+            "command": "$XDG_CONFIG_HOME/tmux/scripts/agent-tmux-status.sh busy",
             "type": "command"
           }
         ],
@@ -35,7 +35,7 @@
       {
         "hooks": [
           {
-            "command": "[ -n \"$TMUX_PANE\" ] && tmux set -uw -t \"$TMUX_PANE\" window-status-style",
+            "command": "$XDG_CONFIG_HOME/tmux/scripts/agent-tmux-status.sh idle",
             "type": "command"
           }
         ]
@@ -45,7 +45,7 @@
       {
         "hooks": [
           {
-            "command": "[ -n \"$TMUX_PANE\" ] && tmux set -w -t \"$TMUX_PANE\" window-status-style 'fg=green'",
+            "command": "$XDG_CONFIG_HOME/tmux/scripts/agent-tmux-status.sh busy",
             "type": "command"
           }
         ]

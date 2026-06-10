@@ -1,6 +1,6 @@
 #!/bin/sh
-# claude-tmux-status.sh — drive the tmux window status from Claude Code hooks.
-# Usage: claude-tmux-status.sh <event>
+# agent-tmux-status.sh - drive the tmux window status from agent hooks.
+# Usage: agent-tmux-status.sh <event>
 #   busy     working     -> green   (UserPromptSubmit, PostToolUse)
 #   waiting  needs input -> yellow  (PermissionRequest)
 #   error    failed      -> red     (PostToolUseFailure, StopFailure)

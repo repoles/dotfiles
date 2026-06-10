@@ -10,7 +10,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$XDG_CONFIG_HOME/tmux/scripts/claude-tmux-status.sh notify"
+            "command": "$XDG_CONFIG_HOME/tmux/scripts/agent-tmux-status.sh notify"
           }
         ]
       }
@@ -20,7 +20,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$XDG_CONFIG_HOME/tmux/scripts/claude-tmux-status.sh waiting"
+            "command": "$XDG_CONFIG_HOME/tmux/scripts/agent-tmux-status.sh waiting"
           }
         ]
       }
@@ -30,7 +30,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$XDG_CONFIG_HOME/tmux/scripts/claude-tmux-status.sh busy"
+            "command": "$XDG_CONFIG_HOME/tmux/scripts/agent-tmux-status.sh busy"
           }
         ]
       }
@@ -40,7 +40,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$XDG_CONFIG_HOME/tmux/scripts/claude-tmux-status.sh error"
+            "command": "$XDG_CONFIG_HOME/tmux/scripts/agent-tmux-status.sh error"
           }
         ]
       }
@@ -50,7 +50,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$XDG_CONFIG_HOME/tmux/scripts/claude-tmux-status.sh idle"
+            "command": "$XDG_CONFIG_HOME/tmux/scripts/agent-tmux-status.sh idle"
           }
         ]
       }
@@ -60,7 +60,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$XDG_CONFIG_HOME/tmux/scripts/claude-tmux-status.sh idle"
+            "command": "$XDG_CONFIG_HOME/tmux/scripts/agent-tmux-status.sh idle"
           }
         ]
       }
@@ -70,7 +70,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$XDG_CONFIG_HOME/tmux/scripts/claude-tmux-status.sh error"
+            "command": "$XDG_CONFIG_HOME/tmux/scripts/agent-tmux-status.sh error"
           }
         ]
       }
@@ -80,7 +80,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$XDG_CONFIG_HOME/tmux/scripts/claude-tmux-status.sh busy"
+            "command": "$XDG_CONFIG_HOME/tmux/scripts/agent-tmux-status.sh busy"
           }
         ]
       }
