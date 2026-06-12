@@ -25,6 +25,9 @@ if status is-interactive
     set -g custom_prompt_git_status_ahead_symbol \u2191 # ↑
     set -g custom_prompt_git_status_behind_symbol \u2193 # ↓
 
+    set -g custom_prompt_ruby_color red
+    set -g custom_prompt_ruby_symbol \ueb48 # 
+
     # set -g custom_prompt_command_duration_threshold 2000
     set -g custom_prompt_command_duration_color yellow
     set -g custom_prompt_time_color brblack

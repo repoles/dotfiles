@@ -2,12 +2,17 @@ function fish_prompt
     set -l last_status $status
     set -l last_duration $CMD_DURATION
 
-    # Line 1: directory | git info | command duration
+    # Line 1: directory | git info | ruby version | command duration
     set -l line1 (custom_prompt_pwd)
 
     set -l git_info (custom_prompt_git)
     if test -n "$git_info"
         set line1 "$line1 $git_info"
+    end
+
+    set -l ruby_info (custom_prompt_ruby)
+    if test -n "$ruby_info"
+        set line1 "$line1 $ruby_info"
     end
 
     set -l duration_threshold 5000
