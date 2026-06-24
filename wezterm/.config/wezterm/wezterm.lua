@@ -2,8 +2,8 @@ local wezterm = require 'wezterm'
 
 local config = wezterm.config_builder()
 
-config.initial_cols = 80
-config.initial_rows = 25
+config.initial_cols = 100
+config.initial_rows = 30
 
 -- WezTerm bundles JetBrains Mono, Nerd Font Symbols and Noto Color Emoji
 -- https://wezterm.org/config/fonts.html

@@ -37,8 +37,8 @@ macos-titlebar-proxy-icon = hidden
 
 # window-title-font-family = JetBrains Mono
 
-window-width = 80
-window-height = 25
+window-width = 100
+window-height = 30
 
 window-padding-x = 1
 window-padding-y = 0
