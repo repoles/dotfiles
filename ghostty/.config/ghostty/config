@@ -1,9 +1,10 @@
-font-family = JetBrains Mono
+font-family = MonoLisaCode
 font-family = Symbols Nerd Font Mono
 
 font-size = 18
-# font-thicken = true
-font-feature = -calt, -liga, -dlig
+font-thicken = true
+font-feature = +ss11, +ss13, +cv04, +cv05, +cv08, +cv09, +cv11
+# local font_features = { 'ss11=1', 'ss13=1', 'cv04=1', 'cv05=1', 'cv08=1', 'cv09=1', 'cv11=1' }
 
 theme = Ayu
 # theme = Argonaut

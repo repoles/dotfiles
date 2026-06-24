@@ -8,49 +8,46 @@ config.initial_rows = 30
 -- WezTerm bundles JetBrains Mono, Nerd Font Symbols and Noto Color Emoji
 -- https://wezterm.org/config/fonts.html
 
-config.font = wezterm.font {
-  family = 'JetBrains Mono',
-  weight = 'Regular',
-  style = 'Normal',
-  harfbuzz_features = { 'calt=0', 'clig=0', 'liga=0' }
-}
+-- local font_family = 'JetBrains Mono'
+-- local font_features = { 'calt=0', 'clig=0', 'liga=0' }
+
+local font_family = 'MonoLisaCode'
+-- https://www.monolisa.dev/tester/code
+local font_features = { 'ss11=1', 'ss13=1', 'cv04=1', 'cv05=1', 'cv08=1', 'cv09=1', 'cv11=1' }
+
+local function font(opts)
+  opts = opts or {}
+
+  return wezterm.font {
+    family = font_family,
+    weight = opts.weight or 'Regular',
+    style = opts.style or 'Normal',
+    harfbuzz_features = font_features
+  }
+end
+
+config.font = font()
 
 config.font_rules = {
   {
     intensity = 'Bold',
     italic = false,
-    font = wezterm.font {
-      family = 'JetBrains Mono',
-      weight = 'ExtraBold',
-      style = 'Normal'
-    },
+    font = font { weight = 'Black' },
   },
   {
     intensity = 'Bold',
     italic = true,
-    font = wezterm.font {
-      family = 'JetBrains Mono',
-      weight = 'ExtraBold',
-      style = 'Italic'
-    },
+    font = font { weight = 'Black', style = 'Italic' },
   },
   {
     intensity = 'Half',
     italic = false,
-    font = wezterm.font {
-      family = 'JetBrains Mono',
-      weight = 'Thin',
-      style = 'Normal'
-    },
+    font = font { weight = 'Thin' },
   },
   {
     intensity = 'Half',
     italic = true,
-    font = wezterm.font {
-      family = 'JetBrains Mono',
-      weight = 'Thin',
-      style = 'Italic'
-    },
+    font = font { weight = 'Thin', style = 'Italic' },
   }
 }
 
