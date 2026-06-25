@@ -18,6 +18,7 @@ brew 'atuin' # Shell history reimagined
 
 brew 'jless' # Command-line JSON viewer
 brew 'jq' # Lightweight and flexible command-line JSON processor
+brew 'yq' # Like jq, but for YAML (and XML/TOML) documents
 
 brew 'pv' # Monitor data's progress through a pipe
 brew 'stow' # Organize software neatly under a single directory tree
@@ -27,9 +28,12 @@ brew 'htop' # Improved top (interactive process viewer)
 brew 'btop' # A monitor of resources
 
 brew 'ripgrep' # Search tool like grep and The Silver Searcher
+brew 'sd' # Intuitive find & replace CLI (a simpler, modern sed)
 brew 'dua-cli' # View disk space usage and delete unwanted data, fast
+brew 'dust' # More intuitive version of du in Rust (visual disk usage tree)
 brew 'httpie' # User-friendly cURL replacement (command-line HTTP client)
 brew 'git-delta' # A syntax-highlighting pager for git, diff, grep, and blame output
+brew 'gh' # GitHub command-line tool (PRs, issues, releases, API)
 
 brew 'awscli' # Official Amazon AWS command-line interface
 brew 'aws-vault' # Securely store and access AWS credentials
