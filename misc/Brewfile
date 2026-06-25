@@ -65,7 +65,6 @@ cask 'ghostty'
 cask 'kitty'
 
 cask 'whatsapp'
-cask 'basecamp'
 cask 'cleanshot'
 cask 'transmit'
 cask 'itsycal'
