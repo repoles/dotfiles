@@ -1,2 +1,5 @@
 Brewfile.lock.json
 fish_variables
+
+# mise local overrides (secrets, machine-specific env)
+mise/.config/mise/config.local.toml
