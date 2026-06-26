@@ -17,3 +17,5 @@
 	showInformativeStatus = true
 [diff "rails_credentials"]
 	textconv = bin/rails credentials:diff
+[url "https://github.com/"]
+	insteadOf = git@github.com:
