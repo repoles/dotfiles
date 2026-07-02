@@ -86,7 +86,7 @@ config.window_decorations = 'RESIZE | TITLE' -- MACOS_FORCE_ENABLE_SHADOW
 config.enable_scroll_bar = false
 
 -- Disable hyperlinks
--- config.hyperlink_rules = {}
+config.hyperlink_rules = {}
 
 local act = wezterm.action
 
