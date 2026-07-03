@@ -11,13 +11,17 @@ abbr --add rt "bin/rails test"
 
 abbr --add rcs "bin/rails console --sandbox"
 
-abbr --add devlog  "tail -f log/development.log"
-abbr --add prodlog "tail -f log/production.log"
-abbr --add testlog "tail -f log/test.log"
+abbr --add devlog  "tail -n 0 -f log/development.log"
+abbr --add prodlog "tail -n 0 -f log/production.log"
+abbr --add testlog "tail -n 0 -f log/test.log"
 
-abbr --add hdevlog "tmux split-window -v -d \"exec tail -f log/development.log\""
-abbr --add hprodlog "tmux split-window -v -d \"exec tail -f log/production.log\""
-abbr --add htestlog "tmux split-window -v -d \"exec tail -f log/test.log\""
+abbr --add hdevlog "tmux split-window -v -d \"exec tail -n 0 -f log/development.log\""
+abbr --add hprodlog "tmux split-window -v -d \"exec tail -n 0 -f log/production.log\""
+abbr --add htestlog "tmux split-window -v -d \"exec tail -n 0 -f log/test.log\""
+
+abbr --add vdevlog "tmux split-window -h -d \"exec tail -n 0 -f log/development.log\""
+abbr --add vprodlog "tmux split-window -h -d \"exec tail -n 0 -f log/production.log\""
+abbr --add vtestlog "tmux split-window -h -d \"exec tail -n 0 -f log/test.log\""
 
 abbr --position anywhere --add RED "RAILS_ENV=development"
 abbr --position anywhere --add REP "RAILS_ENV=production"
