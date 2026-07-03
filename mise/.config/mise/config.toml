@@ -6,5 +6,3 @@ ruby.compile=false
 [tools]
 ruby = "4"
 python = "3"
-node = "lts"
-"npm:yarn" = "latest"
