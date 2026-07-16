@@ -28,7 +28,8 @@ function ts --description "Select an open tmux session"
         end
     end
 
-    set session_lines (tmux list-sessions -F "#{session_activity}	#{session_name}	#{session_windows}	#{window_name}	#{session_alerts}	#{session_attached}")
+    # the ✳ is dropped from the title, like in tw and the status-right
+    set session_lines (tmux list-sessions -F "#{session_activity}	#{session_name}	#{session_windows}	#{window_name}	#{session_alerts}	#{session_attached}	#{s|^✳ ||:pane_title}")
 
     if test $status -ne 0
         return 1
@@ -44,6 +45,7 @@ function ts --description "Select an open tmux session"
         set position (math (count $entries) + 1)
         set session_status
         set alerts
+        set title
         set windows "windows"
 
         if test "$parts[3]" -eq 1
@@ -52,6 +54,10 @@ function ts --description "Select an open tmux session"
 
         if test -n "$parts[5]"
             set alerts " [$parts[5]]"
+        end
+
+        if test -n "$parts[7]"
+            set title " \"$parts[7]\""
         end
 
         if test "$parts[2]" = "$current_session"
@@ -68,7 +74,8 @@ function ts --description "Select an open tmux session"
             set last $position
         end
 
-        set --append entries "$parts[2]: $parts[3] $windows [$parts[4]]$alerts ("(string join ', ' $session_status)")"
+        # the title goes last: it is the only field with no length bound, so fzf truncates it against the real popup width
+        set --append entries "$parts[2]: $parts[3] $windows [$parts[4]]$alerts ("(string join ', ' $session_status)")$title"
     end
 
     set binds
