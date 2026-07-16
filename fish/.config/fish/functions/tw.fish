@@ -26,6 +26,7 @@ function tw --description "Select a window in the current tmux session"
     for line in $window_lines
         set parts (string split \t -- $line)
         set position (math (count $entries) + 1)
+        set title
 
         if test "$parts[5]" -gt 0
             set current $position
@@ -35,9 +36,14 @@ function tw --description "Select a window in the current tmux session"
             set last $position
         end
 
+        if test -n "$parts[4]"
+            set title " \"$parts[4]\""
+        end
+
         set active (string split ' ' (humanize_duration (math --scale=0 "($now - $parts[7]) * 1000")))[1]
 
-        set --append entries "$parts[1]:[$parts[2]$parts[3]] \"$parts[4]\" (active $active ago)"
+        # the title goes last: it is the only field with no length bound, so fzf truncates it against the real popup width
+        set --append entries "$parts[1]:[$parts[2]$parts[3]] (active $active ago)$title"
     end
 
     set binds
