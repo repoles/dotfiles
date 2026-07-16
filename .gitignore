@@ -3,3 +3,7 @@ fish_variables
 
 # mise local overrides (secrets, machine-specific env)
 mise/.config/mise/config.local.toml
+
+# Local state the tools write into the stowed directories themselves
+aws/.aws/cli/cache/
+zed/.config/zed/prompts/
