@@ -1,18 +1,29 @@
-function tw --wraps="tmux list-windows" --description "Select a window in the current tmux session"
+function tw --description "Select a window in the current tmux session"
     if not set --query TMUX
         echo "tw: not inside a tmux session" >&2
         return 1
     end
 
+    if test (count $argv) -gt 0
+        echo "tw: arguments are not supported; windows are selected from the current session" >&2
+        return 2
+    end
+
     set now (date +%s)
     set entries
-    set current 1
+    set current
     set last
 
     # list-windows already sorts by index
     # like in style.conf, the last-window flag becomes ‐ (U+2010) so that ~- does not turn into a ligature
     # the ✳ is dropped from the title, like in the status-right
-    for line in (tmux list-windows -F "#{window_index}	#{window_name}	#{s|-|‐|:window_flags}	#{s|^✳ ||:pane_title}	#{window_active}	#{window_last_flag}	#{window_activity}" $argv)
+    set window_lines (tmux list-windows -F "#{window_index}	#{window_name}	#{s|-|‐|:window_flags}	#{s|^✳ ||:pane_title}	#{window_active}	#{window_last_flag}	#{window_activity}")
+
+    if test $status -ne 0
+        return 1
+    end
+
+    for line in $window_lines
         set parts (string split \t -- $line)
         set position (math (count $entries) + 1)
 
@@ -29,17 +40,30 @@ function tw --wraps="tmux list-windows" --description "Select a window in the cu
         set --append entries "$parts[1]:[$parts[2]$parts[3]] \"$parts[4]\" (active $active ago)"
     end
 
-    # start on the current window; W jumps to the last one, like the S binding in ts
-    set binds "start:pos($current)"
+    set binds
+
+    if test -n "$current"
+        set --append binds "start:pos($current)"
+    end
 
     if test -n "$last"
         set --append binds "W:pos($last)+accept"
     end
 
-    set selected (printf '%s\n' $entries \
-        | fzf --exact --sync --tmux center,70%,50% --bind (string join ',' $binds))
+    set fzf_options --exact --sync --tmux center,70%,50%
 
-    if test -z "$selected"
+    if test (count $binds) -gt 0
+        set --append fzf_options --bind (string join ',' $binds)
+    end
+
+    set selected (printf '%s\n' $entries | fzf $fzf_options)
+    set fzf_status $status
+
+    if test $fzf_status -eq 130
+        return
+    else if test $fzf_status -ne 0
+        return $fzf_status
+    else if test -z "$selected"
         return
     end
 
