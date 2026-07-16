@@ -7,6 +7,11 @@ function ts --wraps="tmux list-sessions" --description "Select an open tmux sess
             set parts (string split \t -- $line)
             set session_status
             set alerts
+            set windows "windows"
+
+            if test "$parts[3]" -eq 1
+                set windows "window"
+            end
 
             if test -n "$parts[5]"
                 set alerts " [$parts[5]]"
@@ -19,7 +24,7 @@ function ts --wraps="tmux list-sessions" --description "Select an open tmux sess
                 set --append session_status "accessed $last_accessed ago"
             end
 
-            echo "$parts[2]: $parts[3] windows [$parts[4]]$alerts ("(string join ', ' $session_status)")"
+            echo "$parts[2]: $parts[3] $windows [$parts[4]]$alerts ("(string join ', ' $session_status)")"
         end \
         | fzf --exact --tmux center,70%,50% --bind 'S:pos(2)+accept')
 
