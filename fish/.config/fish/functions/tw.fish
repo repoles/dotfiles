@@ -56,7 +56,7 @@ function tw --description "Select a window in the current tmux session"
         set --append binds "W:pos($last)+accept"
     end
 
-    set fzf_options --exact --sync --tmux center,70%,50%
+    set fzf_options --exact --sync --tmux center,80%,50%
 
     if test (count $binds) -gt 0
         set --append fzf_options --bind (string join ',' $binds)
