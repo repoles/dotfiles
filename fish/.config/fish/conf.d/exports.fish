@@ -32,6 +32,7 @@ set -l fzf_prompt \u276f # ❯
 set -x FZF_DEFAULT_OPTS "--tmux center,90%,70% --layout reverse"\
 " --prompt='$fzf_prompt ' --marker='$fzf_prompt'"\
 " --color=hl:bright-yellow --color=hl+:bright-yellow"\
+" --color=bg:#11151c,bg+:#1c212b,gutter:#11151c"\
 " --color=info:cyan,border:bright-black,prompt:green"\
 " --color=pointer:red,marker:yellow,spinner:yellow,header:blue"\
 
