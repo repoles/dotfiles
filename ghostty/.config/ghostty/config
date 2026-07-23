@@ -2,9 +2,8 @@ font-family = MonoLisaCode
 font-family = Symbols Nerd Font Mono
 
 font-size = 18
-font-thicken = true
+font-thicken = false
 font-feature = +ss11, +ss13, +cv04, +cv05, +cv08, +cv09, +cv11
-# local font_features = { 'ss11=1', 'ss13=1', 'cv04=1', 'cv05=1', 'cv08=1', 'cv09=1', 'cv11=1' }
 
 theme = Ayu
 # theme = Argonaut
@@ -17,10 +16,10 @@ theme = Ayu
 # background-opacity = 0
 # background-blur = macos-glass-regular
 
-cursor-style = block
+# cursor-style = block
 # cursor-color = #666666
 # cursor-text = #ffffff
-cursor-style-blink = false
+# cursor-style-blink = false
 # cursor-invert-fg-bg = true
 adjust-cursor-thickness = 4
 
@@ -31,7 +30,7 @@ adjust-cursor-thickness = 4
 # unfocused-split-fill = #000000
 
 # window-decoration = none
-macos-window-shadow = false
+# macos-window-shadow = false
 macos-option-as-alt = true
 # macos-titlebar-style = tabs
 macos-titlebar-proxy-icon = hidden
@@ -44,7 +43,7 @@ window-height = 30
 window-padding-x = 1
 window-padding-y = 0
 window-padding-balance = true
-window-padding-color = extend
+# window-padding-color = extend
 
 # macos-icon = xray
 
@@ -67,5 +66,5 @@ keybind = cmd+left=csi:1;2H
 # Cmd + Right Arrow -> Shift+End (end of line in nvim)
 keybind = cmd+right=csi:1;2F
 
-shell-integration-features = no-cursor
+# shell-integration-features = no-cursor
 # shell-integration-features = ssh-terminfo,ssh-env
