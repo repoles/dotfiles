@@ -44,6 +44,13 @@ vim.keymap.set("v", "<LeftRelease>", '"+y', { silent = true })
 -- scroll sideways instead. Prose filetypes turn 'wrap' back on below.
 vim.opt.wrap = false
 
+-- Signal text hidden off-screen: › in the last column when the line continues to
+-- the right, ‹ in the first once scrolled away from the start. Those markers are
+-- only drawn in 'list' mode, which also lets tabs and trailing spaces show up as
+-- something other than blank.
+vim.opt.list = true
+vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣", extends = "›", precedes = "‹" }
+
 -- These only take effect where 'wrap' is on, but keep them global so that
 -- turning wrap on anywhere (:set wrap) breaks at word boundaries rather than
 -- mid-word, with continuation lines aligned to the original indentation.
