@@ -40,8 +40,13 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 })
 vim.keymap.set("v", "<LeftRelease>", '"+y', { silent = true })
 
--- Wrap long lines at word boundaries instead of mid-word, and keep the
--- continuation lines aligned with the indentation of the original line.
+-- Don't wrap long lines: in code a wrapped line misreads as two lines, so let it
+-- scroll sideways instead. Prose filetypes turn 'wrap' back on below.
+vim.opt.wrap = false
+
+-- These only take effect where 'wrap' is on, but keep them global so that
+-- turning wrap on anywhere (:set wrap) breaks at word boundaries rather than
+-- mid-word, with continuation lines aligned to the original indentation.
 vim.opt.linebreak = true
 vim.opt.breakindent = true
 
@@ -61,10 +66,19 @@ vim.api.nvim_create_autocmd("BufReadPost", {
     end,
 })
 
+-- Wrap prose, where a long line is a paragraph rather than a statement
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = { "markdown", "text" },
+    callback = function()
+        vim.opt_local.wrap = true
+    end,
+})
+
 -- Set text width and color column for gitcommit filetype
 vim.api.nvim_create_autocmd("FileType", {
     pattern = "gitcommit",
     callback = function()
+        vim.opt_local.wrap = true -- Prose, so wrap instead of scrolling sideways
         vim.opt_local.textwidth = 72 -- Set text width to 72
         vim.opt_local.colorcolumn = "72" -- Highlight column 72
         vim.fn.cursor(1, 1) -- Move cursor to the beginning of the file
