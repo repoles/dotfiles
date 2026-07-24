@@ -113,6 +113,6 @@ vim.api.nvim_create_autocmd("FileType", {
     callback = function()
         vim.opt_local.wrap = true -- Prose, so wrap instead of scrolling sideways
         vim.opt_local.textwidth = 72 -- Set text width to 72
-        vim.opt_local.colorcolumn = "72" -- Highlight column 72
+        vim.opt_local.colorcolumn = "+1" -- Highlight the first column past 'textwidth'
     end
 })
