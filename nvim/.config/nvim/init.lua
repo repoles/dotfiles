@@ -40,6 +40,11 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 })
 vim.keymap.set("v", "<LeftRelease>", '"+y', { silent = true })
 
+-- Wrap long lines at word boundaries instead of mid-word, and keep the
+-- continuation lines aligned with the indentation of the original line.
+vim.opt.linebreak = true
+vim.opt.breakindent = true
+
 -- Show line numbers
 vim.opt.number = true
 
