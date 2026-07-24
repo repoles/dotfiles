@@ -87,8 +87,11 @@ vim.api.nvim_create_autocmd("BufReadPost", {
         if skip_cursor_restore[name] then
             return
         end
-        local row, col = unpack(vim.api.nvim_buf_get_mark(0, '"'))
-        if row > 0 and row <= vim.api.nvim_buf_line_count(0) then
+        local row, col = unpack(vim.api.nvim_buf_get_mark(args.buf, '"'))
+        if vim.api.nvim_get_current_buf() == args.buf
+            and row > 0
+            and row <= vim.api.nvim_buf_line_count(args.buf)
+        then
             vim.api.nvim_win_set_cursor(0, { row, col })
         end
     end,
