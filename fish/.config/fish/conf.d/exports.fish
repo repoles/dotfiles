@@ -16,13 +16,9 @@ set -x BUNDLE_USER_CONFIG $XDG_CONFIG_HOME/bundle/config.yml
 set -x BUNDLE_USER_PLUGIN $XDG_DATA_HOME/bundle
 set -x BUNDLE_USER_CACHE $XDG_CACHE_HOME/bundle
 
-set -x IRBRC $XDG_CONFIG_HOME/irb/irbrc.rb
-mkdir -p $XDG_DATA_HOME/irb # where irb history must be saved
-
 set -x PRYRC $XDG_CONFIG_HOME/pry/pryrc.rb
-
-set -x MYSQL_HISTFILE $XDG_DATA_HOME/mysql/history
-mkdir -p (dirname $MYSQL_HISTFILE)
+set -x IRBRC $XDG_CONFIG_HOME/irb/irbrc.rb # creates its own history directory
+set -x MYSQL_HISTFILE $XDG_DATA_HOME/mysql/history # the mysql function creates its directory
 
 set -x AWS_CONFIG_FILE $XDG_CONFIG_HOME/aws/config
 # I'm using aws-vault now (https://github.com/99designs/aws-vault)
