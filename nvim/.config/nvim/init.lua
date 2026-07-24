@@ -32,12 +32,14 @@ vim.keymap.set("i", "<S-End>", "<End>")
 -- Use system clipboard
 vim.opt.clipboard:append("unnamedplus")
 
--- Auto-copy mouse selection to clipboard
+-- Briefly highlight the text that was just yanked
 vim.api.nvim_create_autocmd("TextYankPost", {
     callback = function()
         vim.highlight.on_yank({ timeout = 150 })
     end,
 })
+
+-- Auto-copy mouse selection to clipboard
 vim.keymap.set("v", "<LeftRelease>", '"+y', { silent = true })
 
 -- Don't wrap long lines: in code a wrapped line misreads as two lines, so let it
