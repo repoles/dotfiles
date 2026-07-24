@@ -32,8 +32,11 @@ vim.keymap.set("i", "<S-End>", "<End>")
 -- Use system clipboard
 vim.opt.clipboard:append("unnamedplus")
 
+local config_group = vim.api.nvim_create_augroup("UserConfig", { clear = true })
+
 -- Briefly highlight the text that was just yanked
 vim.api.nvim_create_autocmd("TextYankPost", {
+    group = config_group,
     callback = function()
         vim.hl.on_yank({ timeout = 150 })
     end,
@@ -78,6 +81,7 @@ local skip_cursor_restore = {
 }
 
 vim.api.nvim_create_autocmd("BufReadPost", {
+    group = config_group,
     callback = function(args)
         local name = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(args.buf), ":t")
         if skip_cursor_restore[name] then
@@ -92,6 +96,7 @@ vim.api.nvim_create_autocmd("BufReadPost", {
 
 -- Wrap prose, where a long line is a paragraph rather than a statement
 vim.api.nvim_create_autocmd("FileType", {
+    group = config_group,
     pattern = { "markdown", "text" },
     callback = function()
         vim.opt_local.wrap = true
@@ -100,6 +105,7 @@ vim.api.nvim_create_autocmd("FileType", {
 
 -- Set text width and color column for gitcommit filetype
 vim.api.nvim_create_autocmd("FileType", {
+    group = config_group,
     pattern = "gitcommit",
     callback = function()
         vim.opt_local.wrap = true -- Prose, so wrap instead of scrolling sideways
