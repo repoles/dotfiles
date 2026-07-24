@@ -65,9 +65,24 @@ vim.opt.number = true
 -- Enable relative line numbers
 -- vim.opt.relativenumber = true
 
--- Remember last cursor position
+-- Remember last cursor position. Git reuses one path per message kind, so the
+-- shada mark from the *previous* commit would drop the cursor in the middle of
+-- an unrelated message; those files always start at the top instead. Matching by
+-- name rather than filetype is deliberate: 'filetype' is still empty this early.
+local skip_cursor_restore = {
+    ["COMMIT_EDITMSG"] = true,
+    ["MERGE_MSG"] = true,
+    ["SQUASH_MSG"] = true,
+    ["TAG_EDITMSG"] = true,
+    ["git-rebase-todo"] = true,
+}
+
 vim.api.nvim_create_autocmd("BufReadPost", {
-    callback = function()
+    callback = function(args)
+        local name = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(args.buf), ":t")
+        if skip_cursor_restore[name] then
+            return
+        end
         local row, col = unpack(vim.api.nvim_buf_get_mark(0, '"'))
         if row > 0 and row <= vim.api.nvim_buf_line_count(0) then
             vim.api.nvim_win_set_cursor(0, { row, col })
@@ -90,6 +105,5 @@ vim.api.nvim_create_autocmd("FileType", {
         vim.opt_local.wrap = true -- Prose, so wrap instead of scrolling sideways
         vim.opt_local.textwidth = 72 -- Set text width to 72
         vim.opt_local.colorcolumn = "72" -- Highlight column 72
-        vim.fn.cursor(1, 1) -- Move cursor to the beginning of the file
     end
 })
