@@ -1,4 +1,4 @@
-if set -q TMUX
+if status is-interactive; and set -q TMUX
     function __tmux_notify_long_cmd --on-event fish_postexec
         set -l last_status $status
 
