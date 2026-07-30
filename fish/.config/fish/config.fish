@@ -33,6 +33,7 @@ if status is-interactive
 
     # set -g custom_prompt_command_duration_threshold 2000
     set -g custom_prompt_command_duration_color yellow
+    set -g custom_prompt_command_duration_symbol \uf252 # 
     set -g custom_prompt_time_color brblack
     set -g custom_prompt_symbol \u276f # ❯
     set -g custom_prompt_symbol_success_color green

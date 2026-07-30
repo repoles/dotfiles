@@ -20,17 +20,9 @@ function fish_prompt
         set line1 "$line1 $ruby_info"
     end
 
-    set -l duration_threshold 5000
-    set -q custom_prompt_command_duration_threshold
-        and set duration_threshold $custom_prompt_command_duration_threshold
-
-    if test "$last_duration" -ge "$duration_threshold"
-        set -l duration_str (humanize_duration $last_duration)
-        if set -q custom_prompt_command_duration_color
-            set line1 "$line1 "(set_color $custom_prompt_command_duration_color)"$duration_str"(set_color normal)
-        else
-            set line1 "$line1 $duration_str"
-        end
+    set -l duration_info (custom_prompt_command_duration $last_duration)
+    if test -n "$duration_info"
+        set line1 "$line1 $duration_info"
     end
 
     # Line 2: time | prompt symbol
