@@ -2,8 +2,13 @@ function fish_prompt
     set -l last_status $status
     set -l last_duration $CMD_DURATION
 
-    # Line 1: directory | git info | ruby version | command duration
+    # Line 1: ssh host | directory | git info | ruby version | command duration
     set -l line1 (custom_prompt_pwd)
+
+    set -l ssh_info (custom_prompt_ssh)
+    if test -n "$ssh_info"
+        set line1 "$ssh_info $line1"
+    end
 
     set -l git_info (custom_prompt_git)
     if test -n "$git_info"

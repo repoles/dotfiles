@@ -15,6 +15,9 @@ if status is-interactive
     # --- Custom prompt settings ---
     set -g fish_transient_prompt 1
 
+    set -g custom_prompt_ssh_color cyan
+    # set -g custom_prompt_ssh_symbol \uf233 # 
+
     set -g custom_prompt_pwd_color blue
 
     set -g custom_prompt_git_branch_color purple
