@@ -30,7 +30,7 @@ adjust-cursor-thickness = 4
 # unfocused-split-fill = #000000
 
 # window-decoration = none
-# macos-window-shadow = false
+macos-window-shadow = false
 macos-option-as-alt = true
 # macos-titlebar-style = tabs
 macos-titlebar-proxy-icon = hidden
@@ -40,10 +40,10 @@ macos-titlebar-proxy-icon = hidden
 window-width = 100
 window-height = 30
 
-window-padding-x = 1
+window-padding-x = 0
 window-padding-y = 0
 window-padding-balance = true
-# window-padding-color = extend
+window-padding-color = extend
 
 # macos-icon = xray
 
@@ -66,5 +66,4 @@ keybind = cmd+left=csi:1;2H
 # Cmd + Right Arrow -> Shift+End (end of line in nvim)
 keybind = cmd+right=csi:1;2F
 
-# shell-integration-features = no-cursor
-# shell-integration-features = ssh-terminfo,ssh-env
+shell-integration-features = ssh-terminfo,ssh-env
