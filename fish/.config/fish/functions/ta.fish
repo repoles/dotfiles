@@ -46,14 +46,14 @@ function ta --description "Select a claude or codex window across all tmux sessi
         # instead the name of its native binary, versioned for claude (2_1_217) and per-arch for
         # codex (codex-aarch64-apple-darwin). codex still starts with codex, in the window name or
         # the running command, so a prefix match catches it either way. claude's binary carries no
-        # such hint, but it always prepends a marker to the title — ✳ when idle or awaiting input,
-        # an animated braille spinner while it works — and that marker is claude's alone.
+        # such hint, but it always prepends a symbol to the title, and that marker is claude's
+        # alone; matching \p{So} instead of a list keeps this working when the symbol changes.
         set agent
         if string match --quiet --regex '^codex' -- "$name"
             or string match --quiet --regex '^codex' -- "$cmd"
             set agent codex
         else if test "$name" = claude
-            or string match --quiet --regex '^(✳|[\x{2800}-\x{28ff}])' -- "$raw_title"
+            or string match --quiet --regex '^\p{So}' -- "$raw_title"
             set agent claude
         else
             continue
@@ -70,8 +70,8 @@ function ta --description "Select a claude or codex window across all tmux sessi
         # on an agent window it tells you how long ago it stopped producing output
         set last_active (string split ' ' (humanize_duration (math --scale=0 "($now - $parts[1]) * 1000")))[1]
 
-        # drop only the ✳ the agent prepends, like the status bar and tw; the braille spinner stays
-        set clean_title (string replace --regex '^✳ ' '' -- "$raw_title")
+        # drop the symbol claude code prepends to the title, like the status bar and tw
+        set clean_title (string replace --regex '^\p{So}\s*' '' -- "$raw_title")
 
         if test -n "$clean_title"
             set title " \"$clean_title\""

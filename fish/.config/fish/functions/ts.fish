@@ -28,8 +28,7 @@ function ts --description "Select an open tmux session"
         end
     end
 
-    # the ✳ is dropped from the title, like in tw and the status-right
-    set session_lines (tmux list-sessions -F "#{session_activity}	#{session_name}	#{session_windows}	#{window_name}	#{session_alerts}	#{session_attached}	#{s|^✳ ||:pane_title}")
+    set session_lines (tmux list-sessions -F "#{session_activity}	#{session_name}	#{session_windows}	#{window_name}	#{session_alerts}	#{session_attached}	#{pane_title}")
 
     if test $status -ne 0
         return 1
@@ -56,8 +55,11 @@ function ts --description "Select an open tmux session"
             set alerts " [$parts[5]]"
         end
 
-        if test -n "$parts[7]"
-            set title " \"$parts[7]\""
+        # drop the symbol claude code prepends to the title, like in tw and the status-right
+        set clean_title (string replace --regex '^\p{So}\s*' '' -- "$parts[7]")
+
+        if test -n "$clean_title"
+            set title " \"$clean_title\""
         end
 
         if test "$parts[2]" = "$current_session"

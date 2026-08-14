@@ -16,8 +16,7 @@ function tw --description "Select a window in the current tmux session"
 
     # list-windows already sorts by index
     # like in style.conf, the last-window flag becomes ‐ (U+2010) so that ~- does not turn into a ligature
-    # the ✳ is dropped from the title, like in the status-right
-    set window_lines (tmux list-windows -F "#{window_index}	#{window_name}	#{s|-|‐|:window_flags}	#{s|^✳ ||:pane_title}	#{window_active}	#{window_last_flag}	#{window_activity}")
+    set window_lines (tmux list-windows -F "#{window_index}	#{window_name}	#{s|-|‐|:window_flags}	#{pane_title}	#{window_active}	#{window_last_flag}	#{window_activity}")
 
     if test $status -ne 0
         return 1
@@ -36,8 +35,12 @@ function tw --description "Select a window in the current tmux session"
             set last $position
         end
 
-        if test -n "$parts[4]"
-            set title " \"$parts[4]\""
+        # drop the symbol claude code prepends to the title, like the status-right
+        # \p{So} covers every symbol it has used across versions, so a release cannot break this
+        set clean_title (string replace --regex '^\p{So}\s*' '' -- "$parts[4]")
+
+        if test -n "$clean_title"
+            set title " \"$clean_title\""
         end
 
         set active (string split ' ' (humanize_duration (math --scale=0 "($now - $parts[7]) * 1000")))[1]
