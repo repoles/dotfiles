@@ -41,13 +41,7 @@ if status is-interactive
 
     # ---
 
-    # mise activate must come after every other PATH change so its
-    # tool paths win over the ones Homebrew and ~/.local/bin provide.
     /opt/homebrew/bin/brew shellenv | source
-
-    fish_add_path $HOME/.local/bin
-    $HOME/.local/bin/mise activate fish | source
-
     zoxide init fish --cmd j | source
 
     # https://junegunn.github.io/fzf/shell-integration/#setting-up-shell-integration
@@ -58,5 +52,6 @@ if status is-interactive
     # set -x STARSHIP_CONFIG $XDG_CONFIG_HOME/starship/starship.toml
     # starship init fish | source
 
+    fish_add_path $HOME/.local/bin
     [ "$TERM_PROGRAM" = "Apple_Terminal" ] && function fish_title; end
 end

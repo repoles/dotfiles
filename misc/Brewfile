@@ -5,11 +5,8 @@ brew 'fish' # Friendly interactive shell
 brew 'tmux' # Terminal multiplexer
 brew 'starship' # Cross-shell prompt for astronauts
 
-# mise (polyglot runtime manager) is installed by hand, see the README.
-# Installing it with homebrew is not recommended anymore.
-# https://x.com/jdxcode/status/2083727165179273379
-# https://mise.jdx.dev/installing-mise.html
-brew 'gnupg' # GPG, so the hand-installed mise can verify release signatures
+brew 'mise' # Polyglot runtime manager (asdf rust clone)
+brew 'gnupg' # GPG, so mise can verify release signatures
 
 brew 'eza' # Modern, maintained replacement for ls
 brew 'bat' # Clone of cat with syntax highlighting and Git integration

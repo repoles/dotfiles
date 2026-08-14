@@ -39,30 +39,10 @@ echo "$(which fish)" | sudo tee -a /etc/shells
 chsh -s "$(which fish)"
 ```
 
-### 5. Install [mise](https://mise.jdx.dev)
-
-mise is [no longer meant to be installed through Homebrew](https://mise.jdx.dev/installing-mise.html), so it is not in the Brewfile and gets its own step:
-
-```sh
-curl https://mise.run | sh
-```
-
-This puts the binary in `~/.local/bin/mise`, which is where `fish/.config/fish/config.fish` expects it. Homebrew no longer handles the upgrades either:
-
-```sh
-mise self-update
-```
-
-### 6. Install remaining programs
+### 5. Install remaining programs
 
 Open a new terminal (now running fish) and install everything from the Brewfile:
 
 ```sh
 brew bundle --file=~/Code/Dotfiles/misc/Brewfile --no-upgrade --verbose
-```
-
-Then check that mise is healthy and its tool paths come first in `PATH`:
-
-```sh
-mise doctor
 ```
