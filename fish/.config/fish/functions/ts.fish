@@ -55,8 +55,8 @@ function ts --description "Select an open tmux session"
             set alerts " [$parts[5]]"
         end
 
-        # drop the symbol claude code prepends to the title, like in tw and the status-right
-        set clean_title (string replace --regex '^\p{So}\s*' '' -- "$parts[7]")
+        # drop only the idle ✳, like in tw and the status-right; the working spinner stays
+        set clean_title (string replace --regex '^✳\s*' '' -- "$parts[7]")
 
         if test -n "$clean_title"
             set title " \"$clean_title\""

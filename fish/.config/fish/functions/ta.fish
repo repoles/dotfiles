@@ -70,8 +70,9 @@ function ta --description "Select a claude or codex window across all tmux sessi
         # on an agent window it tells you how long ago it stopped producing output
         set last_active (string split ' ' (humanize_duration (math --scale=0 "($now - $parts[1]) * 1000")))[1]
 
-        # drop the symbol claude code prepends to the title, like the status bar and tw
-        set clean_title (string replace --regex '^\p{So}\s*' '' -- "$raw_title")
+        # drop only the ✳ claude code prepends when idle, like the status bar and tw; the
+        # working spinner stays, it is the one marker that says something is happening
+        set clean_title (string replace --regex '^✳\s*' '' -- "$raw_title")
 
         if test -n "$clean_title"
             set title " \"$clean_title\""

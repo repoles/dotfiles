@@ -35,9 +35,9 @@ function tw --description "Select a window in the current tmux session"
             set last $position
         end
 
-        # drop the symbol claude code prepends to the title, like the status-right
-        # \p{So} covers every symbol it has used across versions, so a release cannot break this
-        set clean_title (string replace --regex '^\p{So}\s*' '' -- "$parts[4]")
+        # drop only the ✳ claude code prepends when idle, like the status-right
+        # the working spinner is left alone, it is the signal that the agent is busy
+        set clean_title (string replace --regex '^✳\s*' '' -- "$parts[4]")
 
         if test -n "$clean_title"
             set title " \"$clean_title\""
