@@ -41,7 +41,6 @@ if status is-interactive
 
     # ---
 
-    /opt/homebrew/bin/brew shellenv | source
     zoxide init fish --cmd j | source
 
     # https://junegunn.github.io/fzf/shell-integration/#setting-up-shell-integration
