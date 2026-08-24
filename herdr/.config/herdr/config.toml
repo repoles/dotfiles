@@ -1,0 +1,15 @@
+onboarding = false
+
+[ui.toast]
+delivery = "herdr"
+
+[ui]
+status_indicators = "dots"
+prompt_new_tab_name = false
+
+# [ui.sidebar.spaces]
+# row_gap = 1
+
+[theme]
+name = "catppuccin"
+auto_switch = false
