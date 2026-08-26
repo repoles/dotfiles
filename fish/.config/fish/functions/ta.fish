@@ -25,49 +25,11 @@ function ta --description "Select a claude or codex window across all tmux sessi
         end
     end
 
-    # -a covers every session and the filter keeps one line per window; the pane title is kept
-    # raw for detection and cleaned below
-    set pane_lines (tmux list-panes -a -f '#{pane_active}' -F "#{window_activity}	#{pane_tty}	#{session_name}	#{window_index}	#{window_name}	#{pane_current_command}	#{pane_title}")
+    # -a lists windows across every session; the pane title is kept raw for detection and cleaned below
+    set window_lines (tmux list-windows -a -F "#{window_activity}	#{session_name}	#{window_index}	#{window_name}	#{pane_current_command}	#{pane_title}")
 
     if test $status -ne 0
         return 1
-    end
-
-    # window_activity is not the last output: session_set_current calls window_update_activity,
-    # so merely visiting a window resets it. the mtime of the pane's tty only moves when the
-    # process writes to it, which is the signal we want; switching windows and typing into a
-    # pane that ignores stdin both leave it alone. window_activity stays as the fallback for
-    # the rare pane whose tty stat fails, like one that dies between the two calls.
-    set ttys
-    for line in $pane_lines
-        set --append ttys (string split \t -- $line)[2]
-    end
-
-    set stat_ttys
-    set stat_times
-
-    if test (count $ttys) -gt 0
-        # one stat for every pane; %N echoes the path back so a skipped tty cannot shift the rows
-        for stat_line in (stat -f '%m %N' $ttys 2>/dev/null)
-            set stat_parts (string split ' ' -- $stat_line)
-            set --append stat_times $stat_parts[1]
-            set --append stat_ttys $stat_parts[2]
-        end
-    end
-
-    set window_lines
-
-    for line in $pane_lines
-        set parts (string split \t -- $line)
-        set last_output $parts[1]
-        set tty_index (contains --index -- $parts[2] $stat_ttys)
-
-        if test -n "$tty_index"
-            set last_output $stat_times[$tty_index]
-        end
-
-        # the tty is dropped here, so the rest of the function sees the same fields as before
-        set --append window_lines (string join \t $last_output $parts[3..-1])
     end
 
     set window_lines (printf '%s\n' $window_lines | sort --reverse --numeric-sort)
@@ -104,8 +66,8 @@ function ta --description "Select a claude or codex window across all tmux sessi
             set current $position
         end
 
-        # the last output is kept even for the current window: on an agent window it tells you
-        # how long ago it stopped producing output
+        # window_activity is the last output in the window, kept even for the current one:
+        # on an agent window it tells you how long ago it stopped producing output
         set last_active (string split ' ' (humanize_duration (math --scale=0 "($now - $parts[1]) * 1000")))[1]
 
         # drop only the ✳ claude code prepends when idle, like the status bar and tw; the
