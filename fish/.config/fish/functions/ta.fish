@@ -25,11 +25,45 @@ function ta --description "Select a claude or codex window across all tmux sessi
         end
     end
 
-    # -a lists windows across every session; the pane title is kept raw for detection and cleaned below
-    set window_lines (tmux list-windows -a -F "#{window_activity}	#{session_name}	#{window_index}	#{window_name}	#{pane_current_command}	#{pane_title}")
+    # the stamp is written by agent-tmux-status.sh, which claude and codex both call from their
+    # own hooks, so it only moves when the agent itself does something. neither window_activity
+    # nor the mtime of the pane's tty can say that: session_set_current bumps the first on a
+    # mere visit, and entering a session makes both agents rewrite their terminal modes, a write
+    # the second cannot tell from real output. window_activity is still the fallback for a pane
+    # with no stamp, like a window opened before its first hook fired.
+    set cache_home $XDG_CACHE_HOME
+
+    if test -z "$cache_home"
+        set cache_home $HOME/.cache
+    end
+
+    set stamp_dir $cache_home/tmux-agent-activity
+
+    # -a covers every session and the filter keeps one line per window; the pane id resolves the
+    # stamp and the pane title is kept raw for detection, cleaned below
+    set pane_lines (tmux list-panes -a -f '#{pane_active}' -F "#{window_activity}	#{pane_id}	#{session_name}	#{window_index}	#{window_name}	#{pane_current_command}	#{pane_title}")
 
     if test $status -ne 0
         return 1
+    end
+
+    set window_lines
+
+    for line in $pane_lines
+        set parts (string split \t -- $line)
+        set last_active_at $parts[1]
+        set stamp_file $stamp_dir/$parts[2]
+
+        if test -r "$stamp_file"
+            read --local stamp <$stamp_file
+
+            if string match --quiet --regex '^\d+$' -- "$stamp"
+                set last_active_at $stamp
+            end
+        end
+
+        # the pane id is dropped here, so the rest of the function sees the same fields as before
+        set --append window_lines (string join \t $last_active_at $parts[3..-1])
     end
 
     set window_lines (printf '%s\n' $window_lines | sort --reverse --numeric-sort)
@@ -66,8 +100,8 @@ function ta --description "Select a claude or codex window across all tmux sessi
             set current $position
         end
 
-        # window_activity is the last output in the window, kept even for the current one:
-        # on an agent window it tells you how long ago it stopped producing output
+        # the stamp is kept even for the current window: on an agent window it tells you how
+        # long ago the agent last did something
         set last_active (string split ' ' (humanize_duration (math --scale=0 "($now - $parts[1]) * 1000")))[1]
 
         # drop only the ✳ claude code prepends when idle, like the status bar and tw; the
