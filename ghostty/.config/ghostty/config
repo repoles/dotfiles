@@ -1,9 +1,9 @@
-font-family = MonoLisaCode
+font-family = JetBrains Mono
 font-family = Symbols Nerd Font Mono
 
 font-size = 18
 font-thicken = false
-font-feature = +ss11, +ss13, +cv04, +cv05, +cv08, +cv09, +cv11
+# font-feature = +ss11, +ss13, +cv04, +cv05, +cv08, +cv09, +cv11
 
 theme = Ayu
 # theme = Argonaut
@@ -11,6 +11,7 @@ theme = Ayu
 # theme = GitHub Dark
 # theme = Monokai Classic
 # theme = Gruvbox Dark Hard
+# theme = Catppuccin Macchiato
 
 # background = #000000
 # background-opacity = 0
@@ -30,15 +31,15 @@ adjust-cursor-thickness = 4
 # unfocused-split-fill = #000000
 
 # window-decoration = none
-macos-window-shadow = false
+# macos-window-shadow = false
 macos-option-as-alt = true
-# macos-titlebar-style = tabs
+# macos-titlebar-style = hidden
 macos-titlebar-proxy-icon = hidden
 
 # window-title-font-family = JetBrains Mono
 
 window-width = 100
-window-height = 30
+window-height = 35
 
 window-padding-x = 0
 window-padding-y = 0
