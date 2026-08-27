@@ -7,3 +7,5 @@ mise/.config/mise/config.local.toml
 # Local state the tools write into the stowed directories themselves
 aws/.aws/cli/cache/
 zed/.config/zed/prompts/
+herdr/.config/herdr/.plugins.lock
+herdr/.config/herdr/session.json
