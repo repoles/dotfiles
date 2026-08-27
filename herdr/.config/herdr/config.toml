@@ -4,12 +4,12 @@ onboarding = false
 delivery = "herdr"
 
 [ui]
-status_indicators = "dots"
 prompt_new_tab_name = false
 
 # [ui.sidebar.spaces]
 # row_gap = 1
 
-[theme]
-name = "catppuccin"
-auto_switch = false
+[ui.sidebar.agents]
+row_gap = 1
+
+rows = [["state_icon", "workspace", "tab"], ["terminal_title_stripped"]]
