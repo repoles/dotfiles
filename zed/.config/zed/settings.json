@@ -1,18 +1,20 @@
 {
   "autosave": "on_window_change",
+  "cli_default_open_behavior": "new_window",
   // "ui_font_family": "MonoLisaText",
-  "buffer_font_family": "MonoLisaCode",
+  "buffer_font_family": "JetBrains Mono", // MonoLisaCode
   "buffer_font_fallbacks": ["Symbols Nerd Font Mono"],
   "buffer_font_size": 16,
-  "buffer_font_features": {
-    "ss11": true,
-    "ss13": true,
-    "cv04": true,
-    "cv05": true,
-    "cv08": true,
-    "cv09": true,
-    "cv11": true,
-  },
+  // "buffer_font_features": {
+  //   // MonoLisaCode Ligatures
+  //   "ss11": true,
+  //   "ss13": true,
+  //   "cv04": true,
+  //   "cv05": true,
+  //   "cv08": true,
+  //   "cv09": true,
+  //   "cv11": true,
+  // },
   "theme": {
     "mode": "system",
     "light": "Ayu Light",
@@ -20,5 +22,10 @@
   },
   "file_types": {
     "Shell Script": ["conf"],
+  },
+  "languages": {
+    "Lua": {
+      "enable_language_server": false,
+    },
   },
 }
