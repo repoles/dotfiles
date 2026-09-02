@@ -1,9 +1,13 @@
 {
   "attribution": {
     "commit": "",
-    "pr": ""
+    "pr": "",
+    "sessionUrl": false
   },
-  "model": "opus",
+  "permissions": {
+    "defaultMode": "default"
+  },
+  "model": "opus[1m]",
   "hooks": {
     "Notification": [
       {
