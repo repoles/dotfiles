@@ -1,4 +1,7 @@
 {
+  "git_panel": {
+    "group_by": "staging"
+  },
   "autosave": "on_window_change",
   "cli_default_open_behavior": "new_window",
   // "ui_font_family": "MonoLisaText",
