@@ -65,6 +65,11 @@
         "hooks": [
           {
             "type": "command",
+            "command": "$HOME/.local/bin/claude_memory_link >/dev/null 2>&1 || true",
+            "timeout": 15
+          },
+          {
+            "type": "command",
             "command": "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/scripts/agent-tmux-status.sh idle"
           }
         ]
