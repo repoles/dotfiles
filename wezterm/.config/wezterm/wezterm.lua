@@ -9,7 +9,7 @@ config.initial_rows = 35
 -- https://wezterm.org/config/fonts.html
 
 local font_family = 'JetBrains Mono'
-local font_features = { 'calt=0', 'clig=0', 'liga=0' }
+local font_features = {} -- { 'calt=0', 'clig=0', 'liga=0' }
 
 -- local font_family = 'MonoLisaCode'
 -- https://www.monolisa.dev/tester/code
