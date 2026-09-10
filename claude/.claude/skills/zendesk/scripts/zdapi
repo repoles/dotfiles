@@ -1,0 +1,134 @@
+#!/usr/bin/env bash
+# zdapi — authenticated curl wrapper for the Zendesk REST API v2.
+#
+#   zdapi GET  /tickets.json
+#   zdapi GET  "/search.json?query=type:ticket status:open"
+#   zdapi PUT  /tickets/123.json '{"ticket":{"status":"solved"}}'
+#   zdapi POST /tickets.json @body.json
+#
+# Auth is OAuth 2.0 client credentials (API tokens are being removed by Zendesk).
+# The access token is fetched on demand and cached in $XDG_CACHE_HOME/zendesk until
+# shortly before it expires, so a burst of calls costs one token request.
+#
+# Prints the response body on stdout. On HTTP >= 400 it prints the status and body on
+# stderr and exits 1; on 429 it also reports the Retry-After interval.
+set -euo pipefail
+
+for var in ZENDESK_SUBDOMAIN ZENDESK_CLIENT_ID ZENDESK_CLIENT_SECRET; do
+  if [ -z "${!var:-}" ]; then
+    echo "zdapi: \$$var is not set — see the Auth section of the zendesk skill" >&2
+    exit 64
+  fi
+done
+
+if [ $# -lt 2 ]; then
+  echo "usage: zdapi METHOD PATH [JSON|@file]" >&2
+  exit 64
+fi
+
+method=$1
+path=$2
+body=${3:-}
+
+scope=${ZENDESK_SCOPE:-read tickets:write}
+lifetime=3600
+cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/zendesk"
+cache_file="$cache_dir/token-${ZENDESK_SUBDOMAIN}.json"
+
+# ---------- Token ----------
+
+# Client credentials issues no refresh token: when it expires we just ask for another.
+fetch_token() {
+  local resp status payload
+  resp=$(curl --silent --show-error --write-out '\n%{http_code}' \
+    --request POST "https://${ZENDESK_SUBDOMAIN}.zendesk.com/oauth/tokens" \
+    --header 'Accept: application/json' \
+    --data-urlencode 'grant_type=client_credentials' \
+    --data-urlencode "client_id=${ZENDESK_CLIENT_ID}" \
+    --data-urlencode "client_secret=${ZENDESK_CLIENT_SECRET}" \
+    --data-urlencode "scope=${scope}" \
+    --data-urlencode "expires_in=${lifetime}")
+  status=${resp##*$'\n'}
+  payload=${resp%$'\n'*}
+
+  if [ "$status" != 200 ]; then
+    echo "zdapi: OAuth token request failed (HTTP $status)" >&2
+    printf '%s\n' "$payload" >&2
+    [ "$status" = 401 ] && echo "zdapi: check ZENDESK_CLIENT_ID/SECRET and that the OAuth client is Confidential" >&2
+    exit 1
+  fi
+
+  mkdir -p "$cache_dir"
+  local tmp; tmp=$(mktemp "$cache_dir/.tok.XXXXXX")
+  chmod 600 "$tmp"
+  # Store an absolute expiry, trimmed by 60s so a long call can't expire mid-flight.
+  jq --argjson now "$(date +%s)" --arg scope "$scope" \
+     '{access_token, scope: $scope, expires_at: ($now + (.expires_in // 3600) - 60)}' <<<"$payload" >"$tmp"
+  mv "$tmp" "$cache_file"
+  jq -r .access_token "$cache_file"
+}
+
+access_token() {
+  if [ -s "$cache_file" ] \
+     && [ "$(jq -r '.expires_at // 0' "$cache_file")" -gt "$(date +%s)" ] 2>/dev/null \
+     && [ "$(jq -r '.scope // ""' "$cache_file")" = "$scope" ]; then
+    jq -r .access_token "$cache_file"
+  else
+    fetch_token
+  fi
+}
+
+# ---------- Request ----------
+
+# Encode the characters curl rejects in a URL but that show up routinely in Zendesk
+# search queries. '%' is left alone so an already-encoded path still works.
+encode() {
+  local s=$1
+  s=${s// /%20}; s=${s//\"/%22}; s=${s//</%3C}; s=${s//>/%3E}
+  s=${s//\{/%7B}; s=${s//\}/%7D}; s=${s//|/%7C}; s=${s//\\/%5C}; s=${s//^/%5E}
+  printf '%s' "$s"
+}
+
+url="https://${ZENDESK_SUBDOMAIN}.zendesk.com/api/v2$(encode "$path")"
+headers=$(mktemp)
+trap 'rm -f "$headers"' EXIT
+
+call() {
+  local token=$1 args
+  # %{http_code} is single-line, so the last line of the capture is always the status.
+  # --globoff: curl reads [ ] as a glob range, and Zendesk's cursor pagination
+  # (page[size], page[after]) and filter[type] put brackets in the query string.
+  args=(--silent --show-error --location --globoff --dump-header "$headers" --write-out '\n%{http_code}'
+        --header "Authorization: Bearer $token"
+        --request "$method" --header 'Accept: application/json')
+  [ -n "$body" ] && args+=(--header 'Content-Type: application/json' --data-binary "$body")
+  curl "${args[@]}" "$url"
+}
+
+# fetch_token exits on failure, but it runs in a subshell here — check explicitly.
+token=$(access_token) || exit 1
+response=$(call "$token")
+status=${response##*$'\n'}
+
+# A cached token can be revoked or expire early; drop it and try once with a fresh one.
+if [ "$status" = 401 ] && [ -s "$cache_file" ]; then
+  rm -f "$cache_file"
+  token=$(fetch_token) || exit 1
+  response=$(call "$token")
+  status=${response##*$'\n'}
+fi
+
+payload=${response%$'\n'*}
+
+if [ "$status" -ge 400 ] 2>/dev/null; then
+  echo "zdapi: HTTP $status on $method $path" >&2
+  if [ "$status" = 429 ]; then
+    echo "zdapi: rate limited — $(grep -i '^retry-after:' "$headers" | tail -1 | tr -d '\r')" >&2
+  elif [ "$status" = 403 ]; then
+    echo "zdapi: forbidden — the OAuth client's scopes may not cover this endpoint (current: $scope)" >&2
+  fi
+  printf '%s\n' "$payload" >&2
+  exit 1
+fi
+
+printf '%s\n' "$payload"
