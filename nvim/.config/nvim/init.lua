@@ -3,34 +3,38 @@ vim.cmd('colorscheme lunaperche')
 
 -- Move by word with OPT+Left/Right (macOS-style).
 -- WezTerm sends Alt+b/Alt+f (<M-b>/<M-f>); Ghostty sends <M-Left>/<M-Right>.
-for _, lhs in ipairs({ "<M-Right>", "<M-f>" }) do
-    vim.keymap.set({ "n", "v" }, lhs, "w")
-    -- In insert mode, land just after the last char of the word (VSCode-style).
-    vim.keymap.set("i", lhs, "<C-o>e<Right>")
-end
-for _, lhs in ipairs({ "<M-Left>", "<M-b>" }) do
-    vim.keymap.set({ "n", "v" }, lhs, "b")
-    vim.keymap.set("i", lhs, "<C-o>b")
-end
+-- for _, lhs in ipairs({ "<M-Right>", "<M-f>" }) do
+--     vim.keymap.set({ "n", "x" }, lhs, "w")
+--     -- In insert mode, land just after the last char of the word (VSCode-style).
+--     vim.keymap.set("i", lhs, "<C-o>e<Right>")
+-- end
+-- for _, lhs in ipairs({ "<M-Left>", "<M-b>" }) do
+--     vim.keymap.set({ "n", "x" }, lhs, "b")
+--     vim.keymap.set("i", lhs, "<C-o>b")
+-- end
 
 -- Jump to start/end of line with CTRL+a/CTRL+e (readline/VSCode-style).
-vim.keymap.set({ "n", "v" }, "<C-a>", "0")
-vim.keymap.set({ "n", "v" }, "<C-e>", "$")
-vim.keymap.set("i", "<C-a>", "<Home>")
-vim.keymap.set("i", "<C-e>", "<End>")
+-- vim.keymap.set({ "n", "x" }, "<C-a>", "0")
+-- vim.keymap.set({ "n", "x" }, "<C-e>", "$")
+-- vim.keymap.set("i", "<C-a>", "<Home>")
+-- vim.keymap.set("i", "<C-e>", "<End>")
 
 -- CMD+Left -> first non-blank char (VSCode-style). The terminals (WezTerm/Ghostty)
 -- send Shift+Home (\x1b[1;2H) for CMD+Left, which Neovim parses as <S-Home>.
-vim.keymap.set({ "n", "v" }, "<S-Home>", "^")
-vim.keymap.set("i", "<S-Home>", "<C-o>^")
+-- vim.keymap.set({ "n", "x" }, "<S-Home>", "^")
+-- vim.keymap.set("i", "<S-Home>", "<C-o>^")
 
 -- CMD+Right -> end of line (VSCode-style). The terminals send Shift+End
 -- (\x1b[1;2F) for CMD+Right, which Neovim parses as <S-End>.
-vim.keymap.set({ "n", "v" }, "<S-End>", "$")
-vim.keymap.set("i", "<S-End>", "<End>")
+-- vim.keymap.set({ "n", "x" }, "<S-End>", "$")
+-- vim.keymap.set("i", "<S-End>", "<End>")
 
 -- Use system clipboard
-vim.opt.clipboard:append("unnamedplus")
+vim.opt.clipboard = "unnamedplus"
+
+-- Keep the undo history on disk, under ~/.local/state/nvim/undo, so undo still
+-- reaches back past the last time the file was closed.
+vim.opt.undofile = true
 
 local config_group = vim.api.nvim_create_augroup("UserConfig", { clear = true })
 
@@ -43,7 +47,7 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 })
 
 -- Auto-copy mouse selection to clipboard
-vim.keymap.set("v", "<LeftRelease>", '"+y', { silent = true })
+vim.keymap.set("x", "<LeftRelease>", '"+y', { silent = true })
 
 -- Don't wrap long lines: in code a wrapped line misreads as two lines, so let it
 -- scroll sideways instead. Prose filetypes turn 'wrap' back on below.
@@ -67,6 +71,27 @@ vim.opt.number = true
 
 -- Enable relative line numbers
 -- vim.opt.relativenumber = true
+
+-- Keep a few lines of context above and below the cursor. Without it the cursor
+-- can sit on the very last visible line, with the next line of code only a
+-- scroll away and no hint of what it says.
+vim.opt.scrolloff = 4
+
+-- Search case-insensitively, unless the pattern has an uppercase letter in it:
+-- /error also finds Error, while /Error stays exact. 'smartcase' only reads
+-- patterns that are typed, so * and # stay case-insensitive either way.
+vim.opt.ignorecase = true
+vim.opt.smartcase = true
+
+-- Put a new split below or to the right, where the eye already expects the new
+-- window. The default sends it above or to the left, which pushes the window
+-- being read out from under the cursor.
+vim.opt.splitright = true
+vim.opt.splitbelow = true
+
+-- Ask whether to save when a command would abandon a modified buffer, instead
+-- of refusing with E37 and leaving the command to be retyped with a ! suffix.
+vim.opt.confirm = true
 
 -- Remember last cursor position. Git reuses one path per message kind, so the
 -- shada mark from the *previous* commit would drop the cursor in the middle of
