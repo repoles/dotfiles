@@ -37,6 +37,14 @@ wacli sync --once --presence-mode quiet     # sync until idle, then exit
 
 - `--once` is essential: the default `--follow` runs until Ctrl+C and will hang the call.
 - `--presence-mode quiet` avoids broadcasting "online" to contacts while syncing.
+- Budget ~40s minimum: it connects, drains, then waits out `--idle-exit` (30s default)
+  before quitting. Give the call a generous timeout instead of killing it early.
+- **stderr is noisy on a healthy sync.** Floods of
+  `[ERROR] ... Unable to verify ciphertext mac: mismatching MAC in signal message` and
+  `stored message <id> ... without content: unhandled payload protocolMessage` are normal
+  for a linked (non-primary) device and are not failures. Judge the run by its exit code
+  and the closing `Idle for 30s, exiting.` / `Messages stored: N` lines — never report a
+  sync as broken because `[ERROR]` appeared.
 - Historical questions ("what did we agree in March?") need no sync — but old messages
   may simply never have been pulled. `wacli history coverage` shows the real range per
   chat; `wacli history backfill --chat <JID>` requests more from the primary device.
