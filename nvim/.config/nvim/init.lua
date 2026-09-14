@@ -77,6 +77,10 @@ vim.opt.number = true
 -- scroll away and no hint of what it says.
 vim.opt.scrolloff = 4
 
+-- Scroll the wheel one line at a time instead of the default three, so a small
+-- flick nudges the view rather than jumping past the line being read.
+vim.opt.mousescroll = "ver:1,hor:6"
+
 -- Search case-insensitively, unless the pattern has an uppercase letter in it:
 -- /error also finds Error, while /Error stays exact. 'smartcase' only reads
 -- patterns that are typed, so * and # stay case-insensitive either way.
