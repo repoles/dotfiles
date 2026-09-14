@@ -24,7 +24,8 @@ case "$1" in
 		tmux set -uw -t "$TMUX_PANE" window-status-style
 		# a pane leaves no hook behind when it dies, so the stamps of the ones that are gone
 		# are swept here, on the event that ends a turn rather than on every tool call
-		live=$(tmux list-panes -a -F '#{pane_id}')
+		# keep the stamps if tmux cannot tell us which panes are still alive
+		live=$(tmux list-panes -a -F '#{pane_id}') || exit 1
 		for stamp in "$stamps"/*; do
 			[ -e "$stamp" ] || continue
 			printf '%s\n' "$live" | grep -qxF "${stamp##*/}" || rm -f "$stamp"
