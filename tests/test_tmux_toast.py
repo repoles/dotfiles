@@ -63,8 +63,9 @@ class TmuxToastTest(unittest.TestCase):
 
     # Rows a message has to take to be denied room over a toast resting on
     # the floor of this 40 row window: that toast starts on row 37, and a
-    # margin row and two borders stand between them, so 33 rows still fit.
-    crowding_out = ['line %d' % row for row in range(34)]
+    # margin row, two borders and the margin over the new toast stand between
+    # them, so 32 rows still fit.
+    crowding_out = ['line %d' % row for row in range(33)]
 
     def top(self, pane):
         return self.command('display-message', '-p', '-t', pane,
@@ -155,14 +156,14 @@ class TmuxToastTest(unittest.TestCase):
 
     def test_long_line_keeps_beginning_and_end(self):
         self.assert_toast(10, ['abcdefghijklmnopqrst'],
-                          [' abcdefghi', ' jklmnopqr', ' st'])
+                          [' abcdefgh', ' ijklmnop', ' qrst'])
 
     def test_embedded_newlines(self):
         self.assert_toast(34, ['first\nsecond', 'third'],
                           [' first', ' second', ' third'])
 
     def test_exact_width_has_no_extra_row(self):
-        self.assert_toast(10, ['123456789'], [' 123456789'])
+        self.assert_toast(10, ['12345678'], [' 12345678'])
 
     def test_short_lines_are_unchanged(self):
         self.assert_toast(34, ['hello', 'world'], [' hello', ' world'])
@@ -172,7 +173,7 @@ class TmuxToastTest(unittest.TestCase):
         self.assert_toast(34, ['first\n\nsecond\n'], [' first', '', ' second', ''])
 
     def test_unicode_uses_display_columns(self):
-        self.assert_toast(10, ['ação漢字xy'], [' ação漢字x', ' y'])
+        self.assert_toast(10, ['ação漢字xy'], [' ação漢字', ' xy'])
 
     def test_tabs_are_expanded_before_wrapping(self):
         # Tab stops are relative to the text, not to the padded line. The
@@ -195,29 +196,40 @@ class TmuxToastTest(unittest.TestCase):
                                               '#{pane_id}').stdout, before)
 
     def test_maximum_width_preserves_borders_and_margin(self):
-        self.assert_toast(96, ['x' * 96], [' ' + 'x' * 95, ' x'])
+        self.assert_toast(94, ['x' * 94], [' ' + 'x' * 92, ' xx'])
         panes = self.command('list-panes', '-F',
                              '#{@toast} #{pane_left} #{pane_width} #{window_width}').stdout
-        self.assertIn('1 1 96 100', panes.splitlines())
+        # Two columns of margin on each side of the two border columns, so the
+        # widest toast stands as far off the left edge as off the right.
+        self.assertIn('1 3 94 100', panes.splitlines())
+
+    def test_maximum_height_preserves_borders_and_margin(self):
+        lines = ['row %d' % row for row in range(40)]
+        self.assert_toast(34, lines, [' ' + line for line in lines[:35]] + [' …'])
+        panes = self.command('list-panes', '-F',
+                             '#{@toast} #{pane_top} #{pane_height} #{window_height}').stdout
+        # A row of margin over the top border and under the bottom one, so the
+        # tallest toast stands as far off the top edge as off the bottom.
+        self.assertIn('1 2 36 40', panes.splitlines())
 
     def test_excessive_width_preserves_existing_toast(self):
         self.assert_toast(34, ['existing toast'], [' existing toast'])
         before = self.command('list-panes', '-F', '#{pane_id}').stdout
-        for width in ['97', '101', '18446744073709551616']:
+        for width in ['95', '101', '18446744073709551616']:
             with self.subTest(width=width):
                 result = subprocess.run(
                     ['sh', str(self.script), '-w', width, 'replacement'],
                     env=self.env, capture_output=True, text=True)
                 self.assertEqual(result.returncode, 2)
-                self.assertIn('use at most 96 columns', result.stderr)
+                self.assertIn('use at most 94 columns', result.stderr)
                 self.assertEqual(self.command('list-panes', '-F',
                                               '#{pane_id}').stdout, before)
 
     def test_width_limit_tracks_window_size(self):
         try:
-            self.command('resize-window', '-x', '12', '-y', '40')
-            self.assert_toast(8, ['123456789'], [' 1234567', ' 89'])
-            self.command('resize-window', '-x', '11', '-y', '40')
+            self.command('resize-window', '-x', '14', '-y', '40')
+            self.assert_toast(8, ['123456789'], [' 123456', ' 789'])
+            self.command('resize-window', '-x', '13', '-y', '40')
             before = self.command('list-panes', '-F', '#{pane_id}').stdout
             result = subprocess.run(['sh', str(self.script), '-w', '8', 'replacement'],
                                     env=self.env, capture_output=True, text=True)
@@ -445,7 +457,7 @@ class TmuxToastTest(unittest.TestCase):
                 if pane.endswith(' 1'):
                     self.command('kill-pane', '-t', pane.split()[0])
 
-    def test_the_stack_fills_up_to_the_top_row(self):
+    def test_the_stack_fills_up_to_the_top_margin(self):
         self.assert_toast(34, ['first'], [' first'])
         first, = self.toast_panes()
         subprocess.run(['sh', str(self.script), '-d', '30',
@@ -455,8 +467,9 @@ class TmuxToastTest(unittest.TestCase):
         self.assertEqual(len(panes), 2, 'a toast that fits dropped the stack')
         second, = [pane for pane in panes if pane != first]
         # One row short of crowding the first toast out: the text runs from
-        # row 1 to row 33, which leaves the top border the row 0 it needs.
-        self.assertEqual(self.top(second), '1')
+        # row 2 to row 33, which leaves row 1 for the top border and row 0 as
+        # the margin over it.
+        self.assertEqual(self.top(second), '2')
 
     def test_a_toast_the_stack_cannot_hold_starts_again_from_the_bottom(self):
         self.assert_toast(34, ['first'], [' first'])
@@ -469,7 +482,7 @@ class TmuxToastTest(unittest.TestCase):
         self.assertEqual(len(panes), 1)
         # Back on the floor, at the size it would have had on an empty window:
         # a message cut down to the room left over is the worse of the two.
-        self.assertEqual(self.top(panes[0]), '4')
+        self.assertEqual(self.top(panes[0]), '5')
         self.assertEqual(self.command('capture-pane', '-p', '-t', panes[0]).stdout,
                          '\n'.join(' ' + line for line in self.crowding_out) + '\n')
 

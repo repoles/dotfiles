@@ -25,10 +25,10 @@ case $duration in
   ''|*[!0-9.]*|*.*.*|.) die "invalid duration '$duration' (use non-negative seconds)" ;;
 esac
 
-# 8 is a judgement call: one column goes to padding, and narrower than this
+# 8 is a judgement call: two columns go to padding, and narrower than this
 # even a short word is chopped, so the message becomes a column of fragments.
 # A leading zero is rejected because $(( )) would read it as octal: 010 would
-# fold the text at 7 columns inside a 10 column box, and 08 is an error.
+# fold the text at 6 columns inside a 10 column box, and 08 is an error.
 case $width in
   ''|*[!0-9]*|[0-7]|0?*) die "invalid width '$width' (use 8 columns or more)" ;;
 esac
@@ -36,14 +36,16 @@ esac
 # Keep every operation on the same window even if the user switches away.
 window_id=$(tmux display-message -p '#{window_id}') || exit 1
 
-# Reserve two border columns and the two-column right margin. The window is
-# measured here rather than inside the format that places the pane: the
-# vertical offset is arithmetic over the stack now, and the two offsets are
-# read side by side.
+# Reserve two border columns and a two-column margin on each side. Only the
+# right margin is laid out, by the offset below; the left one is this cap
+# alone, and without it the widest toast rests against the left edge while
+# still standing clear of the right. The window is measured here rather than
+# inside the format that places the pane: the vertical offset is arithmetic
+# over the stack now, and the two offsets are read side by side.
 window_width=$(tmux display-message -p -t "$window_id" '#{window_width}') || exit 1
 case $window_width in ''|*[!0-9]*) die "cannot read the window width" ;; esac
-max_width=$((window_width - 4))
-[ "$max_width" -ge 8 ] || die "window is too narrow (need at least 12 columns)"
+max_width=$((window_width - 6))
+[ "$max_width" -ge 8 ] || die "window is too narrow (need at least 14 columns)"
 # Compare digit counts first so oversized input cannot overflow shell integers.
 if [ "${#width}" -gt "${#max_width}" ] || [ "$width" -gt "$max_width" ]; then
   die "invalid width '$width' (use at most $max_width columns in this window)"
@@ -62,14 +64,16 @@ esac
 
 # Fold so the pane height matches the rendered line count; otherwise tmux
 # wraps the text itself and the top scrolls out of view.
-# Wrap within width - 1 to reserve left padding on every line.
-# Cap the height to leave room for borders and the bottom margin: past the
+# Wrap within width - 2 so a column of padding stands on either side: the
+# left one is written out, the right one is the column the text stops before.
+# Cap the height to leave room for borders and a row of margin above and
+# below, the same way the width leaves a margin on either side: past the
 # window height new-pane fails outright and no toast is shown at all.
 window_height=$(tmux display-message -p -t "$window_id" '#{window_height}') || exit 1
 case $window_height in ''|*[!0-9]*) die "cannot read the window height" ;; esac
-max_height=$((window_height - 3))
-[ "$max_height" -ge 1 ] || die "window is too short (need at least 4 lines)"
-text_width=$((width - 1))
+max_height=$((window_height - 4))
+[ "$max_height" -ge 1 ] || die "window is too short (need at least 5 lines)"
+text_width=$((width - 2))
 
 # Use UTF-8 while preparing the text so fold measures display columns. C.UTF-8
 # adds nothing but the encoding, so take it when it is there and settle for any
@@ -140,14 +144,15 @@ anchor=$(printf '%s\n' "$live" |
     NF == 2 && (top == "" || $2 < top) { top = $2 }
     END { print (top == "" ? floor : top) }')
 
-# Above the stack there is no room left for this one, and a message folded
-# down to a row or two is worth less than the ones already read: drop the
-# stack and start again from the bottom, where the height the text was folded
-# to is certain to fit. What is dropped is named here and killed at the end:
-# nothing below is certain to work, and a toast on screen is worth more than
-# the one that failed to replace it.
+# Above the stack there is no room left for this one; of the rows over the
+# toast above, four go to this one's two borders and to the row of margin
+# under and over it. A message folded down to a row or two is worth less
+# than the ones already read: drop the stack and start again from the bottom,
+# where the height the text was folded to is certain to fit. What is dropped
+# is named here and killed at the end: nothing below is certain to work, and
+# a toast on screen is worth more than the one that failed to replace it.
 replaced=
-if [ "$height" -gt "$((anchor - 4))" ]; then
+if [ "$height" -gt "$((anchor - 5))" ]; then
   replaced=$(printf '%s\n' "$live" | awk 'NF == 2 { print $1 }')
   anchor=$((window_height + 1))
 fi
