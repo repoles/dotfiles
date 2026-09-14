@@ -72,8 +72,10 @@ class TmuxToastTest(unittest.TestCase):
                             '#{pane_top}').stdout.strip()
 
     def toast_panes(self):
+        # Every window on the server, not just the ambient one: a toast goes
+        # to the window the user is on, which may be in another session.
         return [pane.split()[0] for pane
-                in self.command('list-panes', '-F',
+                in self.command('list-panes', '-a', '-F',
                                 '#{pane_id} #{@toast}#{pane_floating_flag}'
                                 ).stdout.splitlines() if pane.endswith(' 11')]
 
@@ -93,14 +95,14 @@ class TmuxToastTest(unittest.TestCase):
             yield dict(self.env, PATH=directory + os.pathsep + self.env['PATH'])
 
     @contextlib.contextmanager
-    def attached_client(self):
+    def attached_client(self, session='toast-test'):
         """Attach a client on a pty, so tmux has somewhere to report to."""
         master, slave = pty.openpty()
         # The window follows the newest client, so keep the client at the size
         # the other tests expect, plus the row the status line takes.
         fcntl.ioctl(slave, termios.TIOCSWINSZ, struct.pack('HHHH', 41, 100, 0, 0))
         client = subprocess.Popen([self.tmux, '-S', self.socket, 'attach',
-                                   '-t', 'toast-test'],
+                                   '-t', session],
                                   stdin=slave, stdout=slave, stderr=slave,
                                   env=self.env)
         os.close(slave)
@@ -536,6 +538,123 @@ class TmuxToastTest(unittest.TestCase):
         self.assertEqual(self.top(panes[0]), '5')
         self.assertEqual(self.command('capture-pane', '-p', '-t', panes[0]).stdout,
                          '\n'.join(' ' + line for line in self.crowding_out) + '\n')
+
+    # A toast is only read where the user is looking, and -o is the caller
+    # saying which window it is about so it can be held back when that window
+    # is the one on screen. Both answers come from the attached clients, which
+    # is what carries across sessions: a session switched away from keeps a
+    # current window, so #{window_active} still reads 1 for a window nobody is
+    # watching and #{session_attached} reads 0 for one the user left a moment
+    # ago on a client that is still very much there.
+
+    @contextlib.contextmanager
+    def other_session(self):
+        """A second session, so a toast can be asked for from outside."""
+        self.command('new-session', '-d', '-s', 'toast-elsewhere',
+                     '-x', '100', '-y', '40', 'sleep', '120')
+        try:
+            yield self.command('list-panes', '-t', 'toast-elsewhere', '-F',
+                               '#{window_id}').stdout.split()[0]
+        finally:
+            self.command('kill-session', '-t', 'toast-elsewhere', check=False)
+
+    def watched_window(self):
+        return self.command('list-clients', '-F', '#{window_id}').stdout.split()[0]
+
+    def windows(self):
+        return self.command('list-windows', '-F', '#{window_id}').stdout.split()
+
+    def raise_toast(self, *arguments):
+        # Run from inside a pane of the ambient session, the way both callers
+        # do: with TMUX_PANE set, an ambient target resolves to that session's
+        # current window rather than to the window a client is on, so the two
+        # only agree while the user has stayed put.
+        pane = self.command('display-message', '-p', '-t', 'toast-test',
+                            '#{pane_id}').stdout.strip()
+        return subprocess.run(['sh', str(self.script), '-d', '30', *arguments],
+                              env=dict(self.env, TMUX_PANE=pane),
+                              capture_output=True, text=True, timeout=10)
+
+    def assert_landed_on(self, window):
+        pane, = self.toast_panes()
+        self.assertEqual(self.command('display-message', '-p', '-t', pane,
+                                      '#{window_id}').stdout.strip(), window)
+
+    def test_a_toast_about_the_window_on_screen_is_held_back(self):
+        with self.attached_client():
+            watched = self.watched_window()
+            result = self.raise_toast('-o', watched, 'hello')
+            self.assertEqual(result.returncode, 3, result.stderr)
+            self.assertEqual(self.toast_panes(), [])
+
+    def test_a_toast_about_another_window_lands_where_the_user_is(self):
+        with self.attached_client():
+            watched = self.watched_window()
+            other, = [window for window in self.windows() if window != watched]
+            result = self.raise_toast('-o', other, 'hello')
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assert_landed_on(watched)
+
+    def test_a_toast_from_a_session_the_user_left_still_lands(self):
+        # The window it is about is the current one of its own session and
+        # that session has no client, which is every sign of being watched
+        # that a single session can give while the user is in another one.
+        with self.other_session() as elsewhere:
+            with self.attached_client(session='toast-elsewhere'):
+                watched = self.watched_window()
+                self.assertEqual(watched, elsewhere)
+                # Named against the session and not the ambient window, which
+                # tmux resolves through the attached client and so answers
+                # with the window the user moved to.
+                origin, = [window.split()[1] for window in self.command(
+                    'list-windows', '-t', 'toast-test', '-F',
+                    '#{window_active} #{window_id}').stdout.splitlines()
+                    if window.startswith('1 ')]
+                result = self.raise_toast('-o', origin, 'hello')
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assert_landed_on(elsewhere)
+
+    def test_a_toast_follows_the_user_into_another_session(self):
+        # Asked for from one session with the only client in another: the
+        # ambient window would put the toast where nobody would ever read it.
+        with self.other_session() as elsewhere:
+            with self.attached_client(session='toast-elsewhere'):
+                self.assertEqual(self.raise_toast('hello').returncode, 0)
+                self.assert_landed_on(elsewhere)
+
+    def test_a_toast_is_held_back_when_no_one_is_attached(self):
+        # Without -o the toast still goes up, which is what the rest of the
+        # suite runs on; asking for one only while the user is elsewhere is
+        # asking for a user, and a pane raised for nobody is gone by the time
+        # anyone attaches.
+        self.assertEqual(self.command('list-clients', '-F', 'x').stdout, '')
+        origin = self.command('display-message', '-p', '#{window_id}').stdout.strip()
+        result = self.raise_toast('-o', origin, 'hello')
+        self.assertEqual(result.returncode, 3, result.stderr)
+        self.assertEqual(self.toast_panes(), [])
+
+    def test_a_toast_is_held_back_for_a_window_a_second_client_is_on(self):
+        # One terminal is on the window it is about, so the user has already
+        # been told by the thing itself; the newest client being elsewhere
+        # does not make that screen any less visible.
+        with self.other_session() as elsewhere:
+            with self.attached_client():
+                watched = self.watched_window()
+                with self.attached_client(session='toast-elsewhere'):
+                    result = self.raise_toast('-o', watched, 'hello')
+                    self.assertEqual(result.returncode, 3, result.stderr)
+                    self.assertEqual(self.toast_panes(), [])
+                    # The newest client is where an unheld one would land.
+                    self.assertEqual(self.raise_toast('-o', elsewhere,
+                                                      'hello').returncode, 3)
+
+    def test_a_toast_lands_on_the_client_last_used(self):
+        with self.other_session() as elsewhere:
+            with self.attached_client():
+                time.sleep(1.1)  # client_activity counts whole seconds
+                with self.attached_client(session='toast-elsewhere'):
+                    self.assertEqual(self.raise_toast('hello').returncode, 0)
+                    self.assert_landed_on(elsewhere)
 
     def test_control_characters_cannot_drive_the_pane(self):
         # Interpreted instead of dropped, the carriage return would overwrite

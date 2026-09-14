@@ -26,21 +26,10 @@
 
 [ -n "$TMUX_PANE" ] || exit 0
 
-# Both gates and the origin are resolved here, against the pane the hook fired
-# in, rather than at display time: the toast is a pane, and tmux puts it in the
-# session's current window rather than in this one. The window fields would
-# name that window instead, and the point of the toast is to say which other
-# one is asking. Split twice only, so a window name may carry spaces itself.
-info=$(tmux display-message -p -t "$TMUX_PANE" '#{session_attached} #{window_active} [#S] #I:#W') || exit 1
-rest=${info#* }
-attached=${info%% *}
-active=${rest%% *}
-origin=${rest#* }
-
-# No client on the session, so the toast would live and die unseen
-[ "$attached" = 0 ] && exit 0
-# The user is already watching the window that is asking
-[ "$active" = 1 ] && exit 0
+# Named against the pane the hook fired in rather than at display time: the
+# toast is raised in the window the user is watching, and the whole point of
+# this line is to say which other one is asking.
+origin=$(tmux display-message -p -t "$TMUX_PANE" '[#S] #I:#W') || exit 1
 
 # Held whole so the two fields come from one read of stdin. They are asked for
 # separately because a message may carry newlines of its own, which leaves no
@@ -76,5 +65,15 @@ esac
 [ -n "$message" ] || message=$fallback
 
 # Held longer than the 4s a status line message gets: the agent notifies
-# precisely when it has already been waiting a while.
-exec "$(dirname "$0")/tmux-toast.sh" -l "$level" -d 8 "$message" "$origin"
+# precisely when it has already been waiting a while. -o leaves the toast to
+# decide whether the user is somewhere else and so wants telling at all, since
+# answering that means knowing which window they are on, which is the same
+# thing the toast has to know to raise itself where they will read it.
+"$(dirname "$0")/tmux-toast.sh" -o "$TMUX_PANE" -l "$level" -d 8 "$message" "$origin"
+
+# 3 is the toast held back because the user is already there, which is this
+# hook working as intended; a hook exiting non-zero is reported as having
+# failed, so only a real failure is passed on.
+status=$?
+[ "$status" = 3 ] && exit 0
+exit "$status"

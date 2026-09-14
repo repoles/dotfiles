@@ -1,9 +1,11 @@
 #!/bin/sh
 # tmux-toast.sh - show a transient notification in a tmux floating pane.
 # Usage: tmux-toast.sh [-l error|warn|ok|info] [-d seconds] [-w width]
-#                     [-s style] line [line...]
+#                     [-s style] [-o window] line [line...]
 # An explicit -s overrides -l regardless of option order. Without -w the text
 # is folded at a default measure and the box is then shrunk to what it holds.
+# -o names the window the toast is about, which asks for it to be raised only
+# while the user is somewhere else; exit status 3 says it was held back.
 #
 # Needs tmux 3.7+ (the new-pane command). The pane is created detached so it
 # never steals focus. It is anchored to the bottom right corner, and one raised
@@ -12,7 +14,7 @@
 
 die() { printf 'tmux-toast: %s\n' "$1" >&2; exit 2; }
 
-duration=4; width=; auto=1; level=info; style=
+duration=4; width=; auto=1; level=info; style=; origin=
 # The widths a toast takes when none is asked for: the text is folded at the
 # first and the box is then shrunk to fit it, but never below the second. 42
 # columns is 40 of text once the padding on either side is taken out, which
@@ -21,9 +23,10 @@ duration=4; width=; auto=1; level=info; style=
 # as a sliver rather than as a card, and short ones coming out at a common
 # width also keep a stack of them from looking ragged.
 default_width=42; minimum_width=20
-while getopts d:w:s:l: option; do
+while getopts d:w:s:l:o: option; do
   case $option in
     d) duration=$OPTARG ;; s) style=$OPTARG ;; l) level=$OPTARG ;;
+    o) origin=$OPTARG ;;
     w) width=$OPTARG; auto= ;;
     ?) exit 2 ;;
   esac
@@ -45,8 +48,40 @@ if [ -z "$auto" ]; then
   esac
 fi
 
-# Keep every operation on the same window even if the user switches away.
-window_id=$(tmux display-message -p '#{window_id}') || exit 1
+# A toast is a pane, so it is only read if it is raised in the window the user
+# is looking at, which is the one their client is on and not the one it was
+# asked for from: the two part company the moment a command finishes in a
+# window left behind, which is precisely when a toast is worth raising. The
+# client answers across sessions, where the window's own #{window_active} does
+# not: a session switched away from keeps its current window, so that flag
+# still reads 1 for a window nobody is watching.
+#
+# Clients come newest activity first, so the one at the head is the terminal
+# last used, which is where the user is among several. A control mode client
+# drives tmux from a program and paints nothing, so it neither counts as
+# watching a window nor is a place to raise a toast.
+clients=$(tmux list-clients -F '#{client_activity} #{client_control_mode} #{window_id}') || exit 1
+watching=$(printf '%s\n' "$clients" | awk '$2 == 0 { print $1, $3 }' |
+  sort -rn | cut -d' ' -f2)
+
+# Asked for only while the user is elsewhere. A pane is the wrong place to
+# leave a message nobody asked to keep, so with no client attached it is held
+# back rather than raised into a window no one is at: by the time anyone looks
+# the timer has long since taken it down.
+if [ -n "$origin" ]; then
+  origin=$(tmux display-message -p -t "$origin" '#{window_id}') || exit 1
+  [ -n "$watching" ] || exit 3
+  for window in $watching; do
+    [ "$window" = "$origin" ] && exit 3
+  done
+fi
+
+# Resolved once, so every operation below stays on the one window even if the
+# user switches away meanwhile. With nothing attached there is no client to
+# follow and the ambient window stands in, which is what a toast raised on a
+# detached server can do.
+window_id=$(printf '%s\n' "$watching" | head -1)
+[ -n "$window_id" ] || window_id=$(tmux display-message -p '#{window_id}') || exit 1
 
 # Reserve two border columns and a two-column margin on each side. Only the
 # right margin is laid out, by the offset below; the left one is this cap
