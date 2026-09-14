@@ -133,7 +133,8 @@ class TmuxToastTest(unittest.TestCase):
             os.close(master)
 
     def assert_toast(self, width, lines, expected):
-        subprocess.run(['sh', str(self.script), '-w', str(width), '-d', '30',
+        asked = [] if width is None else ['-w', str(width)]
+        subprocess.run(['sh', str(self.script), *asked, '-d', '30',
                         *lines], env=self.env, capture_output=True,
                        text=True, check=True)
         panes = self.command('list-panes', '-F',
@@ -238,6 +239,56 @@ class TmuxToastTest(unittest.TestCase):
             self.assertEqual(self.command('list-panes', '-F', '#{pane_id}').stdout, before)
         finally:
             self.command('resize-window', '-x', '100', '-y', '40')
+
+    def geometry(self):
+        """Every toast up, as its left column and its width."""
+        return self.command('list-panes', '-F',
+                            '#{@toast} #{pane_left} #{pane_width}'
+                            ).stdout.splitlines()
+
+    # The left column is asserted along with the width so that each of these
+    # also stands for the right edge the box was laid out from: in this 100
+    # column window the two come to 97 whatever the text turns out to measure.
+    def test_automatic_width_fits_the_text(self):
+        self.assert_toast(None, ['x' * 30], [' ' + 'x' * 30])
+        self.assertIn('1 65 32', self.geometry())
+
+    def test_automatic_width_uses_display_columns(self):
+        # Twelve characters standing in twenty four columns. Measured as bytes
+        # they would read as thirty six and the box would come out at its cap.
+        self.assert_toast(None, ['漢字' * 6], [' ' + '漢字' * 6])
+        self.assertIn('1 71 26', self.geometry())
+
+    def test_automatic_width_measures_the_text_and_not_a_format(self):
+        # The measurement puts the text in a tmux option, so a message of this
+        # shape is the one that would come back expanded: 24 columns as it
+        # stands, and 12 - short enough to be held up by the floor - if tmux
+        # were to read it.
+        self.assert_toast(None, ['#{window_width} abcdefgh'],
+                          [' #{window_width} abcdefgh'])
+        self.assertIn('1 71 26', self.geometry())
+
+    def test_automatic_width_holds_a_floor(self):
+        self.assert_toast(None, ['hi'], [' hi'])
+        self.assertIn('1 77 20', self.geometry())
+
+    def test_automatic_width_stops_at_the_default(self):
+        self.assert_toast(None, ['x' * 50], [' ' + 'x' * 40, ' ' + 'x' * 10])
+        self.assertIn('1 55 42', self.geometry())
+
+    def test_automatic_width_fits_a_narrow_window(self):
+        # The floor gives way to the window: 20 columns do not fit here, and a
+        # toast at the widest the window allows is worth more than none.
+        try:
+            self.command('resize-window', '-x', '14', '-y', '40')
+            self.assert_toast(None, ['123456789'], [' 123456', ' 789'])
+            self.assertIn('1 3 8', self.geometry())
+        finally:
+            self.command('resize-window', '-x', '100', '-y', '40')
+
+    def test_measuring_the_text_leaves_no_option_behind(self):
+        self.assert_toast(None, ['hello'], [' hello'])
+        self.assertNotIn('toast-measure', self.command('show-options', '-w').stdout)
 
     def test_valid_durations_expire(self):
         before = self.command('list-panes', '-F', '#{pane_id}').stdout

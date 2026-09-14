@@ -2,7 +2,8 @@
 # tmux-toast.sh - show a transient notification in a tmux floating pane.
 # Usage: tmux-toast.sh [-l error|warn|ok|info] [-d seconds] [-w width]
 #                     [-s style] line [line...]
-# An explicit -s overrides -l regardless of option order.
+# An explicit -s overrides -l regardless of option order. Without -w the text
+# is folded at a default measure and the box is then shrunk to what it holds.
 #
 # Needs tmux 3.7+ (the new-pane command). The pane is created detached so it
 # never steals focus. It is anchored to the bottom right corner, and one raised
@@ -11,10 +12,19 @@
 
 die() { printf 'tmux-toast: %s\n' "$1" >&2; exit 2; }
 
-duration=4; width=34; level=info; style=
+duration=4; width=; auto=1; level=info; style=
+# The widths a toast takes when none is asked for: the text is folded at the
+# first and the box is then shrunk to fit it, but never below the second. 42
+# columns is 40 of text once the padding on either side is taken out, which
+# holds a sentence that is still read at a glance; the borders stand outside
+# that again, so the default asks a 48 column window. Under 20 a toast reads
+# as a sliver rather than as a card, and short ones coming out at a common
+# width also keep a stack of them from looking ragged.
+default_width=42; minimum_width=20
 while getopts d:w:s:l: option; do
   case $option in
-    d) duration=$OPTARG ;; w) width=$OPTARG ;; s) style=$OPTARG ;; l) level=$OPTARG ;;
+    d) duration=$OPTARG ;; s) style=$OPTARG ;; l) level=$OPTARG ;;
+    w) width=$OPTARG; auto= ;;
     ?) exit 2 ;;
   esac
 done
@@ -29,9 +39,11 @@ esac
 # even a short word is chopped, so the message becomes a column of fragments.
 # A leading zero is rejected because $(( )) would read it as octal: 010 would
 # fold the text at 6 columns inside a 10 column box, and 08 is an error.
-case $width in
-  ''|*[!0-9]*|[0-7]|0?*) die "invalid width '$width' (use 8 columns or more)" ;;
-esac
+if [ -z "$auto" ]; then
+  case $width in
+    ''|*[!0-9]*|[0-7]|0?*) die "invalid width '$width' (use 8 columns or more)" ;;
+  esac
+fi
 
 # Keep every operation on the same window even if the user switches away.
 window_id=$(tmux display-message -p '#{window_id}') || exit 1
@@ -46,8 +58,13 @@ window_width=$(tmux display-message -p -t "$window_id" '#{window_width}') || exi
 case $window_width in ''|*[!0-9]*) die "cannot read the window width" ;; esac
 max_width=$((window_width - 6))
 [ "$max_width" -ge 8 ] || die "window is too narrow (need at least 14 columns)"
+# An automatic width is folded at the default and shrunk further below, so it
+# only has to be brought under the cap here; an asked for one has to meet it.
+if [ -n "$auto" ]; then
+  width=$default_width
+  [ "$width" -le "$max_width" ] || width=$max_width
 # Compare digit counts first so oversized input cannot overflow shell integers.
-if [ "${#width}" -gt "${#max_width}" ] || [ "$width" -gt "$max_width" ]; then
+elif [ "${#width}" -gt "${#max_width}" ] || [ "$width" -gt "$max_width" ]; then
   die "invalid width '$width' (use at most $max_width columns in this window)"
 fi
 
@@ -87,7 +104,10 @@ utf8_locale=$(printf '%s\n' "$locales" | grep -Eix -m1 'C\.utf-?8' ||
 # the padding and an escape would repaint the pane, and both spend columns that
 # fold has already counted. Tab and newline are left to expand and fold. Done
 # bytewise, so no multibyte character is cut apart; what survives an escape is
-# printable text and nothing more.
+# printable text and nothing more. The blanks a line ends on go with them:
+# fold -s keeps the space it broke on, and against a solid background that
+# paints nothing, but it is a column the measurement below counts and would
+# leave the box standing wider than the text inside it.
 # Omit the final newline so the pane does not scroll. The row count trails the
 # text rather than leading it: a toast may well end in blank lines, and command
 # substitution would strip those unless something comes after them.
@@ -98,15 +118,42 @@ rendered=$(export LC_ALL="$utf8_locale"
     NR <= max_height { line[NR] = $0 }
     END {
       total = (NR > max_height ? max_height : NR)
-      for (i = 1; i <= total; i++)
-        printf("%s %s", (i == 1 ? "" : "\n"),
-               (NR > max_height && i == total) ? "…" : line[i])
+      for (i = 1; i <= total; i++) {
+        padded = " " ((NR > max_height && i == total) ? "…" : line[i])
+        sub(/ +$/, "", padded)
+        printf("%s%s", (i == 1 ? "" : "\n"), padded)
+      }
       printf("\n%d", total)
     }')
 newline='
 '
 height=${rendered##*"$newline"}
 text=${rendered%"$newline"*}
+
+# Shrink the box onto the text unless a width was asked for. tmux is the
+# authority on how wide it draws a line, and #{w:} answers for a user option
+# without expanding its value, so a message carrying a #{...} of its own is
+# measured rather than evaluated. Each line is set and read back in one
+# command, and the option is named after the pid so two toasts raised at once
+# cannot read each other's lines. The column added to the widest of them is
+# the one the text stops before on the right; the left one is the padding the
+# text already carries.
+if [ -n "$auto" ]; then
+  probe="@toast-measure-$$"
+  natural=0
+  while IFS= read -r line; do
+    columns=$(tmux set -w -t "$window_id" "$probe" "$line" \
+      \; display-message -p -t "$window_id" "#{w:$probe}") || exit 1
+    case $columns in ''|*[!0-9]*) die "cannot measure the text" ;; esac
+    [ "$columns" -le "$natural" ] || natural=$columns
+  done <<MEASURE
+$text
+MEASURE
+  tmux set -wu -t "$window_id" "$probe" 2>/dev/null
+  width=$((natural + 1))
+  [ "$width" -ge "$minimum_width" ] || width=$minimum_width
+  [ "$width" -le "$max_width" ] || width=$max_width
+fi
 
 # The kill scheduled below runs in a shell, which needs tmux by path.
 tmux_bin=$(command -v tmux) || die "cannot find tmux"
