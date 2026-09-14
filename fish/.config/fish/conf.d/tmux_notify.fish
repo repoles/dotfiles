@@ -22,7 +22,8 @@ if status is-interactive; and set -q TMUX
         set -l short_cmd (string shorten --max 40 -- $argv[1])
         set -l duration (humanize_duration $CMD_DURATION)
 
-        # -d 0 to show the message until dismissed
-        tmux display-message -t $TMUX_PANE "[#S] #I:#W $symbol $short_cmd ($duration)"
+        # -C so the message does not freeze the pane the user is working in:
+        # without it tmux holds that tty frozen until the message expires
+        tmux display-message -C -t $TMUX_PANE "[#S] #I:#W $symbol $short_cmd ($duration)"
     end
 end

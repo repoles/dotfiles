@@ -33,7 +33,8 @@ case "$1" in
 	notify)
 		state=$(tmux display-message -p -t "$TMUX_PANE" -F "#{session_attached}.#{window_active}")
 		case "$state" in
-			0.*|*.0) tmux display-message -t "$TMUX_PANE" "[#S] #I:#W > $(jq -r .message)" ;;
+			# -C so the message does not freeze the pane the user is watching elsewhere
+			0.*|*.0) tmux display-message -C -t "$TMUX_PANE" "[#S] #I:#W > $(jq -r .message)" ;;
 		esac
 		;;
 esac
