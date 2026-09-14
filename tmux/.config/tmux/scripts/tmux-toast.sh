@@ -62,43 +62,80 @@ case $max_height in ''|*[!0-9-]*) die "cannot read the window height" ;; esac
 [ "$max_height" -ge 1 ] || die "window is too short (need at least 4 lines)"
 text_width=$((width - 1))
 
-# Use UTF-8 while preparing the text so fold measures display columns.
-utf8_locale=C.UTF-8
-locale -a 2>/dev/null | grep -qx "$utf8_locale" || utf8_locale=en_US.UTF-8
+# Use UTF-8 while preparing the text so fold measures display columns. C.UTF-8
+# adds nothing but the encoding, so take it when it is there and settle for any
+# other UTF-8 locale; with none installed the empty value leaves LC_ALL unset
+# rather than naming a locale that does not exist and measuring bytes anyway.
+locales=$(locale -a 2>/dev/null)
+utf8_locale=$(printf '%s\n' "$locales" | grep -Eix -m1 'C\.utf-?8' ||
+              printf '%s\n' "$locales" | grep -Ei -m1 '\.utf-?8$')
 
-# Count rows before removing the final newline, preserving blank lines.
-# Omit the final newline so the pane does not scroll.
-text_file=$(mktemp -t toast)
-height=$(export LC_ALL="$utf8_locale"
-  printf '%s\n' "$@" | expand | fold -s -w "$text_width" |
-  awk -v text_file="$text_file" -v max_height="$max_height" '
+# Drop the control characters a message may carry: a carriage return would eat
+# the padding and an escape would repaint the pane, and both spend columns that
+# fold has already counted. Tab and newline are left to expand and fold. Done
+# bytewise, so no multibyte character is cut apart; what survives an escape is
+# printable text and nothing more.
+# Omit the final newline so the pane does not scroll. The row count trails the
+# text rather than leading it: a toast may well end in blank lines, and command
+# substitution would strip those unless something comes after them.
+rendered=$(export LC_ALL="$utf8_locale"
+  printf '%s\n' "$@" | LC_ALL=C tr -d '\001-\010\013-\037\177' |
+  expand | fold -s -w "$text_width" |
+  awk -v max_height="$max_height" '
     NR <= max_height { line[NR] = $0 }
     END {
       total = (NR > max_height ? max_height : NR)
       for (i = 1; i <= total; i++)
         printf("%s %s", (i == 1 ? "" : "\n"),
-               (NR > max_height && i == total) ? "…" : line[i]) > text_file
-      print total
+               (NR > max_height && i == total) ? "…" : line[i])
+      printf("\n%d", total)
     }')
+newline='
+'
+height=${rendered##*"$newline"}
+text=${rendered%"$newline"*}
 
-# Dismiss whatever toast is still up in this window.
-tmux list-panes -F '#{pane_id} #{@toast}' | awk '$2 == "1" { print $1 }' |
-  while read -r stale_pane; do tmux kill-pane -t "$stale_pane" 2>/dev/null; done
+# The kill scheduled below runs in a shell, which needs tmux by path.
+tmux_bin=$(command -v tmux) || die "cannot find tmux"
+
+# Whatever toast is up now, named here and dismissed at the end: nothing below
+# is certain to work, and a toast on screen is worth more than the one that
+# failed to replace it. #{@toast} would answer for a pane that never carried
+# the mark, because a user option falls back to the window, session and global
+# scopes; show -p reads the pane and nothing else. Only floating panes are
+# asked, so the sweep costs one call in the usual case.
+stale=$(tmux list-panes -F '#{pane_id} #{pane_floating_flag}' |
+  awk '$2 == "1" { print $1 }' |
+  while read -r pane; do
+    [ "$(tmux show -pv -t "$pane" @toast 2>/dev/null)" = 1 ] && printf '%s\n' "$pane"
+  done)
 
 # -x/-y size the content, so the border adds one cell on each side. The offsets
 # leave a 2 column / 1 line margin, which reads as even given cell proportions.
-pane_id=$(tmux new-pane -d -P -F '#{pane_id}' \
+# -I fills the pane from stdin and runs no command in it, so the toast carries
+# no process and no file of its own: nothing is left to clean up after it.
+pane_id=$(printf '%s' "$text" | tmux new-pane -d -I -P -F '#{pane_id}' \
   -x "$width" -y "$height" \
   -X "#{e|-:#{window_width},$((width + 3))}" \
   -Y "#{e|-:#{window_height},$((height + 2))}" \
-  -s "$style" -R "$style" \
-  sh -c "cat '$text_file'; rm -f '$text_file'; exec sleep 2147483647") || { rm -f "$text_file"; exit 1; }
+  -s "$style" -R "$style") || exit 1
 tmux set -p -t "$pane_id" @toast 1
 
 # Removed from outside on purpose: a pane whose own command exits fires the
 # pane-exited hook, so a toast wired to that hook would retrigger itself.
-tmux run-shell -b -d "$duration" -C "kill-pane -t $pane_id" || {
+# A toast replaced before its timer fires leaves this kill with no pane to find,
+# and tmux reports that: with -C the error goes to the status line of every
+# attached client, and from a shell the exit status drops the current pane into
+# view mode. Only stderr is ignored, so the kill has to end in success instead.
+# The socket is spelled out because the shell inherits the server's environment
+# rather than ours.
+tmux run-shell -b -d "$duration" \
+  "'$tmux_bin' -S '#{socket_path}' kill-pane -t $pane_id || true" || {
   tmux kill-pane -t "$pane_id" 2>/dev/null
-  rm -f "$text_file"
   exit 1
 }
+
+# The new toast is up and booked to go, so the old one can be dropped.
+for pane in $stale; do tmux kill-pane -t "$pane" 2>/dev/null; done
+# An old toast may have expired meanwhile; that does not undo this success.
+exit 0
