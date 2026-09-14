@@ -5,8 +5,9 @@
 # An explicit -s overrides -l regardless of option order.
 #
 # Needs tmux 3.7+ (the new-pane command). The pane is created detached so it
-# never steals focus. It is anchored to the bottom right corner; floating panes
-# do not re-anchor on resize, but a toast is short lived enough not to care.
+# never steals focus. It is anchored to the bottom right corner, and one raised
+# while another is up stacks above it; floating panes do not re-anchor on
+# resize, but a toast is short lived enough not to care.
 
 die() { printf 'tmux-toast: %s\n' "$1" >&2; exit 2; }
 
@@ -32,9 +33,13 @@ case $width in
   ''|*[!0-9]*|[0-7]|0?*) die "invalid width '$width' (use 8 columns or more)" ;;
 esac
 
-# Reserve two border columns and the two-column right margin.
-max_width=$(tmux display-message -p '#{e|-:#{window_width},4}') || exit 1
-case $max_width in ''|*[!0-9-]*) die "cannot read the window width" ;; esac
+# Reserve two border columns and the two-column right margin. The window is
+# measured here rather than inside the format that places the pane: the
+# vertical offset is arithmetic over the stack now, and the two offsets are
+# read side by side.
+window_width=$(tmux display-message -p '#{window_width}') || exit 1
+case $window_width in ''|*[!0-9]*) die "cannot read the window width" ;; esac
+max_width=$((window_width - 4))
 [ "$max_width" -ge 8 ] || die "window is too narrow (need at least 12 columns)"
 # Compare digit counts first so oversized input cannot overflow shell integers.
 if [ "${#width}" -gt "${#max_width}" ] || [ "$width" -gt "$max_width" ]; then
@@ -57,8 +62,9 @@ esac
 # Wrap within width - 1 to reserve left padding on every line.
 # Cap the height to leave room for borders and the bottom margin: past the
 # window height new-pane fails outright and no toast is shown at all.
-max_height=$(tmux display-message -p '#{e|-:#{window_height},3}') || exit 1
-case $max_height in ''|*[!0-9-]*) die "cannot read the window height" ;; esac
+window_height=$(tmux display-message -p '#{window_height}') || exit 1
+case $window_height in ''|*[!0-9]*) die "cannot read the window height" ;; esac
+max_height=$((window_height - 3))
 [ "$max_height" -ge 1 ] || die "window is too short (need at least 4 lines)"
 text_width=$((width - 1))
 
@@ -98,17 +104,41 @@ text=${rendered%"$newline"*}
 # The kill scheduled below runs in a shell, which needs tmux by path.
 tmux_bin=$(command -v tmux) || die "cannot find tmux"
 
-# Whatever toast is up now, named here and dismissed at the end: nothing below
-# is certain to work, and a toast on screen is worth more than the one that
-# failed to replace it. #{@toast} would answer for a pane that never carried
-# the mark, because a user option falls back to the window, session and global
-# scopes; show -p reads the pane and nothing else. Only floating panes are
-# asked, so the sweep costs one call in the usual case.
-stale=$(tmux list-panes -F '#{pane_id} #{pane_floating_flag}' |
-  awk '$2 == "1" { print $1 }' |
-  while read -r pane; do
-    [ "$(tmux show -pv -t "$pane" @toast 2>/dev/null)" = 1 ] && printf '%s\n' "$pane"
+# Every toast up now, each with the row its text starts on. #{@toast} would
+# answer for a pane that never carried the mark, because a user option falls
+# back to the window, session and global scopes; show -p reads the pane and
+# nothing else. Only floating panes are asked, so the sweep costs one call in
+# the usual case.
+live=$(tmux list-panes -F '#{pane_id} #{pane_floating_flag} #{pane_top}' |
+  awk '$2 == "1" { print $1, $3 }' |
+  while read -r pane top; do
+    [ "$(tmux show -pv -t "$pane" @toast 2>/dev/null)" = 1 ] &&
+      printf '%s %s\n' "$pane" "$top"
   done)
+
+# The new toast goes above the highest one up, and the floor stands in for a
+# toast just off the bottom edge so the first one lands by the same rule. The
+# row of margin that rule leaves is also what separates two toasts: their
+# borders alone, laid one against the other, read as a single thick rule
+# rather than as two cards. Two toasts raised in the same instant read this
+# same anchor and land on top of each other; they are raised by commands that
+# ended minutes apart, so nothing is locked to stop that.
+anchor=$(printf '%s\n' "$live" |
+  awk -v floor="$((window_height + 1))" '
+    NF == 2 && (top == "" || $2 < top) { top = $2 }
+    END { print (top == "" ? floor : top) }')
+
+# Above the stack there is no room left for this one, and a message folded
+# down to a row or two is worth less than the ones already read: drop the
+# stack and start again from the bottom, where the height the text was folded
+# to is certain to fit. What is dropped is named here and killed at the end:
+# nothing below is certain to work, and a toast on screen is worth more than
+# the one that failed to replace it.
+replaced=
+if [ "$height" -gt "$((anchor - 4))" ]; then
+  replaced=$(printf '%s\n' "$live" | awk 'NF == 2 { print $1 }')
+  anchor=$((window_height + 1))
+fi
 
 # -x/-y size the content, so the border adds one cell on each side. The offsets
 # leave a 2 column / 1 line margin, which reads as even given cell proportions.
@@ -116,8 +146,8 @@ stale=$(tmux list-panes -F '#{pane_id} #{pane_floating_flag}' |
 # no process and no file of its own: nothing is left to clean up after it.
 pane_id=$(printf '%s' "$text" | tmux new-pane -d -I -P -F '#{pane_id}' \
   -x "$width" -y "$height" \
-  -X "#{e|-:#{window_width},$((width + 3))}" \
-  -Y "#{e|-:#{window_height},$((height + 2))}" \
+  -X "$((window_width - width - 3))" \
+  -Y "$((anchor - height - 3))" \
   -s "$style" -R "$style") || exit 1
 tmux set -p -t "$pane_id" @toast 1
 
@@ -135,7 +165,8 @@ tmux run-shell -b -d "$duration" \
   exit 1
 }
 
-# The new toast is up and booked to go, so the old one can be dropped.
-for pane in $stale; do tmux kill-pane -t "$pane" 2>/dev/null; done
-# An old toast may have expired meanwhile; that does not undo this success.
+# The new toast is up and booked to go, so the stack it displaced can be
+# dropped.
+for pane in $replaced; do tmux kill-pane -t "$pane" 2>/dev/null; done
+# A dropped toast may have expired meanwhile; that does not undo this success.
 exit 0

@@ -60,6 +60,15 @@ class TmuxToastTest(unittest.TestCase):
             else:
                 self.command('send-keys', '-t', current, '-X', 'cancel')
 
+    # Rows a message has to take to be denied room over a toast resting on
+    # the floor of this 40 row window: that toast starts on row 37, and a
+    # margin row and two borders stand between them, so 33 rows still fit.
+    crowding_out = ['line %d' % row for row in range(34)]
+
+    def top(self, pane):
+        return self.command('display-message', '-p', '-t', pane,
+                            '#{pane_top}').stdout.strip()
+
     def toast_panes(self):
         return [pane.split()[0] for pane
                 in self.command('list-panes', '-F',
@@ -231,12 +240,14 @@ class TmuxToastTest(unittest.TestCase):
                     time.sleep(.02)
                 self.assertEqual(panes, before)
 
-    def test_replacing_a_toast_reports_nothing_to_the_client(self):
+    def test_displacing_a_toast_reports_nothing_to_the_client(self):
         with self.attached_client() as tty:
             subprocess.run(['sh', str(self.script), '-d', '1', 'first'],
                            env=self.env, capture_output=True, check=True)
-            # Replaces the first toast, leaving its timer with no pane to kill.
-            subprocess.run(['sh', str(self.script), '-d', '30', 'second'],
+            # Leaves the stack no room, so the first toast is dropped and its
+            # timer is left with no pane to kill.
+            subprocess.run(['sh', str(self.script), '-d', '30',
+                            *self.crowding_out],
                            env=self.env, capture_output=True, check=True)
             time.sleep(2)
             panes = self.command('list-panes', '-F', '#{@toast}').stdout
@@ -246,17 +257,17 @@ class TmuxToastTest(unittest.TestCase):
             modes = self.command('list-panes', '-a', '-F', '#{pane_mode}').stdout
             messages = [line for line in self.command('show-messages').stdout.splitlines()
                         if '%s message:' % tty in line]
-        self.assertIn('1', panes.split(), 'the replacement toast should still be up')
+        self.assertIn('1', panes.split(), 'the new toast should still be up')
         self.assertEqual(modes.split(), [], 'the timer left a pane in a mode')
         self.assertEqual(messages, [], 'tmux reported the timer to the client')
 
-    def test_replacement_succeeds_when_old_toast_disappears_before_cleanup(self):
+    def test_a_dropped_toast_that_disappears_before_cleanup_is_not_missed(self):
         self.assert_toast(34, ['old'], [' old'])
         old, = self.toast_panes()
         with tempfile.TemporaryDirectory(prefix='tmux-toast-expiry-') as directory:
             wrapper = Path(directory) / 'tmux'
-            # Reproduce expiry after the old pane was recorded but before the
-            # final cleanup, without depending on timer timing.
+            # Reproduce expiry after the dropped pane was recorded but before
+            # the final cleanup, without depending on timer timing.
             wrapper.write_text(
                 '#!/bin/sh\n'
                 'if [ "$1" = run-shell ]; then\n'
@@ -269,13 +280,14 @@ class TmuxToastTest(unittest.TestCase):
             # this PATH, so the replacement is scheduled to be killed by a
             # wrapper that is gone by the time the timer fires: it never expires
             # on its own here, and tearDown is what takes it away.
-            result = subprocess.run(['sh', str(self.script), '-d', '30', 'new'],
+            result = subprocess.run(['sh', str(self.script), '-d', '30',
+                                     *self.crowding_out],
                                     env=env, capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, result.stderr)
-        replacement, = self.toast_panes()
-        self.assertNotEqual(replacement, old)
-        self.assertEqual(self.command('capture-pane', '-p', '-t', replacement).stdout,
-                         ' new\n')
+        new, = self.toast_panes()
+        self.assertNotEqual(new, old)
+        self.assertEqual(self.command('capture-pane', '-p', '-t', new).stdout,
+                         '\n'.join(' ' + line for line in self.crowding_out) + '\n')
 
     def test_marker_outside_the_pane_spares_the_other_panes(self):
         subprocess.run(['sh', str(self.script), '-d', '30', 'first'],
@@ -289,12 +301,15 @@ class TmuxToastTest(unittest.TestCase):
                                 '-x', '10', '-y', '2', '-X', '1', '-Y', '1',
                                 'sleep', '120').stdout.strip()
         try:
-            subprocess.run(['sh', str(self.script), '-d', '30', 'second'],
+            # Tall enough that the stack has to be dropped, so the sweep runs
+            # at all: a toast that finds room above the last one kills nothing.
+            subprocess.run(['sh', str(self.script), '-d', '30',
+                            *self.crowding_out],
                            env=self.env, capture_output=True, check=True)
             panes = self.command('list-panes', '-F', '#{pane_id}').stdout.split()
             self.assertIn(worked_in, panes, 'swept a pane being worked in')
             self.assertIn(floating, panes, "swept someone else's floating pane")
-            self.assertNotIn(toast, panes, 'left the replaced toast up')
+            self.assertNotIn(toast, panes, 'left the dropped toast up')
         finally:
             # Tolerant: a regression here is a pane that has already been
             # swept, and the failure above is the one worth reading.
@@ -323,7 +338,7 @@ class TmuxToastTest(unittest.TestCase):
         self.assertIn('simulated run-shell failure', result.stderr)
         self.assertEqual(self.command('list-panes', '-F', '#{pane_id}').stdout, before)
 
-    def test_a_toast_that_cannot_be_replaced_is_left_alone(self):
+    def test_a_toast_that_cannot_be_raised_spares_the_one_up(self):
         self.assert_toast(34, ['existing toast'], [' existing toast'])
         before = self.command('list-panes', '-F', '#{pane_id}').stdout
         for failing in ('new-pane', 'run-shell'):
@@ -338,6 +353,48 @@ class TmuxToastTest(unittest.TestCase):
         self.assertEqual(len(toast), 1, 'the toast should have been left alone')
         self.assertEqual(self.command('capture-pane', '-p', '-t', toast[0]).stdout,
                          ' existing toast\n')
+
+    def test_a_second_toast_stacks_above_the_first(self):
+        self.assert_toast(34, ['first'], [' first'])
+        first, = self.toast_panes()
+        subprocess.run(['sh', str(self.script), '-d', '30', 'second\nline'],
+                       env=self.env, capture_output=True, check=True)
+        second, = [pane for pane in self.toast_panes() if pane != first]
+        # Of the 40 rows, the first toast holds 36 to 38 and leaves 39 as the
+        # margin under it. The second takes 31 to 34, so row 35 is left
+        # between them: two cards rather than one rule of doubled borders.
+        self.assertEqual(self.top(first), '37')
+        self.assertEqual(self.top(second), '32')
+        self.assertEqual(self.command('capture-pane', '-p', '-t', first).stdout,
+                         ' first\n', 'the first toast lost its text')
+
+    def test_the_stack_fills_up_to_the_top_row(self):
+        self.assert_toast(34, ['first'], [' first'])
+        first, = self.toast_panes()
+        subprocess.run(['sh', str(self.script), '-d', '30',
+                        *self.crowding_out[:-1]],
+                       env=self.env, capture_output=True, check=True)
+        panes = self.toast_panes()
+        self.assertEqual(len(panes), 2, 'a toast that fits dropped the stack')
+        second, = [pane for pane in panes if pane != first]
+        # One row short of crowding the first toast out: the text runs from
+        # row 1 to row 33, which leaves the top border the row 0 it needs.
+        self.assertEqual(self.top(second), '1')
+
+    def test_a_toast_the_stack_cannot_hold_starts_again_from_the_bottom(self):
+        self.assert_toast(34, ['first'], [' first'])
+        first, = self.toast_panes()
+        subprocess.run(['sh', str(self.script), '-d', '30', *self.crowding_out],
+                       env=self.env, capture_output=True, check=True)
+        panes = self.toast_panes()
+        self.assertEqual(panes, [pane for pane in panes if pane != first],
+                         'kept a toast the new one had no room above')
+        self.assertEqual(len(panes), 1)
+        # Back on the floor, at the size it would have had on an empty window:
+        # a message cut down to the room left over is the worse of the two.
+        self.assertEqual(self.top(panes[0]), '4')
+        self.assertEqual(self.command('capture-pane', '-p', '-t', panes[0]).stdout,
+                         '\n'.join(' ' + line for line in self.crowding_out) + '\n')
 
     def test_control_characters_cannot_drive_the_pane(self):
         # Interpreted instead of dropped, the carriage return would overwrite
