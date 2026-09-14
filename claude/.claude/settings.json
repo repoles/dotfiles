@@ -11,10 +11,11 @@
   "hooks": {
     "Notification": [
       {
+        "matcher": "permission_prompt|worker_permission_prompt|idle_prompt|agent_needs_input|agent_completed",
         "hooks": [
           {
             "type": "command",
-            "command": "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/scripts/agent-tmux-status.sh notify"
+            "command": "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/scripts/claude-tmux-notify.sh"
           }
         ]
       }

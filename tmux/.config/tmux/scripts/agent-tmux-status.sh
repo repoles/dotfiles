@@ -5,7 +5,6 @@
 #   waiting  needs input -> yellow  (PermissionRequest)
 #   error    failed      -> red     (PostToolUseFailure, StopFailure)
 #   idle     done        -> reset   (Stop, SessionEnd)
-#   notify   forward the notification message to unattended/inactive panes
 
 [ -n "$TMUX_PANE" ] || exit 0
 
@@ -30,12 +29,5 @@ case "$1" in
 			[ -e "$stamp" ] || continue
 			printf '%s\n' "$live" | grep -qxF "${stamp##*/}" || rm -f "$stamp"
 		done
-		;;
-	notify)
-		state=$(tmux display-message -p -t "$TMUX_PANE" -F "#{session_attached}.#{window_active}")
-		case "$state" in
-			# -C so the message does not freeze the pane the user is watching elsewhere
-			0.*|*.0) tmux display-message -C -t "$TMUX_PANE" "[#S] #I:#W > $(jq -r .message)" ;;
-		esac
 		;;
 esac
