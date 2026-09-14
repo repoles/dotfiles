@@ -2,53 +2,103 @@
 # tmux-toast.sh - show a transient notification in a tmux floating pane.
 # Usage: tmux-toast.sh [-l error|warn|ok|info] [-d seconds] [-w width]
 #                     [-s style] line [line...]
+# An explicit -s overrides -l regardless of option order.
 #
 # Needs tmux 3.7+ (the new-pane command). The pane is created detached so it
 # never steals focus. It is anchored to the bottom right corner; floating panes
 # do not re-anchor on resize, but a toast is short lived enough not to care.
 
-dur=4; wid=34; lvl=info; sty=
-while getopts d:w:s:l: o; do
-  case $o in
-    d) dur=$OPTARG ;; w) wid=$OPTARG ;; s) sty=$OPTARG ;; l) lvl=$OPTARG ;;
+die() { printf 'tmux-toast: %s\n' "$1" >&2; exit 2; }
+
+duration=4; width=34; level=info; style=
+while getopts d:w:s:l: option; do
+  case $option in
+    d) duration=$OPTARG ;; w) width=$OPTARG ;; s) style=$OPTARG ;; l) level=$OPTARG ;;
     ?) exit 2 ;;
   esac
 done
 shift $((OPTIND - 1))
 [ $# -gt 0 ] || exit 0
 
-# The level backgrounds all sit at the luminance of the error tone, so every
-# toast carries the same visual weight and only the hue signals severity.
-case $lvl in
-  info)  bg='#11151c' ;;
-  ok)    bg='#0e2518' ;;
-  warn)  bg='#291f0f' ;;
-  error) bg='#3a1518' ;;
-  *) printf 'tmux-toast: unknown level "%s" (use error, warn, ok or info)\n' \
-       "$lvl" >&2; exit 2 ;;
+case $duration in
+  ''|*[!0-9.]*|*.*.*|.) die "invalid duration '$duration' (use non-negative seconds)" ;;
 esac
-# An explicit -s wins over -l regardless of the order they were given in.
-[ -n "$sty" ] || sty="bg=$bg,fg=colour223"
 
-# No trailing newline: one extra line would scroll the content out of view.
-f=$(mktemp -t toast); n=$#
-{ printf ' %s' "$1"; shift
-  for l in "$@"; do printf '\n %s' "$l"; done; } > "$f"
+# 8 is a judgement call: one column goes to padding, and narrower than this
+# even a short word is chopped, so the message becomes a column of fragments.
+# A leading zero is rejected because $(( )) would read it as octal: 010 would
+# fold the text at 7 columns inside a 10 column box, and 08 is an error.
+case $width in
+  ''|*[!0-9]*|[0-7]|0?*) die "invalid width '$width' (use 8 columns or more)" ;;
+esac
+
+# Reserve two border columns and the two-column right margin.
+max_width=$(tmux display-message -p '#{e|-:#{window_width},4}') || exit 1
+case $max_width in ''|*[!0-9-]*) die "cannot read the window width" ;; esac
+[ "$max_width" -ge 8 ] || die "window is too narrow (need at least 12 columns)"
+# Compare digit counts first so oversized input cannot overflow shell integers.
+if [ "${#width}" -gt "${#max_width}" ] || [ "$width" -gt "$max_width" ]; then
+  die "invalid width '$width' (use at most $max_width columns in this window)"
+fi
+
+# Backgrounds share the error tone's luminance so only hue signals severity:
+# a brighter green would make success shout louder than failure.
+case $level in
+  info)  background='#11151c' ;;
+  ok)    background='#0e2518' ;;
+  warn)  background='#291f0f' ;;
+  error) background='#3a1518' ;;
+  *) die "unknown level '$level' (use error, warn, ok or info)" ;;
+esac
+[ -n "$style" ] || style="bg=$background,fg=colour223"
+
+# Fold so the pane height matches the rendered line count; otherwise tmux
+# wraps the text itself and the top scrolls out of view.
+# Wrap within width - 1 to reserve left padding on every line.
+# Cap the height to leave room for borders and the bottom margin: past the
+# window height new-pane fails outright and no toast is shown at all.
+max_height=$(tmux display-message -p '#{e|-:#{window_height},3}') || exit 1
+case $max_height in ''|*[!0-9-]*) die "cannot read the window height" ;; esac
+[ "$max_height" -ge 1 ] || die "window is too short (need at least 4 lines)"
+text_width=$((width - 1))
+
+# Use UTF-8 while preparing the text so fold measures display columns.
+utf8_locale=C.UTF-8
+locale -a 2>/dev/null | grep -qx "$utf8_locale" || utf8_locale=en_US.UTF-8
+
+# Count rows before removing the final newline, preserving blank lines.
+# Omit the final newline so the pane does not scroll.
+text_file=$(mktemp -t toast)
+height=$(export LC_ALL="$utf8_locale"
+  printf '%s\n' "$@" | expand | fold -s -w "$text_width" |
+  awk -v text_file="$text_file" -v max_height="$max_height" '
+    NR <= max_height { line[NR] = $0 }
+    END {
+      total = (NR > max_height ? max_height : NR)
+      for (i = 1; i <= total; i++)
+        printf("%s %s", (i == 1 ? "" : "\n"),
+               (NR > max_height && i == total) ? "…" : line[i]) > text_file
+      print total
+    }')
 
 # Dismiss whatever toast is still up in this window.
 tmux list-panes -F '#{pane_id} #{@toast}' | awk '$2 == "1" { print $1 }' |
-  while read -r p; do tmux kill-pane -t "$p" 2>/dev/null; done
+  while read -r stale_pane; do tmux kill-pane -t "$stale_pane" 2>/dev/null; done
 
 # -x/-y size the content, so the border adds one cell on each side. The offsets
 # leave a 2 column / 1 line margin, which reads as even given cell proportions.
-id=$(tmux new-pane -d -P -F '#{pane_id}' \
-  -x "$wid" -y "$n" \
-  -X "#{e|-:#{window_width},$((wid + 3))}" \
-  -Y "#{e|-:#{window_height},$((n + 2))}" \
-  -s "$sty" -R "$sty" \
-  sh -c "cat '$f'; rm -f '$f'; exec sleep 2147483647") || { rm -f "$f"; exit 1; }
-tmux set -p -t "$id" @toast 1
+pane_id=$(tmux new-pane -d -P -F '#{pane_id}' \
+  -x "$width" -y "$height" \
+  -X "#{e|-:#{window_width},$((width + 3))}" \
+  -Y "#{e|-:#{window_height},$((height + 2))}" \
+  -s "$style" -R "$style" \
+  sh -c "cat '$text_file'; rm -f '$text_file'; exec sleep 2147483647") || { rm -f "$text_file"; exit 1; }
+tmux set -p -t "$pane_id" @toast 1
 
 # Removed from outside on purpose: a pane whose own command exits fires the
 # pane-exited hook, so a toast wired to that hook would retrigger itself.
-tmux run-shell -b -d "$dur" -C "kill-pane -t $id"
+tmux run-shell -b -d "$duration" -C "kill-pane -t $pane_id" || {
+  tmux kill-pane -t "$pane_id" 2>/dev/null
+  rm -f "$text_file"
+  exit 1
+}
