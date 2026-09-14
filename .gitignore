@@ -1,5 +1,6 @@
 Brewfile.lock.json
 fish_variables
+tests/__pycache__/
 
 # mise local overrides (secrets, machine-specific env)
 mise/.config/mise/config.local.toml
