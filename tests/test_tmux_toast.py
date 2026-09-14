@@ -1,6 +1,7 @@
 """Tests for tmux-toast.sh. Run with python3 -m unittest discover -s tests."""
 
 import contextlib
+import concurrent.futures
 import fcntl
 import os
 from pathlib import Path
@@ -367,6 +368,82 @@ class TmuxToastTest(unittest.TestCase):
         self.assertEqual(self.top(second), '32')
         self.assertEqual(self.command('capture-pane', '-p', '-t', first).stdout,
                          ' first\n', 'the first toast lost its text')
+
+    def test_concurrent_toasts_have_separate_positions(self):
+        with tempfile.TemporaryDirectory(prefix='tmux-toast-concurrent-') as directory:
+            wrapper = Path(directory) / 'tmux'
+            # Widen the interval between reading the stack and creating a pane.
+            # Without serialization, all four callers choose the same position.
+            wrapper.write_text(
+                '#!/bin/sh\n'
+                'if [ "$1" = new-pane ]; then sleep .2; fi\n'
+                'exec %s "$@"\n' % shlex.quote(self.tmux))
+            wrapper.chmod(0o755)
+            env = dict(self.env, PATH=directory + os.pathsep + self.env['PATH'])
+            start = threading.Barrier(4)
+
+            def raise_toast(number):
+                start.wait(timeout=5)
+                return subprocess.run(
+                    ['sh', str(self.script), '-d', '30', str(number)],
+                    env=env, capture_output=True, text=True, timeout=5)
+
+            with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
+                results = list(pool.map(raise_toast, range(4)))
+        for result in results:
+            self.assertEqual(result.returncode, 0, result.stderr)
+        panes = self.toast_panes()
+        self.assertEqual(len(panes), 4)
+        self.assertEqual(sorted(int(self.top(pane)) for pane in panes),
+                         [25, 29, 33, 37])
+
+    def test_a_failed_toast_does_not_block_the_next_one(self):
+        for failing in ('new-pane', 'run-shell'):
+            with self.subTest(failing=failing):
+                with self.tmux_failing_on(failing) as env:
+                    result = subprocess.run(
+                        ['sh', str(self.script), '-d', '30', 'failed'],
+                        env=env, capture_output=True, text=True, timeout=5)
+                self.assertEqual(result.returncode, 1)
+                result = subprocess.run(
+                    ['sh', str(self.script), '-d', '30', 'next'],
+                    env=self.env, capture_output=True, text=True, timeout=5)
+                self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_switching_windows_does_not_redirect_a_toast(self):
+        original = self.command('display-message', '-p', '#{window_id}').stdout.strip()
+        other, = [window for window in self.command(
+            'list-windows', '-F', '#{window_id}').stdout.split() if window != original]
+        try:
+            with tempfile.TemporaryDirectory(prefix='tmux-toast-window-') as directory:
+                wrapper = Path(directory) / 'tmux'
+                wrapper.write_text(
+                    '#!/bin/sh\n'
+                    'if [ "$1" = list-panes ]; then\n'
+                    '  %s "$@" || exit 1\n'
+                    '  %s select-window -t %s\n'
+                    '  exit\n'
+                    'fi\n'
+                    'exec %s "$@"\n' % (shlex.quote(self.tmux),
+                                           shlex.quote(self.tmux),
+                                           shlex.quote(other), shlex.quote(self.tmux)))
+                wrapper.chmod(0o755)
+                env = dict(self.env, PATH=directory + os.pathsep + self.env['PATH'])
+                result = subprocess.run(
+                    ['sh', str(self.script), '-d', '30', 'hello'],
+                    env=env, capture_output=True, text=True, timeout=5)
+                self.assertEqual(result.returncode, 0, result.stderr)
+            locations = self.command('list-panes', '-a', '-F',
+                                     '#{window_id} #{pane_floating_flag}').stdout.splitlines()
+            self.assertEqual([line for line in locations if line.endswith(' 1')],
+                             [original + ' 1'])
+        finally:
+            self.command('select-window', '-t', original)
+            # Also remove a misplaced toast if the assertion caught a regression.
+            for pane in self.command('list-panes', '-a', '-F',
+                                     '#{pane_id} #{pane_floating_flag}').stdout.splitlines():
+                if pane.endswith(' 1'):
+                    self.command('kill-pane', '-t', pane.split()[0])
 
     def test_the_stack_fills_up_to_the_top_row(self):
         self.assert_toast(34, ['first'], [' first'])

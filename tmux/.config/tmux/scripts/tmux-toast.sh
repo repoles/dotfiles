@@ -33,11 +33,14 @@ case $width in
   ''|*[!0-9]*|[0-7]|0?*) die "invalid width '$width' (use 8 columns or more)" ;;
 esac
 
+# Keep every operation on the same window even if the user switches away.
+window_id=$(tmux display-message -p '#{window_id}') || exit 1
+
 # Reserve two border columns and the two-column right margin. The window is
 # measured here rather than inside the format that places the pane: the
 # vertical offset is arithmetic over the stack now, and the two offsets are
 # read side by side.
-window_width=$(tmux display-message -p '#{window_width}') || exit 1
+window_width=$(tmux display-message -p -t "$window_id" '#{window_width}') || exit 1
 case $window_width in ''|*[!0-9]*) die "cannot read the window width" ;; esac
 max_width=$((window_width - 4))
 [ "$max_width" -ge 8 ] || die "window is too narrow (need at least 12 columns)"
@@ -62,7 +65,7 @@ esac
 # Wrap within width - 1 to reserve left padding on every line.
 # Cap the height to leave room for borders and the bottom margin: past the
 # window height new-pane fails outright and no toast is shown at all.
-window_height=$(tmux display-message -p '#{window_height}') || exit 1
+window_height=$(tmux display-message -p -t "$window_id" '#{window_height}') || exit 1
 case $window_height in ''|*[!0-9]*) die "cannot read the window height" ;; esac
 max_height=$((window_height - 3))
 [ "$max_height" -ge 1 ] || die "window is too short (need at least 4 lines)"
@@ -104,12 +107,23 @@ text=${rendered%"$newline"*}
 # The kill scheduled below runs in a shell, which needs tmux by path.
 tmux_bin=$(command -v tmux) || die "cannot find tmux"
 
+# Serialize the stack update per window, through marking and cleanup. The
+# timer is asynchronous, so the lock is released while the toast is still up.
+# The channel has no owner, so a script killed between the -L and the -U
+# leaves it locked for good and every later toast waits there. The window is
+# some tens of milliseconds, too narrow to be worth the machinery of a
+# recovery; tmux wait-for -U toast-<window id> is what clears it by hand.
+lock="toast-$window_id"
+tmux wait-for -L "$lock" || exit 1
+trap 'tmux wait-for -U "$lock" 2>/dev/null' 0
+trap 'exit 1' HUP INT TERM
+
 # Every toast up now, each with the row its text starts on. #{@toast} would
 # answer for a pane that never carried the mark, because a user option falls
 # back to the window, session and global scopes; show -p reads the pane and
 # nothing else. Only floating panes are asked, so the sweep costs one call in
 # the usual case.
-live=$(tmux list-panes -F '#{pane_id} #{pane_floating_flag} #{pane_top}' |
+live=$(tmux list-panes -t "$window_id" -F '#{pane_id} #{pane_floating_flag} #{pane_top}' |
   awk '$2 == "1" { print $1, $3 }' |
   while read -r pane top; do
     [ "$(tmux show -pv -t "$pane" @toast 2>/dev/null)" = 1 ] &&
@@ -120,9 +134,7 @@ live=$(tmux list-panes -F '#{pane_id} #{pane_floating_flag} #{pane_top}' |
 # toast just off the bottom edge so the first one lands by the same rule. The
 # row of margin that rule leaves is also what separates two toasts: their
 # borders alone, laid one against the other, read as a single thick rule
-# rather than as two cards. Two toasts raised in the same instant read this
-# same anchor and land on top of each other; they are raised by commands that
-# ended minutes apart, so nothing is locked to stop that.
+# rather than as two cards.
 anchor=$(printf '%s\n' "$live" |
   awk -v floor="$((window_height + 1))" '
     NF == 2 && (top == "" || $2 < top) { top = $2 }
@@ -144,7 +156,7 @@ fi
 # leave a 2 column / 1 line margin, which reads as even given cell proportions.
 # -I fills the pane from stdin and runs no command in it, so the toast carries
 # no process and no file of its own: nothing is left to clean up after it.
-pane_id=$(printf '%s' "$text" | tmux new-pane -d -I -P -F '#{pane_id}' \
+pane_id=$(printf '%s' "$text" | tmux new-pane -t "$window_id" -d -I -P -F '#{pane_id}' \
   -x "$width" -y "$height" \
   -X "$((window_width - width - 3))" \
   -Y "$((anchor - height - 3))" \
@@ -159,7 +171,7 @@ tmux set -p -t "$pane_id" @toast 1
 # view mode. Only stderr is ignored, so the kill has to end in success instead.
 # The socket is spelled out because the shell inherits the server's environment
 # rather than ours.
-tmux run-shell -b -d "$duration" \
+tmux run-shell -t "$window_id" -b -d "$duration" \
   "'$tmux_bin' -S '#{socket_path}' kill-pane -t $pane_id || true" || {
   tmux kill-pane -t "$pane_id" 2>/dev/null
   exit 1
