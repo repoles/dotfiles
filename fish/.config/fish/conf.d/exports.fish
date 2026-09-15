@@ -24,13 +24,9 @@ set -x AWS_CONFIG_FILE $XDG_CONFIG_HOME/aws/config
 # I'm using aws-vault now (https://github.com/99designs/aws-vault)
 # set -x AWS_SHARED_CREDENTIALS_FILE $XDG_CONFIG_HOME/aws/credentials
 
-set -l fzf_prompt \u276f # ❯
-set -x FZF_DEFAULT_OPTS "--popup center,90%,70% --layout reverse --border"\
-" --prompt='$fzf_prompt ' --marker='$fzf_prompt'"\
-" --color=hl:bright-yellow --color=hl+:bright-yellow"\
-" --color=bg:#11151c,bg+:#1c212b,gutter:#11151c"\
-" --color=info:cyan,border:bright-black,prompt:green"\
-" --color=pointer:red,marker:yellow,spinner:yellow,header:blue"\
+# Discard inherited inline defaults so they cannot override the shared file.
+set -e FZF_DEFAULT_OPTS
+set -x FZF_DEFAULT_OPTS_FILE $XDG_CONFIG_HOME/fzf/config
 
 set -x FZF_CTRL_R_OPTS "--with-nth=2.."
 

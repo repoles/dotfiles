@@ -29,13 +29,8 @@ humanize_duration() {
 choose_entry() {
     local current=$1 last_key=${2:-} last=${3:-} selected status
     local options=(
-        --exact --sync --no-multi --no-popup --layout reverse --border
+        --exact --sync --no-multi --no-popup
         --delimiter $'\t' --with-nth '2..'
-        --prompt '❯ ' --marker '❯'
-        --color 'hl:bright-yellow,hl+:bright-yellow'
-        --color 'bg:#11151c,bg+:#1c212b,gutter:#11151c'
-        --color 'info:cyan,border:bright-black,prompt:green'
-        --color 'pointer:red,marker:yellow,spinner:yellow,header:blue'
     )
 
     if [[ -n $current ]]; then options+=(--bind "start:pos($current)"); fi

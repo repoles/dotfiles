@@ -29,11 +29,17 @@ class TmuxSelectorBindingsTest(unittest.TestCase):
             socket = str(path / 'socket')
             (path / 'config').mkdir()
             (path / 'config/tmux').symlink_to(ROOT / 'tmux/.config/tmux')
+            (path / 'config/fzf').mkdir()
+            defaults = (ROOT / 'fzf/.config/fzf/config').read_text()
+            defaults_file = path / 'config/fzf/config'
+            defaults_file.write_text(defaults + "\n--header='Shared fzf defaults'\n")
             env = dict(os.environ, TERM='xterm-256color',
                        XDG_CONFIG_HOME=str(path / 'config'),
                        XDG_CACHE_HOME=str(path / 'cache'))
             for key in ['TMUX', 'TMUX_PANE', 'FZF_DEFAULT_OPTS', 'FZF_DEFAULT_OPTS_FILE']:
                 env.pop(key, None)
+            # Simulate the variable exported by Fish when it starts the server.
+            env['FZF_DEFAULT_OPTS_FILE'] = str(defaults_file)
 
             def command(*args):
                 result = subprocess.run([tmux, '-S', socket, *args], env=env,
@@ -119,13 +125,17 @@ class TmuxSelectorBindingsTest(unittest.TestCase):
                                      if line.startswith(('bind-key S ', 'bind-key W ', 'bind-key A ')))
                 (path / 'bindings.conf').write_text(bindings + '\n')
                 command('source-file', str(path / 'bindings.conf'))
+                self.assertEqual(command('show-environment', '-g', 'FZF_DEFAULT_OPTS_FILE'),
+                                 f'FZF_DEFAULT_OPTS_FILE={defaults_file}')
                 first, second = attach(), attach()
 
-                popup(first, 'W', '(active')
+                popup(first, 'W', 'Shared fzf defaults')
                 search_and_accept(first, 'codex')
                 wait_for(lambda: state(first)[1] == agent, 'W did not select the agent window')
 
-                popup(first, 'S', 'current session')
+                # A fresh fzf invocation rereads the file without reloading tmux.
+                defaults_file.write_text(defaults + "\n--header='Updated fzf defaults'\n")
+                popup(first, 'S', 'Updated fzf defaults')
                 search_and_accept(first, 'work')
                 wait_for(lambda: state(first)[0] == 'work]local', 'S did not switch sessions')
                 self.assertEqual(state(second)[0], 'dotfiles')
