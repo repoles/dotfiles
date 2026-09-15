@@ -25,7 +25,7 @@ set -x AWS_CONFIG_FILE $XDG_CONFIG_HOME/aws/config
 # set -x AWS_SHARED_CREDENTIALS_FILE $XDG_CONFIG_HOME/aws/credentials
 
 set -l fzf_prompt \u276f # ❯
-set -x FZF_DEFAULT_OPTS "--tmux center,90%,70% --layout reverse"\
+set -x FZF_DEFAULT_OPTS "--popup center,90%,70% --layout reverse --border"\
 " --prompt='$fzf_prompt ' --marker='$fzf_prompt'"\
 " --color=hl:bright-yellow --color=hl+:bright-yellow"\
 " --color=bg:#11151c,bg+:#1c212b,gutter:#11151c"\

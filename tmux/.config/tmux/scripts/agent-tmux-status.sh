@@ -8,7 +8,7 @@
 
 [ -n "$TMUX_PANE" ] || exit 0
 
-# ta reads these stamps to tell how long ago each agent window last did something. no tmux
+# select-agent-window.sh reads these stamps to tell when each agent last did something. no tmux
 # timestamp can say that: session_set_current bumps window_activity on a mere visit, and
 # entering a session makes claude and codex rewrite their terminal modes, a write the pane
 # tty's mtime cannot tell from real output. a hook fires only when the agent itself acts
