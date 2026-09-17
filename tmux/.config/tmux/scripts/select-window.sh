@@ -3,7 +3,7 @@
 
 source "$(dirname -- "$0")/selector-common.sh"
 
-format="#{window_id}${separator}#{session_name}${separator}#{window_index}:#{window_name}#{s|-|‐|:window_flags}"
+format="#{window_id}${separator}#{session_name}${separator}#{window_index}:#{window_name}#{window_flags}"
 format+="${separator}#{window_active}${separator}#{window_last_flag}${separator}#{window_activity}${separator}#{pane_title}"
 # list-windows already sorts by index. Pin the query to the binding's session.
 window_lines=$(tmux list-windows -t "$SELECTOR_SESSION" -F "$format")

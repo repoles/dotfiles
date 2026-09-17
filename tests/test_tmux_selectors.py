@@ -87,7 +87,7 @@ if not os.environ.get('EMPTY_SELECTION'):
 
     def test_window_uses_session_and_stable_id_not_displayed_index(self):
         result = self.run_selector('select-window', [
-            row('@42', 'work]local', '2:fish‐', 0, 1, 199999, ''),
+            row('@42', 'work]local', '2:fish-', 0, 1, 199999, ''),
             row('@11', 'work]local', '3:codex*', 1, 0, 199940, 'Title'),
         ])
         self.assertEqual(result.returncode, 0, result.stderr)
@@ -95,7 +95,7 @@ if not os.environ.get('EMPTY_SELECTION'):
         self.assertEqual(self.commands()[-1],
                          ['switch-client', '-c', '/dev/ttys-review', '-t', '$1:@42'])
         self.assertEqual(self.menu()['rows'][0],
-                         '$1:@42\t[work]local] 2:fish‐ (active 1s ago)')
+                         '$1:@42\t[work]local] 2:fish- (active 1s ago)')
         self.assertIn('start:pos(2)', self.menu()['options'])
         self.assertIn('W:pos(1)+accept', self.menu()['options'])
 
