@@ -16,19 +16,32 @@ https://docs.honeybadger.io/resources/cli/
 
 ## Auth (already configured)
 
-The **personal auth token** (Data API) is provided as the `HONEYBADGER_AUTH_TOKEN`
-env var via mise — defined in `~/.config/mise/config.local.toml` (a stow symlink into
-this dotfiles repo, git-ignored). Because it's the mise **global** config, the token is
-available in any directory once mise is active.
+The **personal auth token** (Data API) lives in the login keychain, as a generic
+password named `HONEYBADGER_AUTH_TOKEN` under the account `avantsistemas`. The upstream
+`hb` binary only reads credentials from flags or the environment, so this skill ships a
+wrapper — `scripts/hb`, next to this file — that pulls the token from the keychain and
+execs the real binary. **Every `hb` command below goes through it**, invoked by path (it
+isn't on `PATH`):
 
-- If a command fails with *"auth token is required"*, the env var isn't loaded. Force it
-  by prefixing commands with the mise env, e.g.:
-  `eval "$(mise env -s bash)"; hb projects list`
+```bash
+~/.claude/skills/honeybadger/scripts/hb projects list
+```
+
+Flags, subcommands and `--help` all pass straight through, so the upstream docs apply
+unchanged.
+
 - Two credential types exist: `--auth-token` / `HONEYBADGER_AUTH_TOKEN` for the **Data
   API** (reading projects/faults — what you almost always want) and `--api-key` /
-  `HONEYBADGER_API_KEY` for the **Reporting API** (sending deploys/metrics).
+  `HONEYBADGER_API_KEY` for the **Reporting API** (sending deploys/metrics). The wrapper
+  requires the first and passes the second along only if a keychain item for it exists.
+- An exported variable overrides the keychain, which is how you run one command as
+  another user: `HONEYBADGER_AUTH_TOKEN=<other> scripts/hb projects list`. Set
+  `HONEYBADGER_KEYCHAIN_ACCOUNT` for a different account, `HONEYBADGER_BIN` to point at
+  a binary that isn't the first `hb` on `PATH`.
+- If the wrapper says the token is neither set nor in the keychain, check the item with
+  `security find-generic-password -a avantsistemas -s HONEYBADGER_AUTH_TOKEN -w`.
 - To rotate the token: User settings → Authentication in the Honeybadger web app, then
-  update `~/.config/mise/config.local.toml`.
+  `security add-generic-password -a avantsistemas -s HONEYBADGER_AUTH_TOKEN -w '<new>' -U`.
 
 ## Standard workflow
 

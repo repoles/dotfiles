@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+# hb — the Honeybadger CLI with its credentials pulled from the login keychain.
+#
+#   hb projects list
+#   hb faults get --project-id 12345 --id 67890 -o json
+#
+# The real `hb` is a compiled binary and only reads its credentials from flags or the
+# environment, so this wrapper fills the environment in and execs it — every flag and
+# subcommand passes straight through, and the upstream --help stays authoritative.
+#
+# HONEYBADGER_AUTH_TOKEN (Data API: projects, faults, insights) is required.
+# HONEYBADGER_API_KEY (Reporting API: deploys, metrics) is only looked up, never
+# demanded — most commands never touch it.
+set -euo pipefail
+
+keychain_account=${HONEYBADGER_KEYCHAIN_ACCOUNT:-avantsistemas}
+
+from_keychain() {
+  security find-generic-password -a "$keychain_account" -s "$1" -w 2>/dev/null || true
+}
+
+# An exported variable wins, so a one-off token stays a prefix away.
+if [ -z "${HONEYBADGER_AUTH_TOKEN:-}" ]; then
+  HONEYBADGER_AUTH_TOKEN=$(from_keychain HONEYBADGER_AUTH_TOKEN)
+  export HONEYBADGER_AUTH_TOKEN
+fi
+
+if [ -z "${HONEYBADGER_API_KEY:-}" ]; then
+  key=$(from_keychain HONEYBADGER_API_KEY)
+  [ -n "$key" ] && export HONEYBADGER_API_KEY="$key"
+fi
+
+if [ -z "${HONEYBADGER_AUTH_TOKEN:-}" ]; then
+  echo "hb: \$HONEYBADGER_AUTH_TOKEN is not set and no 'HONEYBADGER_AUTH_TOKEN' item for account '$keychain_account' is in the keychain — see the Auth section of the honeybadger skill" >&2
+  exit 64
+fi
+
+# Find the real binary, skipping this wrapper in case scripts/ ever lands on PATH.
+self=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")
+if [ -n "${HONEYBADGER_BIN:-}" ]; then
+  real=$HONEYBADGER_BIN
+else
+  real=
+  while IFS= read -r candidate; do
+    [ "$candidate" = "$self" ] && continue
+    real=$candidate
+    break
+  done < <(type -a -P hb 2>/dev/null || true)
+fi
+
+if [ -z "$real" ] || [ ! -x "$real" ]; then
+  echo "hb: the Honeybadger CLI binary was not found on PATH — install it with 'brew install honeybadger-io/tap/honeybadger', or point \$HONEYBADGER_BIN at it" >&2
+  exit 127
+fi
+
+exec "$real" "$@"
