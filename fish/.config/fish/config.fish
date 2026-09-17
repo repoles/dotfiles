@@ -41,7 +41,6 @@ if status is-interactive
     # ---
 
     fish_add_path $HOME/.local/bin
-    [ "$TERM_PROGRAM" = "Apple_Terminal" ] && function fish_title; end
 
     zoxide init fish --cmd j | source
     atuin init fish --disable-up-arrow | source
