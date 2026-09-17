@@ -8,12 +8,12 @@ config.initial_rows = 35
 -- WezTerm bundles JetBrains Mono, Nerd Font Symbols and Noto Color Emoji
 -- https://wezterm.org/config/fonts.html
 
-local font_family = 'JetBrains Mono'
-local font_features = {} -- { 'calt=0', 'clig=0', 'liga=0' }
+-- local font_family = 'JetBrains Mono'
+-- local font_features = {} -- { 'calt=0', 'clig=0', 'liga=0' }
 
--- local font_family = 'MonoLisaCode'
+local font_family = 'MonoLisaCode'
 -- https://www.monolisa.dev/tester/code
--- local font_features = { 'ss11=1', 'ss13=1', 'cv04=1', 'cv05=1', 'cv08=1', 'cv09=1', 'cv11=1' }
+local font_features = { 'ss11=1', 'ss13=1', 'cv04=0', 'cv05=1', 'cv08=1', 'cv09=1', 'cv11=0' }
 
 local function font(opts)
   opts = opts or {}
