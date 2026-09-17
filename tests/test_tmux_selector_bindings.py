@@ -104,6 +104,7 @@ class TmuxSelectorBindingsTest(unittest.TestCase):
                     self.fail(f'{key} terminal output: {terminal_text(client, offset)[-2000:]!r}')
                 # Let fzf finish terminal initialization before sending keys.
                 time.sleep(.1)
+                return terminal_text(client, offset)
 
             def search_and_accept(client, query):
                 os.write(client[0], query.encode())
@@ -140,7 +141,8 @@ class TmuxSelectorBindingsTest(unittest.TestCase):
                 wait_for(lambda: state(first)[0] == 'work]local', 'S did not switch sessions')
                 self.assertEqual(state(second)[0], 'dotfiles')
 
-                popup(first, 'A', '✳ Revise scripts Fish')
+                agent_popup = popup(first, 'A', 'Revise scripts Fish')
+                self.assertNotIn('✳ Revise scripts Fish', agent_popup)
                 os.write(first[0], b'\r')
                 wait_for(lambda: state(first) == ['dotfiles', agent], 'A selected the wrong target')
 

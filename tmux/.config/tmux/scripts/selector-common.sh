@@ -24,6 +24,10 @@ humanize_duration() {
     fi
 }
 
+sanitize_pane_title() {
+    printf '%s' "${1/'✳ '/}"
+}
+
 # entries carry an opaque tmux target before the tab; only the label is shown
 # and searched. Never recover a target from a session name or window index.
 choose_entry() {

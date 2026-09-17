@@ -77,7 +77,7 @@ if not os.environ.get('EMPTY_SELECTION'):
         ])
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(self.menu()['rows'], [
-            '$1\t[work]local] 2:codex (3 windows, current session) "✳ Raw title"',
+            '$1\t[work]local] 2:codex (3 windows, current session) "Raw title"',
             '$2\t[previous] 1:fish (1 window, accessed 2m ago)',
         ])
         self.assertIn('start:pos(1)', self.menu()['options'])
@@ -88,7 +88,7 @@ if not os.environ.get('EMPTY_SELECTION'):
     def test_window_uses_session_and_stable_id_not_displayed_index(self):
         result = self.run_selector('select-window', [
             row('@42', 'work]local', '2:fish-', 0, 1, 199999, ''),
-            row('@11', 'work]local', '3:codex*', 1, 0, 199940, 'Title'),
+            row('@11', 'work]local', '3:codex*', 1, 0, 199940, '✳ Title'),
         ])
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(self.commands()[0][1:3], ['-t', '$1'])
@@ -96,6 +96,8 @@ if not os.environ.get('EMPTY_SELECTION'):
                          ['switch-client', '-c', '/dev/ttys-review', '-t', '$1:@42'])
         self.assertEqual(self.menu()['rows'][0],
                          '$1:@42\t[work]local] 2:fish- (active 1s ago)')
+        self.assertEqual(self.menu()['rows'][1],
+                         '$1:@11\t[work]local] 3:codex* (active 1m ago) "Title"')
         self.assertIn('start:pos(2)', self.menu()['options'])
         self.assertIn('W:pos(1)+accept', self.menu()['options'])
 
@@ -110,7 +112,7 @@ if not os.environ.get('EMPTY_SELECTION'):
         ])
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(self.menu()['rows'], [
-            '$1:@11\t[work] 1:claude* (active 10s ago) "✳ Raw title"',
+            '$1:@11\t[work] 1:claude* (active 10s ago) "Raw title"',
             '$2:@22\t[other] 2:codex- (active 16m ago)',
         ])
         self.assertIn('start:pos(1)', self.menu()['options'])

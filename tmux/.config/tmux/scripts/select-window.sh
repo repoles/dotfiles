@@ -17,6 +17,7 @@ while IFS="$separator" read -r window_id session_name window active last_flag ac
     if (( active )); then current=$position; fi
     if (( last_flag )); then last=$position; fi
     label="[$session_name] $window (active $(humanize_duration "$((now - activity))") ago)"
+    title=$(sanitize_pane_title "$title")
     if [[ -n $title ]]; then label+=" \"$title\""; fi
     entries+=("$SELECTOR_SESSION:$window_id"$'\t'"$label")
 done <<< "$window_lines"

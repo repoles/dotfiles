@@ -30,6 +30,7 @@ while IFS="$separator" read -r activity session_id session_name windows window a
     details="$window_count, $session_status"
     # if [[ -n $alerts ]]; then details+=", alerts: $alerts"; fi
     label="[$session_name] $window ($details)"
+    title=$(sanitize_pane_title "$title")
     if [[ -n $title ]]; then label+=" \"$title\""; fi
     entries+=("$session_id"$'\t'"$label")
 done <<< "$session_lines"

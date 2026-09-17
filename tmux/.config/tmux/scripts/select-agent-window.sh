@@ -44,6 +44,7 @@ while IFS="$separator" read -r activity session_id window_id session_name window
         current=$((${#entries[@]} + 1))
     fi
     label="[$session_name] $window (active $(humanize_duration "$((now - activity))") ago)"
+    title=$(sanitize_pane_title "$title")
     if [[ -n $title ]]; then label+=" \"$title\""; fi
     entries+=("$session_id:$window_id"$'\t'"$label")
 done <<< "$sorted_lines"
