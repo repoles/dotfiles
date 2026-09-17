@@ -14,9 +14,18 @@
 # stderr and exits 1; on 429 it also reports the Retry-After interval.
 set -euo pipefail
 
+# Credentials live in the login keychain as generic passwords under one account, so no
+# shell env is needed. An exported variable still wins, which keeps one-off overrides
+# (a sandbox subdomain, a second client) working without touching the keychain.
+keychain_account=${ZENDESK_KEYCHAIN_ACCOUNT:-avantsistemas}
+
 for var in ZENDESK_SUBDOMAIN ZENDESK_CLIENT_ID ZENDESK_CLIENT_SECRET; do
   if [ -z "${!var:-}" ]; then
-    echo "zdapi: \$$var is not set — see the Auth section of the zendesk skill" >&2
+    printf -v "$var" '%s' \
+      "$(security find-generic-password -a "$keychain_account" -s "$var" -w 2>/dev/null || true)"
+  fi
+  if [ -z "${!var:-}" ]; then
+    echo "zdapi: \$$var is not set and no '$var' item for account '$keychain_account' is in the keychain — see the Auth section of the zendesk skill" >&2
     exit 64
   fi
 done

@@ -26,10 +26,17 @@ Set up once:
 1. Admin Center → Apps and integrations → APIs → **OAuth clients** → add a client of
    type **Confidential** (the flow is refused for public clients). Note the Identifier
    and the Secret — the secret is shown only once.
-2. Put these in `~/.config/mise/config.local.toml` (a stow symlink into the dotfiles
-   repo, git-ignored — same arrangement as the honeybadger skill):
-   `ZENDESK_SUBDOMAIN` (the `<sub>` of `<sub>.zendesk.com`, not the full host),
-   `ZENDESK_CLIENT_ID`, `ZENDESK_CLIENT_SECRET`.
+2. Store these in the login keychain, as generic passwords under the account
+   `avantsistemas` — `ZENDESK_SUBDOMAIN` (the `<sub>` of `<sub>.zendesk.com`, not the
+   full host), `ZENDESK_CLIENT_ID`, `ZENDESK_CLIENT_SECRET`:
+
+   ```bash
+   security add-generic-password -a avantsistemas -s ZENDESK_CLIENT_ID -w '<identifier>' -U
+   ```
+
+   `zdapi` reads each one with `security find-generic-password -a <account> -s <name> -w`,
+   so nothing has to be in the shell environment. Set `ZENDESK_KEYCHAIN_ACCOUNT` to use a
+   different account.
 
 `zdapi` exchanges those for an access token on demand and caches it (mode 600) under
 `$XDG_CACHE_HOME/zendesk/token-<subdomain>.json` until just before it expires, so a
@@ -40,8 +47,10 @@ dropped and refetched once, automatically. Delete the cache file to force a new 
 Zendesk user who *created the OAuth client*. Ticket comments will carry that name — so
 create the client under the account whose name should appear, not a colleague's.
 
-If `zdapi` says a var is not set, mise env isn't loaded in that shell — prefix with
-`eval "$(mise env -s bash)";`.
+An exported `ZENDESK_*` variable overrides the keychain, which is how you point a single
+call at a sandbox subdomain or a second OAuth client. If `zdapi` says a var is neither
+set nor in the keychain, check the item name and account with
+`security find-generic-password -a avantsistemas -s ZENDESK_SUBDOMAIN -w`.
 
 Scopes default to **`read tickets:write`**: broad read plus write on tickets only.
 Resource-qualified read scopes (`tickets:read` and friends) look tighter but break
