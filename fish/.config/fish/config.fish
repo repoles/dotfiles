@@ -1,5 +1,4 @@
-if status is-login
-end
+/opt/homebrew/bin/brew shellenv | source
 
 if status is-interactive
     set -g fish_greeting
@@ -41,16 +40,18 @@ if status is-interactive
 
     # ---
 
+    fish_add_path $HOME/.local/bin
+    [ "$TERM_PROGRAM" = "Apple_Terminal" ] && function fish_title; end
+
     zoxide init fish --cmd j | source
-
-    # https://junegunn.github.io/fzf/shell-integration/#setting-up-shell-integration
-    # fzf --fish | FZF_ALT_C_COMMAND= FZF_CTRL_T_COMMAND= source
-
     atuin init fish --disable-up-arrow | source
 
     # set -x STARSHIP_CONFIG $XDG_CONFIG_HOME/starship/starship.toml
     # starship init fish | source
 
-    fish_add_path $HOME/.local/bin
-    [ "$TERM_PROGRAM" = "Apple_Terminal" ] && function fish_title; end
+    $HOME/.local/bin/mise activate fish | source
+else
+    # Shims resolve the version from the directory the command runs in,
+    # rather than freezing whichever one was current when the shell started.
+    $HOME/.local/bin/mise activate fish --shims | source
 end
