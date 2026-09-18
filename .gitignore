@@ -10,3 +10,5 @@ aws/.aws/cli/cache/
 zed/.config/zed/prompts/
 herdr/.config/herdr/.plugins.lock
 herdr/.config/herdr/session.json
+wacli/.wacli/*
+!wacli/.wacli/config.yaml

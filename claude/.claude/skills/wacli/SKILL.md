@@ -11,8 +11,28 @@ description: >-
 # WhatsApp CLI (`wacli`)
 
 `wacli` keeps a **local SQLite mirror** of the linked WhatsApp account and sends through
-it. Binary from Homebrew; docs: https://wacli.sh — store is `$WACLI_STORE_DIR`
-(`~/.local/state/wacli`, set in `fish/.config/fish/conf.d/exports.fish`).
+it. Binary from Homebrew; docs: https://wacli.sh
+
+## Two accounts — resolve which one before anything else
+
+| account | store | whose |
+| --- | --- | --- |
+| `avant` (default) | `~/.local/state/wacli-avant` | work |
+| `pessoal` | `~/.local/state/wacli-pessoal` | personal |
+
+Both are declared in `~/.wacli/config.yaml`, stowed from `wacli/.wacli/` in this repo.
+That path is fixed: wacli reads `XDG_STATE_HOME` but never `XDG_CONFIG_HOME`, so the
+config cannot live under `~/.config` (upstream issue #426).
+
+`--account NAME` picks one; with no flag everything hits `avant`, the `default_account`.
+Store precedence is `--store` > `--account` > `$WACLI_STORE_DIR` > config, so a stray
+`WACLI_STORE_DIR` in the environment silently overrides the account — there is
+deliberately no such export in `exports.fish` anymore. `wacli doctor` prints the STORE
+actually in use; check it when in doubt.
+
+**The two stores hold different contacts and different chats.** Reading the wrong one
+produces a confident wrong answer; sending from the wrong one puts a personal message in
+a work thread or the reverse. When the request does not make the account obvious, ask.
 
 Do **not** memorize the command surface — it is large and versioned. Every level is
 self-documenting (`wacli <group> --help`, `wacli <group> <cmd> --help`) and every
@@ -66,8 +86,9 @@ that is meant to write.
 A sent message reaches a real person instantly. `wacli messages revoke` exists but only
 works on your own recent messages, and recipients still saw the notification.
 
-- **Confirm recipient and exact text with the user before every `send`.** Show what will
-  go out, verbatim, and who receives it. Never send on inferred intent.
+- **Confirm account, recipient and exact text with the user before every `send`.** Show
+  what will go out, verbatim, who receives it, and which account it leaves from. Never
+  send on inferred intent.
 - Resolve the recipient *first* rather than trusting a name to match. `--to` accepts a
   JID, a phone number, or a contact/group/chat name; when a name is ambiguous `wacli`
   reports the matches and `--pick N` chooses one. Show the matches to the user and let

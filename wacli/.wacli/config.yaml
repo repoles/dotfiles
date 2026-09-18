@@ -1,0 +1,6 @@
+default_account: avant
+accounts:
+    avant:
+        store: /Users/repoles/.local/state/wacli-avant
+    pessoal:
+        store: /Users/repoles/.local/state/wacli-pessoal

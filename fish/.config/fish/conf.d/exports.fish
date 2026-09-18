@@ -31,4 +31,3 @@ set -x FZF_DEFAULT_OPTS_FILE $XDG_CONFIG_HOME/fzf/config
 set -x FZF_CTRL_R_OPTS "--with-nth=2.."
 
 set -x ICLOUD ~/"Library/Mobile Documents/com~apple~CloudDocs"
-set -x WACLI_STORE_DIR $XDG_STATE_HOME/wacli
