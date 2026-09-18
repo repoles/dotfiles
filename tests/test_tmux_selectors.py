@@ -72,23 +72,24 @@ if not os.environ.get('EMPTY_SELECTION'):
         # tmux removes the active-window marker before returning these rows.
         # Keep a nonempty alerts field to verify that it stays out of the label.
         result = self.run_selector('select-session', [
-            row(199880, '$2', 'previous', 1, '1:fish', '', 0, ''),
-            row(200000, '$1', 'work]local', 3, '2:codex', '1!', 1, '✳ Raw title'),
+            row(199880, '$2', 'previous', 1, '1:fish', '', 0, '', 'default'),
+            row(200000, '$1', 'work]local', 3, '2:codex', '1!', 1, '✳ Raw title', 'fg=green'),
         ])
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(self.menu()['rows'], [
-            '$1\t[work]local] 2:codex (3 windows, current session) "Raw title"',
+            '$1\t[work]local] 2:codex (3 windows, current session) "\x1b[32mRaw title\x1b[39m"',
             '$2\t[previous] 1:fish (1 window, accessed 2m ago)',
         ])
         self.assertIn('start:pos(1)', self.menu()['options'])
         self.assertIn('S:pos(2)+accept', self.menu()['options'])
+        self.assertIn('--ansi', self.menu()['options'])
         self.assertEqual(self.commands()[-1],
                          ['switch-client', '-c', '/dev/ttys-review', '-t', '$1'])
 
     def test_window_uses_session_and_stable_id_not_displayed_index(self):
         result = self.run_selector('select-window', [
-            row('@42', 'work]local', '2:fish-', 0, 1, 199999, ''),
-            row('@11', 'work]local', '3:codex*', 1, 0, 199940, '✳ Title'),
+            row('@42', 'work]local', '2:fish-', 0, 1, 199999, '', 'default'),
+            row('@11', 'work]local', '3:codex*', 1, 0, 199940, '✳ Title', 'fg=red'),
         ])
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(self.commands()[0][1:3], ['-t', '$1'])
@@ -97,9 +98,10 @@ if not os.environ.get('EMPTY_SELECTION'):
         self.assertEqual(self.menu()['rows'][0],
                          '$1:@42\t[work]local] 2:fish- (active 1s ago)')
         self.assertEqual(self.menu()['rows'][1],
-                         '$1:@11\t[work]local] 3:codex* (active 1m ago) "Title"')
+                         '$1:@11\t[work]local] 3:codex* (active 1m ago) "\x1b[31mTitle\x1b[39m"')
         self.assertIn('start:pos(2)', self.menu()['options'])
         self.assertIn('W:pos(1)+accept', self.menu()['options'])
+        self.assertIn('--ansi', self.menu()['options'])
 
     def test_agent_stamps_override_activity_and_invalid_stamp_falls_back(self):
         stamps = self.path / 'tmux-agent-activity'
@@ -107,21 +109,38 @@ if not os.environ.get('EMPTY_SELECTION'):
         (stamps / '%1').write_text('0199990\n')
         (stamps / '%2').write_text('invalid\n')
         result = self.run_selector('select-agent-window', [
-            row(100, '%1', '$1', '@11', 'work', '1:claude*', 'claude', '2_1_217', '✳ Raw title'),
-            row(199000, '%2', '$2', '@22', 'other', '2:codex-', 'codex', 'codex', ''),
+            row(100, '%1', '$1', '@11', 'work', '1:claude*', 'claude', '2_1_217', '✳ Raw title', 'fg=yellow'),
+            row(199000, '%2', '$2', '@22', 'other', '2:codex-', 'codex', 'codex', '', 'default'),
         ])
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(self.menu()['rows'], [
-            '$1:@11\t[work] 1:claude* (active 10s ago) "Raw title"',
+            '$1:@11\t[work] 1:claude* (active 10s ago) "\x1b[33mRaw title\x1b[39m"',
             '$2:@22\t[other] 2:codex- (active 16m ago)',
         ])
         self.assertIn('start:pos(1)', self.menu()['options'])
+        self.assertIn('--ansi', self.menu()['options'])
+
+    def test_agent_titles_use_hook_status_colors_only(self):
+        result = self.run_selector('select-agent-window', [
+            row(200000, '%1', '$1', '@11', 'work', '1:claude', 'claude', 'claude', 'Green', 'fg=green'),
+            row(199999, '%2', '$1', '@12', 'work', '2:codex', 'codex', 'codex', 'Yellow', 'fg=yellow'),
+            row(199998, '%3', '$1', '@13', 'work', '3:claude', 'claude', 'claude', 'Red', 'fg=red'),
+            row(199997, '%4', '$1', '@14', 'work', '4:codex', 'codex', 'codex', 'Idle', 'default'),
+        ])
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(self.menu()['rows'], [
+            '$1:@11\t[work] 1:claude (active 0s ago) "\x1b[32mGreen\x1b[39m"',
+            '$1:@12\t[work] 2:codex (active 1s ago) "\x1b[33mYellow\x1b[39m"',
+            '$1:@13\t[work] 3:claude (active 2s ago) "\x1b[31mRed\x1b[39m"',
+            '$1:@14\t[work] 4:codex (active 3s ago) "Idle"',
+        ])
+        self.assertIn('--ansi', self.menu()['options'])
 
     def test_agent_detection_uses_names_and_commands_not_titles(self):
         result = self.run_selector('select-agent-window', [
-            row(199999, '%1', '$1', '@11', 'work', '1:editor*', 'editor', 'fish', '🚀 Release notes'),
-            row(199998, '%2', '$2', '@22', 'other', '2:custom', 'custom', 'codex-aarch64-apple-darwin', 'Title'),
-            row(199997, '%3', '$3', '@33', 'third', '1:custom', 'custom', 'claude', ''),
+            row(199999, '%1', '$1', '@11', 'work', '1:editor*', 'editor', 'fish', '🚀 Release notes', 'default'),
+            row(199998, '%2', '$2', '@22', 'other', '2:custom', 'custom', 'codex-aarch64-apple-darwin', 'Title', 'default'),
+            row(199997, '%3', '$3', '@33', 'third', '1:custom', 'custom', 'claude', '', 'default'),
         ])
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(len(self.menu()['rows']), 2)
@@ -130,7 +149,7 @@ if not os.environ.get('EMPTY_SELECTION'):
 
     def test_future_activity_clamps_to_zero(self):
         result = self.run_selector('select-window', [
-            row('@11', 'work', '1:fish*', 1, 0, 200001, 'Title'),
+            row('@11', 'work', '1:fish*', 1, 0, 200001, 'Title', 'default'),
         ])
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(result.stderr, '')
@@ -162,7 +181,7 @@ if not os.environ.get('EMPTY_SELECTION'):
                               ({'FZF_STATUS': '2'}, 2)]:
             with self.subTest(env=env):
                 result = self.run_selector('select-window', [
-                    row('@11', 'work', '1:fish*', 1, 0, 200000, ''),
+                    row('@11', 'work', '1:fish*', 1, 0, 200000, '', 'default'),
                 ], **env)
                 self.assertEqual(result.returncode, expected, result.stderr)
                 self.assertEqual(len(self.commands()), 1)

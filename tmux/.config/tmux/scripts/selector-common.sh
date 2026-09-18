@@ -28,12 +28,30 @@ sanitize_pane_title() {
     printf '%s' "${1/'✳ '/}"
 }
 
+format_pane_title() {
+    local title style color=
+    title=$(sanitize_pane_title "$1")
+    style=$2
+
+    [[ -n $title ]] || return 0
+    case ",$style," in
+        *,fg=green,*)  color=$'\033[32m' ;;
+        *,fg=yellow,*) color=$'\033[33m' ;;
+        *,fg=red,*)    color=$'\033[31m' ;;
+    esac
+
+    printf ' "'
+    printf '%s%s' "$color" "$title"
+    if [[ -n $color ]]; then printf '\033[39m'; fi
+    printf '"'
+}
+
 # entries carry an opaque tmux target before the tab; only the label is shown
 # and searched. Never recover a target from a session name or window index.
 choose_entry() {
     local current=$1 last_key=${2:-} last=${3:-} selected status
     local options=(
-        --exact --sync --no-multi --no-popup
+        --exact --sync --no-multi --no-popup --ansi
         --delimiter $'\t' --with-nth '2..'
     )
 

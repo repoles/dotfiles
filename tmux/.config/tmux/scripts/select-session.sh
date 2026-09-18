@@ -6,6 +6,7 @@ source "$(dirname -- "$0")/selector-common.sh"
 format="#{session_activity}${separator}#{session_id}${separator}#{session_name}"
 format+="${separator}#{session_windows}${separator}#{window_index}:#{window_name}#{s|\*||:window_flags}"
 format+="${separator}#{session_alerts}${separator}#{session_attached}${separator}#{pane_title}"
+format+="${separator}#{window-status-style}"
 session_lines=$(tmux list-sessions -F "$format")
 session_lines=$(printf '%s\n' "$session_lines" | sort -rn)
 now=$(date +%s)
@@ -13,7 +14,7 @@ entries=()
 current=
 last=
 
-while IFS="$separator" read -r activity session_id session_name windows window alerts attached title; do
+while IFS="$separator" read -r activity session_id session_name windows window alerts attached title style; do
     position=$((${#entries[@]} + 1))
     if [[ $session_id == "$SELECTOR_SESSION" ]]; then
         current=$position
@@ -30,8 +31,7 @@ while IFS="$separator" read -r activity session_id session_name windows window a
     details="$window_count, $session_status"
     # if [[ -n $alerts ]]; then details+=", alerts: $alerts"; fi
     label="[$session_name] $window ($details)"
-    title=$(sanitize_pane_title "$title")
-    if [[ -n $title ]]; then label+=" \"$title\""; fi
+    label+=$(format_pane_title "$title" "$style")
     entries+=("$session_id"$'\t'"$label")
 done <<< "$session_lines"
 
