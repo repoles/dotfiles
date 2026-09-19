@@ -24,7 +24,8 @@ class TmuxSelectorsTest(unittest.TestCase):
         self.env = dict(os.environ, PATH=str(self.path) + ':' + os.environ['PATH'],
                         SELECTOR_CLIENT='/dev/ttys-review', SELECTOR_SESSION='$1',
                         SELECTOR_WINDOW='@11', SELECTOR_LAST_SESSION='previous',
-                        XDG_CACHE_HOME=str(self.path), FIXTURES=str(self.path))
+                        XDG_CACHE_HOME=str(self.path), FIXTURES=str(self.path),
+                        SERVER_INSTANCE='1000-42')
         self.env.pop('FZF_DEFAULT_OPTS', None)
         self.env.pop('FZF_DEFAULT_OPTS_FILE', None)
         self.executable('tmux', '''#!/usr/bin/env python3
@@ -35,6 +36,9 @@ with (path / 'commands').open('a') as log:
 if sys.argv[1].startswith('list-'):
     sys.stdout.write((path / 'rows').read_text())
     sys.exit(int(os.environ.get('QUERY_STATUS', '0')))
+if sys.argv[1] == 'display-message':
+    print(os.environ['SERVER_INSTANCE'])
+    sys.exit(int(os.environ.get('DISPLAY_STATUS', '0')))
 ''')
         self.executable('fzf', '''#!/usr/bin/env python3
 import json, os, pathlib, sys
@@ -103,29 +107,35 @@ if not os.environ.get('EMPTY_SELECTION'):
         self.assertIn('W:pos(1)+accept', self.menu()['options'])
         self.assertIn('--ansi', self.menu()['options'])
 
-    def test_agent_stamps_override_activity_and_invalid_stamp_falls_back(self):
-        stamps = self.path / 'tmux-agent-activity'
-        stamps.mkdir()
+    def test_agent_windows_without_valid_stamps_are_unknown_and_sort_last(self):
+        stamps = self.path / 'tmux-agent-activity' / self.env['SERVER_INSTANCE']
+        stamps.mkdir(parents=True)
         (stamps / '%1').write_text('0199990\n')
         (stamps / '%2').write_text('invalid\n')
         result = self.run_selector('select-agent-window', [
-            row(100, '%1', '$1', '@11', 'work', '1:claude*', 'claude', '2_1_217', '✳ Raw title', 'fg=yellow'),
-            row(199000, '%2', '$2', '@22', 'other', '2:codex-', 'codex', 'codex', '', 'default'),
+            row('%2', '$2', '@22', 'other', '2:codex-', 'codex', 'codex', '', 'default'),
+            row('%1', '$1', '@11', 'work', '1:claude*', 'claude', '2_1_217', '✳ Raw title', 'fg=yellow'),
+            row('%3', '$3', '@33', 'third', '3:codex', 'codex', 'codex', '', 'default'),
         ])
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(self.menu()['rows'], [
             '$1:@11\t[work] 1:claude* (active 10s ago) "\x1b[33mRaw title\x1b[39m"',
-            '$2:@22\t[other] 2:codex- (active 16m ago)',
+            '$2:@22\t[other] 2:codex- (activity unknown)',
+            '$3:@33\t[third] 3:codex (activity unknown)',
         ])
         self.assertIn('start:pos(1)', self.menu()['options'])
         self.assertIn('--ansi', self.menu()['options'])
 
     def test_agent_titles_use_hook_status_colors_only(self):
+        stamps = self.path / 'tmux-agent-activity' / self.env['SERVER_INSTANCE']
+        stamps.mkdir(parents=True)
+        for pane, activity in enumerate(range(200000, 199996, -1), start=1):
+            (stamps / f'%{pane}').write_text(f'{activity}\n')
         result = self.run_selector('select-agent-window', [
-            row(200000, '%1', '$1', '@11', 'work', '1:claude', 'claude', 'claude', 'Green', 'fg=green'),
-            row(199999, '%2', '$1', '@12', 'work', '2:codex', 'codex', 'codex', 'Yellow', 'fg=yellow'),
-            row(199998, '%3', '$1', '@13', 'work', '3:claude', 'claude', 'claude', 'Red', 'fg=red'),
-            row(199997, '%4', '$1', '@14', 'work', '4:codex', 'codex', 'codex', 'Idle', 'default'),
+            row('%1', '$1', '@11', 'work', '1:claude', 'claude', 'claude', 'Green', 'fg=green'),
+            row('%2', '$1', '@12', 'work', '2:codex', 'codex', 'codex', 'Yellow', 'fg=yellow'),
+            row('%3', '$1', '@13', 'work', '3:claude', 'claude', 'claude', 'Red', 'fg=red'),
+            row('%4', '$1', '@14', 'work', '4:codex', 'codex', 'codex', 'Idle', 'default'),
         ])
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(self.menu()['rows'], [
@@ -138,9 +148,9 @@ if not os.environ.get('EMPTY_SELECTION'):
 
     def test_agent_detection_uses_names_and_commands_not_titles(self):
         result = self.run_selector('select-agent-window', [
-            row(199999, '%1', '$1', '@11', 'work', '1:editor*', 'editor', 'fish', '🚀 Release notes', 'default'),
-            row(199998, '%2', '$2', '@22', 'other', '2:custom', 'custom', 'codex-aarch64-apple-darwin', 'Title', 'default'),
-            row(199997, '%3', '$3', '@33', 'third', '1:custom', 'custom', 'claude', '', 'default'),
+            row('%1', '$1', '@11', 'work', '1:editor*', 'editor', 'fish', '🚀 Release notes', 'default'),
+            row('%2', '$2', '@22', 'other', '2:custom', 'custom', 'codex-aarch64-apple-darwin', 'Title', 'default'),
+            row('%3', '$3', '@33', 'third', '1:custom', 'custom', 'claude', '', 'default'),
         ])
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(len(self.menu()['rows']), 2)
@@ -168,12 +178,28 @@ if not os.environ.get('EMPTY_SELECTION'):
 
     def test_no_agents_does_not_open_fzf_or_switch(self):
         result = self.run_selector('select-agent-window', [
-            row(200000, '%1', '$1', '@11', 'work', '1:fish*', 'fish', 'fish', ''),
+            row('%1', '$1', '@11', 'work', '1:fish*', 'fish', 'fish', ''),
         ])
         self.assertEqual(result.returncode, 1)
         self.assertIn('No claude or codex', result.stderr)
         self.assertFalse((self.path / 'menu').exists())
-        self.assertEqual(len(self.commands()), 1)
+        self.assertEqual([command[0] for command in self.commands()],
+                         ['list-panes', 'display-message'])
+
+    def test_agent_server_instance_failure_explains_why_fzf_did_not_open(self):
+        for env in [{'SERVER_INSTANCE': 'invalid'}, {'DISPLAY_STATUS': '1'}]:
+            with self.subTest(env=env):
+                result = self.run_selector('select-agent-window', [
+                    row('%1', '$1', '@11', 'work', '1:codex', 'codex', 'codex', ''),
+                ], **env)
+                self.assertEqual(result.returncode, 1)
+                self.assertEqual(
+                    result.stderr,
+                    'Could not determine the tmux server instance.\n',
+                )
+                self.assertFalse((self.path / 'menu').exists())
+                self.assertEqual([command[0] for command in self.commands()],
+                                 ['list-panes', 'display-message'])
 
     def test_cancel_empty_selection_and_fzf_error_never_switch(self):
         for env, expected in [({'FZF_STATUS': '130'}, 0),
