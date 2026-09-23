@@ -7,7 +7,7 @@
 # subagent asking or finishing. Codex's hook set carries no equivalent event;
 # what it has instead is the notify program named in its own config.toml, a
 # separate channel on a payload of its own. So the two cannot share this the
-# way they share agent-tmux-status.sh, and the name says which one it serves:
+# way they share agent-tmux-hook.sh, and the name says which one it serves:
 # the fields read below are Claude's payload alone.
 #
 # The hook carries a matcher that narrows the sixteen notification types down
