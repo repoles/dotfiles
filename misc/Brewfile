@@ -3,7 +3,7 @@
 
 brew 'fish' # Friendly interactive shell
 brew 'tmux' # Terminal multiplexer
-brew 'starship' # Cross-shell prompt for astronauts
+# brew 'starship' # Cross-shell prompt for astronauts
 
 # mise (polyglot runtime manager) is installed by hand, see the README.
 # Installing it with homebrew is not recommended anymore.
@@ -19,11 +19,11 @@ brew 'zoxide' # Shell extension to navigate your filesystem faster
 brew 'glow' # Markdown reader for the CLI
 brew 'atuin' # Shell history reimagined
 
-brew 'jless' # Command-line JSON viewer
+# brew 'jless' # Command-line JSON viewer
 brew 'jq' # Lightweight and flexible command-line JSON processor
-brew 'yq' # Like jq, but for YAML (and XML/TOML) documents
+# brew 'yq' # Like jq, but for YAML (and XML/TOML) documents
 
-brew 'pv' # Monitor data's progress through a pipe
+# brew 'pv' # Monitor data's progress through a pipe
 brew 'stow' # Organize software neatly under a single directory tree
 
 brew 'fastfetch' # Fast system information tool
@@ -31,10 +31,10 @@ brew 'htop' # Improved top (interactive process viewer)
 brew 'btop' # A monitor of resources
 
 brew 'ripgrep' # Search tool like grep and The Silver Searcher
-brew 'sd' # Intuitive find & replace CLI (a simpler, modern sed)
+# brew 'sd' # Intuitive find & replace CLI (a simpler, modern sed)
 brew 'dua-cli' # View disk space usage and delete unwanted data, fast
 brew 'dust' # More intuitive version of du in Rust (visual disk usage tree)
-brew 'httpie' # User-friendly cURL replacement (command-line HTTP client)
+# brew 'httpie' # User-friendly cURL replacement (command-line HTTP client)
 brew 'git-delta' # A syntax-highlighting pager for git, diff, grep, and blame output
 brew 'gh' # GitHub command-line tool (PRs, issues, releases, API)
 
@@ -56,7 +56,7 @@ brew 'rsync' # since macOS Sequoia is now using openrsync
 
 cask 'arq'
 cask 'hazel'
-cask 'raycast'
+# cask 'raycast'
 cask 'keyboard-maestro'
 
 cask 'jetbrains-toolbox'
@@ -67,16 +67,16 @@ cask 'microsoft-word'
 cask 'google-chrome'
 cask 'docker-desktop'
 
-cask 'wezterm'
+# cask 'wezterm'
 cask 'ghostty'
-cask 'kitty'
+# cask 'kitty'
 
 cask 'whatsapp'
 cask 'cleanshot'
 cask 'transmit'
 cask 'itsycal'
 
-cask 'zed'
+# cask 'zed'
 cask 'postman'
 
 cask 'chatgpt'
