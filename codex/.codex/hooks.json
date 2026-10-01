@@ -31,6 +31,17 @@
         "matcher": "startup|resume"
       }
     ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "command": "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/scripts/agent-tmux-hook.sh idle",
+            "timeout": 3,
+            "type": "command"
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "hooks": [

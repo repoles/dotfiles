@@ -5,7 +5,7 @@
 #   busy     UserPromptSubmit, PostToolUse   UserPromptSubmit, PostToolUse, SessionStart
 #   waiting  PermissionRequest               PermissionRequest
 #   error    PostToolUseFailure, StopFailure -
-#   idle     Stop, SessionStart, SessionEnd  Stop
+#   idle     Stop, SessionStart, SessionEnd  Stop, SessionEnd
 
 [ -n "$TMUX_PANE" ] || exit 0
 
