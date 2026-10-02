@@ -38,6 +38,11 @@
             "command": "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/scripts/agent-tmux-hook.sh idle",
             "timeout": 3,
             "type": "command"
+          },
+          {
+            "command": "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/scripts/agent-tmux-session.sh codex end",
+            "timeout": 3,
+            "type": "command"
           }
         ]
       }
@@ -48,6 +53,10 @@
           {
             "command": "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/scripts/agent-tmux-hook.sh idle",
             "type": "command"
+          },
+          {
+            "command": "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/scripts/agent-tmux-session.sh codex stop",
+            "type": "command"
           }
         ]
       }
@@ -57,6 +66,10 @@
         "hooks": [
           {
             "command": "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/scripts/agent-tmux-hook.sh busy",
+            "type": "command"
+          },
+          {
+            "command": "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/scripts/agent-tmux-session.sh codex start",
             "type": "command"
           }
         ]
