@@ -3,6 +3,7 @@
 import json
 import os
 from pathlib import Path
+import re
 import subprocess
 import tempfile
 import unittest
@@ -233,7 +234,25 @@ printf '%s\n' "$NOW"
                               if any(hook['command'].endswith(f'{script} {tool} {action}')
                                      for hook in group['hooks'])]
                     self.assertEqual(len(groups), 1, event)
-                    self.assertNotIn('matcher', groups[0])
+                    if (tool, event) != ('claude', 'SessionEnd'):
+                        self.assertNotIn('matcher', groups[0])
+
+    def test_claude_keeps_the_record_of_a_session_killed_by_a_signal(self):
+        hooks = json.loads((ROOT / 'claude/.claude/settings.json').read_text())['hooks']
+        script = '/tmux/scripts/agent-tmux-session.sh claude end'
+        group = next(group for group in hooks['SessionEnd']
+                     if any(hook['command'].endswith(script) for hook in group['hooks']))
+
+        # A tmux kill-server or kill -TERM ends a Claude session with reason "other".
+        self.assertIsNone(re.search(group['matcher'], 'other'))
+        for reason in ['clear', 'resume', 'logout', 'prompt_input_exit',
+                       'bypass_permissions_disabled']:
+            with self.subTest(reason=reason):
+                self.assertIsNotNone(re.search(group['matcher'], reason))
+        # The window status still resets however the session ends.
+        self.assertTrue(any('agent-tmux-hook.sh idle' in hook['command']
+                            for group in hooks['SessionEnd'] if 'matcher' not in group
+                            for hook in group['hooks']))
 
 
 if __name__ == '__main__':

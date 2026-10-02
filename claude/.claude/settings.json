@@ -56,7 +56,12 @@
           {
             "type": "command",
             "command": "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/scripts/agent-tmux-hook.sh idle"
-          },
+          }
+        ]
+      },
+      {
+        "matcher": "clear|resume|logout|prompt_input_exit|bypass_permissions_disabled",
+        "hooks": [
           {
             "type": "command",
             "command": "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/scripts/agent-tmux-session.sh claude end"

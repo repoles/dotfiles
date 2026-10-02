@@ -12,6 +12,9 @@
 # The records live in state, not cache, and nothing sweeps them: a file left behind by a
 # crash, a killed pane or a reboot is exactly a session that never concluded. tmux-resurrect
 # restores session names and window/pane indexes, so those locate it again afterwards.
+#
+# Claude still fires SessionEnd when a signal kills it, as tmux kill-server does, with
+# reason "other"; its config runs `end` only for the reasons a person ends a session with.
 
 # Only a session running in tmux has a pane to record. Ending is the exception: a session
 # recorded in tmux can be resumed in another terminal and end there.
