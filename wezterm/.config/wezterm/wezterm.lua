@@ -86,7 +86,20 @@ config.window_decorations = 'RESIZE | TITLE' -- MACOS_FORCE_ENABLE_SHADOW
 config.enable_scroll_bar = false
 
 -- Disable hyperlinks
+-- config.hyperlink_rules = {}
+
+-- The default email rule (\w+@...) stops at dots in the local part, so
+-- "first.last@example.com" only links "last@example.com"
 config.hyperlink_rules = {}
+for _, rule in ipairs(wezterm.default_hyperlink_rules()) do
+  if rule.format ~= 'mailto:$0' then
+    table.insert(config.hyperlink_rules, rule)
+  end
+end
+table.insert(config.hyperlink_rules, {
+  regex = [[\b[\w.%+-]+@[\w-]+(\.[\w-]+)+\b]],
+  format = 'mailto:$0',
+})
 
 local act = wezterm.action
 
