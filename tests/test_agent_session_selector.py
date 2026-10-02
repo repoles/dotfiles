@@ -253,11 +253,13 @@ if status:
                 self.assertFalse((self.path / 'tmux.log').exists())
 
     def test_u_opens_the_selector_from_the_pane_directory(self):
-        binding = next(line for line in (ROOT / 'tmux/.config/tmux/tmux.conf')
-                       .read_text().splitlines() if line.startswith('bind-key U '))
+        lines = (ROOT / 'tmux/.config/tmux/tmux.conf').read_text().splitlines()
+        binding = next(line for line in lines if line.startswith('bind-key U '))
 
         self.assertIn('-e SELECTOR_PATH=#{q:pane_current_path}', binding)
         self.assertIn('/tmux/scripts/select-agent-session.sh"', binding)
+        # tpm runs last and would rebind U to its plugin update unless told otherwise.
+        self.assertIn("set -g @tpm-update 'M-U'", lines)
 
 
 @unittest.skipUnless(shutil.which('tmux'), 'tmux is required')
