@@ -36,8 +36,8 @@ while IFS="$separator" read -r pane_id session_id window_id session_name window 
 done <<< "$pane_lines"
 
 if (( ${#window_lines[@]} == 0 )); then
-    printf 'No claude or codex windows are open.\n' >&2
-    exit 1
+    tmux display-message -c "$SELECTOR_CLIENT" 'No claude or codex windows are open.'
+    exit 0
 fi
 
 sorted_lines=$(printf '%s\n' "${window_lines[@]}" | sort -srn)

@@ -180,11 +180,14 @@ if not os.environ.get('EMPTY_SELECTION'):
         result = self.run_selector('select-agent-window', [
             row('%1', '$1', '@11', 'work', '1:fish*', 'fish', 'fish', ''),
         ])
-        self.assertEqual(result.returncode, 1)
-        self.assertIn('No claude or codex', result.stderr)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stderr, '')
         self.assertFalse((self.path / 'menu').exists())
-        self.assertEqual([command[0] for command in self.commands()],
-                         ['list-panes', 'display-message'])
+        self.assertEqual(self.commands()[0][0], 'list-panes')
+        self.assertEqual(self.commands()[-1],
+                         ['display-message', '-c', '/dev/ttys-review',
+                          'No claude or codex windows are open.'])
+        self.assertEqual(len(self.commands()), 3)
 
     def test_agent_server_instance_failure_explains_why_fzf_did_not_open(self):
         for env in [{'SERVER_INSTANCE': 'invalid'}, {'DISPLAY_STATUS': '1'}]:
