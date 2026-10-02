@@ -11,6 +11,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 SESSION_SCRIPT = ROOT / 'tmux/.config/tmux/scripts/agent-tmux-session.sh'
 SESSION_ID = '0199a1b2-c3d4-7e5f-8a9b-0c1d2e3f4a5b'
+AGENT_LSTART = 'Fri Oct  2 01:39:11 2026    '
 
 
 class AgentTmuxSessionTest(unittest.TestCase):
@@ -22,14 +23,37 @@ class AgentTmuxSessionTest(unittest.TestCase):
         self.env = dict(os.environ, PATH=str(self.path) + ':' + os.environ['PATH'],
                         TMUX_PANE='%1', XDG_STATE_HOME=str(self.path),
                         PANE='work\x1f2\x1fapi: tests\x1f1\x1f✳ Fix\tthe build',
-                        NOW='1791030600')
+                        NOW='1791030600', AGENT_STARTED_AT='1791000000')
+        # The script runs as a child of this test, so its ancestry starts here: a hook
+        # shell, then the agent, then tmux.
+        self.processes = {os.getpid(): (700, '/bin/zsh', ''),
+                          700: (600, '/Users/me/.local/bin/claude', AGENT_LSTART),
+                          600: (1, 'tmux', '')}
+        self.executable('ps', '''#!/usr/bin/env python3
+import json, os, sys
+args = sys.argv[1:]
+pid = args[args.index('-p') + 1]
+process = json.loads(os.environ['PROCESSES']).get(pid)
+if process is None:
+    sys.exit(1)
+ppid, comm, lstart = process
+print(lstart if 'lstart=' in args else '%5d %s' % (ppid, comm))
+''')
         self.executable('tmux', '''#!/bin/sh
 printf '%s\n' "$*" >> "$XDG_STATE_HOME/tmux-commands"
 [ "$1" = display-message ] || exit 1
 printf '%s\n' "$PANE"
 exit "${DISPLAY_STATUS:-0}"
 ''')
-        self.executable('date', '#!/bin/sh\nprintf "%s\\n" "$NOW"\n')
+        self.executable('date', '''#!/bin/sh
+# Only the agent's normalized lstart converts to its start time.
+if [ "$1" = -j ]; then
+    [ "$4" = 'Fri Oct 2 01:39:11 2026' ] || exit 1
+    printf '%s\n' "$AGENT_STARTED_AT"
+    exit
+fi
+printf '%s\n' "$NOW"
+''')
 
     def executable(self, name, contents):
         path = self.path / name
@@ -40,8 +64,11 @@ exit "${DISPLAY_STATUS:-0}"
         if payload is None:
             payload = {'session_id': SESSION_ID, 'cwd': '/Users/me/Code/api',
                        'hook_event_name': 'UserPromptSubmit'}
+        processes = json.dumps({str(pid): process
+                                for pid, process in self.processes.items()})
         return subprocess.run(['/bin/sh', str(SESSION_SCRIPT), *args],
-                              input=json.dumps(payload), env=dict(self.env, **env),
+                              input=json.dumps(payload),
+                              env=dict(self.env, PROCESSES=processes, **env),
                               capture_output=True, text=True)
 
     def record(self, session_id=SESSION_ID):
@@ -63,9 +90,37 @@ exit "${DISPLAY_STATUS:-0}"
             'pane_title': '✳ Fix\tthe build',
             'started_at': 1791030600,
             'last_prompt_at': 1791030600,
+            'agent_pid': 700,
+            'agent_started_at': 1791000000,
         })
         self.assertEqual([p.name for p in self.sessions.iterdir()],
                          [f'{SESSION_ID}.json'])
+
+    def test_an_agent_missing_from_the_ancestry_is_recorded_as_unknown(self):
+        result = self.run_session('codex', 'start')
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual((self.record()['agent_pid'], self.record()['agent_started_at']),
+                         (None, None))
+
+    def test_an_agent_without_a_readable_start_time_is_recorded_as_unknown(self):
+        self.processes[700] = (600, 'claude', 'not a date')
+
+        result = self.run_session('claude', 'start')
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual((self.record()['agent_pid'], self.record()['agent_started_at']),
+                         (None, None))
+
+    def test_stop_refreshes_the_agent_process(self):
+        self.run_session('claude', 'start')
+        self.processes = {os.getpid(): (800, '/bin/sh', ''),
+                          800: (1, 'claude', 'Fri Oct  2 01:39:11 2026')}
+
+        result = self.run_session('claude', 'stop')
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(self.record()['agent_pid'], 800)
 
     def test_later_prompts_refresh_the_record_but_keep_the_start_time(self):
         self.run_session('codex', 'start')
