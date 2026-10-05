@@ -17,8 +17,7 @@ https://developer.zendesk.com/api-reference/ticketing/introduction/
 
 ## Auth — OAuth client credentials
 
-Zendesk is removing API tokens (unused ones already auto-deactivate; no new tokens after
-2026-10-27; all dead 2027-04-30), so this skill authenticates with the OAuth 2.0
+Zendesk is retiring API tokens, so this skill authenticates with the OAuth 2.0
 **client credentials** flow — no browser, no refresh token, made for server-side scripts.
 
 Set up once:
@@ -72,7 +71,7 @@ Zendesk search queries need; prints the body on stdout; and on HTTP >= 400 print
 status and error body on **stderr** and exits 1 (reporting `Retry-After` on a 429).
 Pipe into `jq` freely — a failed call produces no stdout, so it won't feed jq garbage.
 
-Invoke it by path (it isn't on `PATH`):
+Every `zdapi` in the examples below means this wrapper, invoked by path (it isn't on `PATH`):
 `~/.claude/skills/zendesk/scripts/zdapi GET /tickets.json`
 
 ## Reading

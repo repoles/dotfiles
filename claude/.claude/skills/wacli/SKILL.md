@@ -20,14 +20,15 @@ it. Binary from Homebrew; docs: https://wacli.sh
 | `avant` (default) | `~/.local/state/wacli-avant` | work |
 | `pessoal` | `~/.local/state/wacli-pessoal` | personal |
 
-Both are declared in `~/.wacli/config.yaml`, stowed from `wacli/.wacli/` in this repo.
+Both are declared in `~/.wacli/config.yaml`, stowed from `wacli/.wacli/` in the Dotfiles
+repo (`~/Code/Dotfiles`).
 That path is fixed: wacli reads `XDG_STATE_HOME` but never `XDG_CONFIG_HOME`, so the
 config cannot live under `~/.config` (upstream issue #426).
 
 `--account NAME` picks one; with no flag everything hits `avant`, the `default_account`.
 Store precedence is `--store` > `--account` > `$WACLI_STORE_DIR` > config, so a stray
-`WACLI_STORE_DIR` in the environment silently overrides the account — there is
-deliberately no such export in `exports.fish` anymore. `wacli doctor` prints the STORE
+`WACLI_STORE_DIR` in the environment silently overrides the account, which is why the
+Dotfiles `exports.fish` deliberately doesn't set it. `wacli doctor` prints the STORE
 actually in use; check it when in doubt.
 
 **The two stores hold different contacts and different chats.** Reading the wrong one

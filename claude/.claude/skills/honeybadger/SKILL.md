@@ -20,8 +20,8 @@ The **personal auth token** (Data API) lives in the login keychain, as a generic
 password named `HONEYBADGER_AUTH_TOKEN` under the account `avantsistemas`. The upstream
 `hb` binary only reads credentials from flags or the environment, so this skill ships a
 wrapper — `scripts/hb`, next to this file — that pulls the token from the keychain and
-execs the real binary. **Every `hb` command below goes through it**, invoked by path (it
-isn't on `PATH`):
+execs the real binary. **Every `hb` in the examples below means this wrapper**, invoked by
+path (it isn't on `PATH`; the `hb` that is on `PATH` is the upstream binary, with no token):
 
 ```bash
 ~/.claude/skills/honeybadger/scripts/hb projects list
