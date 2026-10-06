@@ -1,9 +1,9 @@
 --popup=center,90%,70%
 --layout=reverse
-# --prompt='❯ '
-# --marker='❯'
-# --color=hl:bright-yellow,hl+:bright-yellow
+--prompt='❯ '
+--marker='❯'
+--color=hl:bright-yellow,hl+:bright-yellow
 --color=bg:#11151c,bg+:#1c212b,gutter:#11151c
-# --color=info:cyan,border:bright-black,prompt:green
-# --color=pointer:red,marker:yellow,spinner:yellow,header:blue
+--color=info:cyan,border:bright-black,prompt:green
+--color=pointer:red,marker:yellow,spinner:yellow,header:blue
 --border
