@@ -56,7 +56,7 @@ exit "${TMUX_STATUS:-0}"
 
     def new_window(self, session, scripts=SCRIPTS):
         return (f"tmux new-window -d -P -F #{{session_name}}:#{{window_index}} -t ={session}: "
-                f"-c #{{session_path}} -n claude {scripts}/start-agent.sh claude "
+                f"-c #{{session_path}} -n claude exec '{scripts}/start-agent.sh' claude "
                 '--permission-mode auto --remote-control')
 
     def test_opens_the_window_in_an_existing_session(self):
