@@ -15,7 +15,7 @@ function custom_prompt_ruby
     test -n "$version_file"; or return
 
     # The file may contain a bare version (3.4.9) or a "ruby-" prefix.
-    set -l ruby_version (string trim -- (cat -- "$version_file" 2>/dev/null)[1])
+    set -l ruby_version (string trim -- (command cat -- "$version_file" 2>/dev/null)[1])
     set ruby_version (string replace -r '^ruby-' '' -- $ruby_version)
     test -n "$ruby_version"; or return
 
