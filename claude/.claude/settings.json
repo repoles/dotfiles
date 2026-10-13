@@ -124,14 +124,15 @@
     ]
   },
   "enabledPlugins": {
-    "basecamp@37signals": true
+    "basecamp-cli@37signals": true
   },
   "extraKnownMarketplaces": {
     "37signals": {
       "source": {
         "source": "github",
         "repo": "basecamp/claude-plugins"
-      }
+      },
+      "autoUpdate": true
     }
   },
   "tui": "fullscreen",
