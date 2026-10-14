@@ -27,11 +27,7 @@ mkdir -p ~/.claude ~/.codex
 stow --verbose --target=$HOME */
 ```
 
-Create those two directories first. When a target directory doesn't exist yet, stow
-links the whole tree instead of its individual files, so on a fresh machine `~/.claude`
-and `~/.codex` would end up pointing into this repository — and everything Claude Code
-and Codex write at runtime (transcripts, plugin caches, `auth.json`) would land inside
-it. Directories that several packages share, like `~/.config`, sort themselves out.
+Create those two directories first. When a target directory doesn't exist yet, stow links the whole tree instead of its individual files, so on a fresh machine `~/.claude` and `~/.codex` would end up pointing into this repository — and everything Claude Code and Codex write at runtime (transcripts, plugin caches, `auth.json`) would land inside it. Directories that several packages share, like `~/.config`, sort themselves out.
 
 ### 4. Set up fish as the default shell
 
