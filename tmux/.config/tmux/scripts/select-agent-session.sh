@@ -110,15 +110,25 @@ delete_records() {
     return 0
 }
 
+# Whether the window exists. display-message answers for the current pane when its target is
+# missing, so the answer must name the window asked for.
+window_exists() {
+    local session=$1 index=$2
+    [[ $(tmux display-message -p -t "=$session:$index" \
+        "#{session_name}$separator#{window_index}" 2>/dev/null) == "$session$separator$index" ]]
+}
+
 # The original pane, when it still belongs to the window the session ran in and holds nothing
 # but an idle shell, as tmux-resurrect leaves it. A pane with any child process is in use.
 idle_original_pane() {
-    local target=$1 window_name=$2 info pane_id name pane_pid dead command
-    info=$(tmux display-message -p -t "$target" \
-        "#{pane_id}$separator#{window_name}$separator#{pane_pid}$separator#{pane_dead}$separator#{pane_current_command}" \
+    local session=$1 window_index=$2 pane_index=$3 window_name=$4
+    local info found pane_id name pane_pid dead command
+    info=$(tmux display-message -p -t "=$session:$window_index.$pane_index" \
+        "#{session_name}:#{window_index}.#{pane_index}$separator#{pane_id}$separator#{window_name}$separator#{pane_pid}$separator#{pane_dead}$separator#{pane_current_command}" \
         2>/dev/null) || return 1
-    IFS="$separator" read -r pane_id name pane_pid dead command <<< "$info"
-    [[ $name == "$window_name" ]] || return 1
+    IFS="$separator" read -r found pane_id name pane_pid dead command <<< "$info"
+    # As in window_exists, a missing pane answers for the current one.
+    [[ $found == "$session:$window_index.$pane_index" && $name == "$window_name" ]] || return 1
     if [[ $dead != 1 ]]; then
         case "$command" in fish|bash|zsh|sh) ;; *) return 1 ;; esac
         pgrep -P "$pane_pid" > /dev/null && return 1
@@ -177,14 +187,18 @@ resume_sessions() {
 
         local format="#{session_id}:#{window_id}$separator#{pane_pid}" result=
         if [[ -n $tmux_session ]] &&
-                pane=$(idle_original_pane "=$tmux_session:$window_index.$pane_index" "$window_name"); then
+                pane=$(idle_original_pane "$tmux_session" "$window_index" "$pane_index" \
+                    "$window_name"); then
             tmux respawn-pane -k -t "$pane" -c "$cwd" "$command" &&
                 result=$(tmux display-message -p -t "$pane" "$format") || result=
         elif [[ -n $tmux_session ]] && tmux has-session -t "=$tmux_session" 2>/dev/null; then
-            # Back at its index: before the window there now, or after the last one.
+            # Back at its index, before the window there now if there is one; without a usable
+            # index, at the first free one.
             local place=(-t "=$tmux_session:")
-            if tmux display-message -p -t "=$tmux_session:$window_index" '' > /dev/null 2>&1; then
+            if window_exists "$tmux_session" "$window_index"; then
                 place=(-b -t "=$tmux_session:$window_index")
+            elif [[ $window_index =~ ^[0-9]+$ ]]; then
+                place=(-t "=$tmux_session:$window_index")
             fi
             result=$(tmux new-window -d -P -F "$format" "${place[@]}" -c "$cwd" -n "$tool" \
                 "$command") || result=

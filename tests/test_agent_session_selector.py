@@ -325,6 +325,25 @@ class AgentSessionResumeTest(SelectorTestCase):
         listed = self.run_selector('--list', 'all')
         self.assertEqual(listed.stdout, '')
 
+    def test_a_missing_window_or_pane_does_not_take_the_current_one(self):
+        # tmux answers for the current pane when a target is missing; make that one look
+        # like the original: an idle shell in a window of the same name.
+        self.tmux('new-window', '-t', 'work:4', '-n', 'claude', 'sh')
+        self.record('window', self.repo, NOW, window_index=6, window_name='claude')
+        self.record('pane', self.repo, NOW, window_index=4, pane_index=1,
+                    window_name='claude')
+
+        result = self.run_selector('--resume', 'window', 'pane')
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        # The pane goes before the window it was in, and the window back at its free index.
+        self.assertEqual(self.agent_output('work:4'), ['fake claude --resume pane'])
+        self.assertEqual(self.agent_output('work:6'), ['fake claude --resume window'])
+        self.assertEqual(self.windows(), [
+            'work:0:shell:0', 'work:1:claude:0', 'work:2:codex:0', 'work:4:claude:300',
+            'work:5:claude:0', 'work:6:claude:300',
+        ])
+
     def test_agents_start_through_the_default_shell(self):
         # fish puts mise's shims first; this stand-in marks the PATH the same way.
         self.executable('marking-shell', '#!/bin/sh\nPATH="/shims:$PATH" exec /bin/sh "$@"\n')
