@@ -1,7 +1,7 @@
 [settings]
 # https://github.com/jdx/mise/discussions/4345
 idiomatic_version_file_enable_tools = ["ruby"]
-ruby.compile=false
+ruby.compile = false
 auto_update = true
 
 [tools]
