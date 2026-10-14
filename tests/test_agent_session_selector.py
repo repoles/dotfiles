@@ -325,6 +325,22 @@ class AgentSessionResumeTest(SelectorTestCase):
         listed = self.run_selector('--list', 'all')
         self.assertEqual(listed.stdout, '')
 
+    def test_agents_start_through_the_default_shell(self):
+        # fish puts mise's shims first; this stand-in marks the PATH the same way.
+        self.executable('marking-shell', '#!/bin/sh\nPATH="/shims:$PATH" exec /bin/sh "$@"\n')
+        self.executable('claude', '#!/bin/sh\necho "fake PATH ${PATH%%:*}"\nexec sleep 300\n')
+        self.tmux('set', '-g', 'default-shell', str(self.bin / 'marking-shell'))
+        # A respawned pane keeps the shell it was created with, so make the idle one under it.
+        self.tmux('new-window', '-t', 'work:4', '-n', 'claude', 'sh')
+        self.record('idle', self.repo, NOW, window_index=4, window_name='claude')
+        self.record('gone', self.repo, NOW, tmux_session='closed')
+
+        result = self.run_selector('--resume', 'idle', 'gone')
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(self.agent_output('work:4'), ['fake PATH /shims'])
+        self.assertEqual(self.agent_output('closed:0'), ['fake PATH /shims'])
+
     def test_a_pane_in_a_renamed_window_is_not_reused(self):
         self.record('moved', self.repo, NOW, window_index=1, window_name='other')
 

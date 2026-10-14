@@ -165,17 +165,20 @@ resume_sessions() {
             skipped+=("$id: $cwd no longer exists")
             continue
         fi
-        local command=("$scripts/start-agent.sh" "$tool")
+        # One string, like Prefix+F1's, so tmux runs it through default-shell: fish then puts
+        # mise's shims ahead of the tool directories activated in the server's PATH, and the
+        # shims pick each project's version. The ID is valid_id's, so it needs no quoting.
+        local command="exec '$scripts/start-agent.sh' $tool"
         case "$tool" in
-            claude) command+=(--resume "$id") ;;
-            codex) command+=(resume "$id") ;;
+            claude) command+=" --resume $id" ;;
+            codex) command+=" resume $id" ;;
             *) skipped+=("$id: unknown agent $tool"); continue ;;
         esac
 
         local format="#{session_id}:#{window_id}$separator#{pane_pid}" result=
         if [[ -n $tmux_session ]] &&
                 pane=$(idle_original_pane "=$tmux_session:$window_index.$pane_index" "$window_name"); then
-            tmux respawn-pane -k -t "$pane" -c "$cwd" "${command[@]}" &&
+            tmux respawn-pane -k -t "$pane" -c "$cwd" "$command" &&
                 result=$(tmux display-message -p -t "$pane" "$format") || result=
         elif [[ -n $tmux_session ]] && tmux has-session -t "=$tmux_session" 2>/dev/null; then
             # Back at its index: before the window there now, or after the last one.
@@ -184,13 +187,13 @@ resume_sessions() {
                 place=(-b -t "=$tmux_session:$window_index")
             fi
             result=$(tmux new-window -d -P -F "$format" "${place[@]}" -c "$cwd" -n "$tool" \
-                "${command[@]}") || result=
+                "$command") || result=
         elif [[ -n $tmux_session ]]; then
             result=$(tmux new-session -d -P -F "$format" -s "$tmux_session" -c "$cwd" -n "$tool" \
-                "${command[@]}") || result=
+                "$command") || result=
         else
             result=$(tmux new-window -d -P -F "$format" -t "$SELECTOR_SESSION:" -c "$cwd" \
-                -n "$tool" "${command[@]}") || result=
+                -n "$tool" "$command") || result=
         fi
         if [[ -z $result ]]; then
             skipped+=("$id could not be opened")
