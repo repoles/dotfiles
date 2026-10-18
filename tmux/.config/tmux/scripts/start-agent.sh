@@ -22,6 +22,12 @@ if [ -n "$TMUX_PANE" ]; then
 		set -w -t "$TMUX_PANE" @full_title 1 || true
 fi
 
+# mise's shims go ahead of the tool directories activated in the server's PATH: they pick
+# each project's version from the directory a command runs in, so the agent's commands
+# need no `mise exec --`.
+PATH=${MISE_DATA_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/mise}/shims:$PATH
+export PATH
+
 case "$tool" in
 	codex) set -- --no-daemon "$@" ;;
 esac

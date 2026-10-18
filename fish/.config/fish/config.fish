@@ -49,8 +49,4 @@ if status is-interactive
     # starship init fish | source
 
     $HOME/.local/bin/mise activate fish | source
-else
-    # Shims resolve the version from the directory the command runs in,
-    # rather than freezing whichever one was current when the shell started.
-    $HOME/.local/bin/mise activate fish --shims | source
 end

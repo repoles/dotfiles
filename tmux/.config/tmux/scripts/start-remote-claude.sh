@@ -32,9 +32,7 @@ if ! tmux has-session -t "=$session" 2>/dev/null; then
 fi
 
 # -d keeps the session on its current window. Without -c, the window would start in the
-# directory this script runs from. The command goes as one string, so tmux runs it through
-# default-shell like Prefix+F1's: fish then puts mise's shims ahead of the tool directories
-# activated in the server's PATH, and the shims pick each project's version.
+# directory this script runs from.
 exec tmux new-window -d -P -F '#{session_name}:#{window_index}' -t "=$session:" \
 	-c '#{session_path}' -n claude \
 	"exec '$scripts/start-agent.sh' claude --permission-mode auto --remote-control"

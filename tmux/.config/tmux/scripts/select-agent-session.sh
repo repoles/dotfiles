@@ -175,9 +175,7 @@ resume_sessions() {
             skipped+=("$id: $cwd no longer exists")
             continue
         fi
-        # One string, like Prefix+F1's, so tmux runs it through default-shell: fish then puts
-        # mise's shims ahead of the tool directories activated in the server's PATH, and the
-        # shims pick each project's version. The ID is valid_id's, so it needs no quoting.
+        # The ID is valid_id's, so it needs no quoting.
         local command="exec '$scripts/start-agent.sh' $tool"
         case "$tool" in
             claude) command+=" --resume $id" ;;
