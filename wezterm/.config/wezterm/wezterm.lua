@@ -13,7 +13,7 @@ config.initial_rows = 35
 
 local font_family = 'MonoLisaCode'
 -- https://www.monolisa.dev/tester/code
-local font_features = { 'ss11=1', 'ss13=1', 'cv04=1', 'cv05=1', 'cv08=1', 'cv09=1', 'cv11=0' }
+local font_features = { 'ss11=1', 'ss13=1', 'cv01=1', 'cv02=1', 'cv04=1', 'cv05=1', 'cv08=1', 'cv09=1' }
 
 local function font(opts)
   opts = opts or {}
