@@ -4,8 +4,7 @@ gui:
   theme:
     selectedLineBgColor:
       - '#222222'
-
 git:
-  pagers:
+  diffRenderers:
     # https://github.com/jesseduffield/lazygit/blob/master/docs/Custom_Pagers.md#delta
-    - pager: delta --dark --paging=never
+    - command: delta --dark --paging=never
