@@ -72,6 +72,25 @@ vim.opt.number = true
 -- Enable relative line numbers
 -- vim.opt.relativenumber = true
 
+vim.pack.add({
+    "https://github.com/lewis6991/gitsigns.nvim"
+})
+
+-- Always leave room for the signs, so the text doesn't
+-- shift sideways when a file gets its first change.
+vim.opt.signcolumn = "yes"
+
+-- Mark the lines changed since the last commit, in the sign column next to the
+-- line numbers: added, changed and deleted lines each get their own sign.
+local gitsigns = require("gitsigns")
+gitsigns.setup()
+
+-- Jump between hunks, and preview or undo the hunk under the cursor.
+-- vim.keymap.set("n", "]h", function() gitsigns.nav_hunk("next") end)
+-- vim.keymap.set("n", "[h", function() gitsigns.nav_hunk("prev") end)
+-- vim.keymap.set("n", "<leader>hp", gitsigns.preview_hunk)
+-- vim.keymap.set("n", "<leader>hr", gitsigns.reset_hunk)
+
 -- Keep a few lines of context above and below the cursor. Without it the cursor
 -- can sit on the very last visible line, with the next line of code only a
 -- scroll away and no hint of what it says.
