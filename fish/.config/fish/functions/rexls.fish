@@ -1,4 +1,4 @@
-function rexls --description "List rex blocks with their process, status and last terminal write"
+function rexls --description "List rex blocks with their process, status and last activity"
     argparse h/help 's/session=' 'w/window=' j/json l/long -- $argv; or return
 
     if set -q _flag_help
@@ -6,9 +6,14 @@ function rexls --description "List rex blocks with their process, status and las
         echo
         echo "SESSION and WINDOW match a label, a full ID or a short ID."
         echo "In the table, * marks the active window or block, @ the current one."
-        echo "ACTIVITY and JSON last_activity use the local terminal's last write time."
-        echo "This is an estimate: control sequences and redraws also count as writes."
-        echo "It does not measure the last agent action; unavailable times are - or null."
+        echo "ACTIVITY uses status_updated_at, falling back to last_tty_write_at when null."
+        echo "In ACTIVITY, ~ marks times estimated from terminal writes."
+        echo "A status report takes priority even when the TTY write is more recent."
+        echo "JSON status_updated_at shows the block's latest status report."
+        echo "An old report does not mean inactivity: a program may work without reporting."
+        echo "JSON last_tty_write_at estimates the local terminal's last write."
+        echo "Control sequences and redraws also count as writes; missing times are - or null."
+        echo "JSON timestamps use local time with whole seconds and an explicit UTC offset."
         return
     end
 
@@ -51,6 +56,16 @@ function rexls --description "List rex blocks with their process, status and las
         return 0
     end
 
+    # Rex reports RFC 3339 timestamps with offsets and fractional seconds.
+    set -l timestamp 'def epoch:
+        capture("^(?<date>[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2})(?<fraction>[.][0-9]+)?(?<zone>Z|[+-][0-9]{2}:[0-9]{2})$")
+        | (.date + "Z" | fromdateiso8601) as $base
+        | (if .zone == "Z" then 0
+           else ((.zone[1:3] | tonumber) * 60 + (.zone[4:6] | tonumber)) * 60
+               * (if .zone[0:1] == "-" then -1 else 1 end) end) as $offset
+        | $base + (("0" + (.fraction // "")) | tonumber) - $offset;
+        def localdate:
+            strflocaltime("%Y-%m-%dT%H:%M:%S%z") | .[0:-2] + ":" + .[-2:];'
     set -l blocks
     for row in $rows
         set -l session_id (printf '%s\n' "$row" | jq -r '.session_id')
@@ -61,7 +76,7 @@ function rexls --description "List rex blocks with their process, status and las
         set -l process (rex block call -s "$session_id" -b "$block_id" process 2>/dev/null)
         set -l program_status (rex block call -s "$session_id" -b "$block_id" program_status 2>/dev/null)
         set -l block (jq -nc --argjson row "$row" --arg host "$host" \
-            --arg title "$title" --arg process "$process" --arg program_status "$program_status" '
+            --arg title "$title" --arg process "$process" --arg program_status "$program_status" "$timestamp"'
             def object: try fromjson catch null | if type == "object" then . else null end;
             def nullable: if . == "" then null else . end;
             def rank: {blocked: 4, error: 3, working: 2, done: 1}[.state] // 0;
@@ -73,6 +88,8 @@ function rexls --description "List rex blocks with their process, status and las
                 process: (try ($p.script // $p.argv0 // $p.name | ltrimstr("-") | split("/") | last | nullable) catch null),
                 status: (try (([$program_status.records[] | select(rank > 0)] | max_by(rank))
                     | .state + (if .state == "blocked" and .kind then ":" + .kind else "" end) | nullable) catch null),
+                status_updated_at: ([$program_status.records[]? | .updated_at? | strings
+                    | try epoch catch empty] | max),
                 pid: (if $row.host_id == $host then (try ($p.pid | numbers) catch null) // null else null end)
             } | del(.host_id)'); or return
         set -a blocks "$block"
@@ -95,10 +112,11 @@ function rexls --description "List rex blocks with their process, status and las
         end
     end
 
-    # Preserve the public JSON fields while discarding the internal PID.
-    set -l output (printf '%s\n' $blocks | jq -sc --argjson tty_times "$tty_times" '
-        map(.last_activity = ($tty_times[.pid | tostring] // null
-            | if . == null then null else todate end) | del(.pid))'); or return
+    # Format both timestamps in this machine's local timezone, then drop the PID.
+    set -l output (printf '%s\n' $blocks | jq -sc --argjson tty_times "$tty_times" "$timestamp"'
+        map(.status_updated_at |= (if . == null then null else localdate end)
+            | .last_tty_write_at = ($tty_times[.pid | tostring] // null
+                | if . == null then null else localdate end) | del(.pid))'); or return
     if set -q _flag_json
         printf '%s\n' "$output" | jq .
         return
@@ -111,13 +129,13 @@ function rexls --description "List rex blocks with their process, status and las
     for row in (printf '%s\n' "$output" | jq -c '.[]')
         set -l title (printf '%s\n' "$row" | jq -r '.title // "-"')
         set title (string shorten -m 30 -- "$title")
-        set -l line (printf '%s\n' "$row" | jq -r --arg title "$title" --argjson long $long --argjson now "$now" '
+        set -l line (printf '%s\n' "$row" | jq -r --arg title "$title" --argjson long $long --argjson now "$now" "$timestamp"'
             def flags($active; $current): (if $active then "*" else " " end)
                 + (if $current then "@" else " " end) + " ";
             def id: if $long then . else .[-6:] end;
             def age:
                 if . == null then "-"
-                else ([$now - fromdate, 0] | max | floor) as $seconds
+                else ([$now - epoch, 0] | max | floor) as $seconds
                     | if $seconds < 60 then "\($seconds)s"
                       elif $seconds < 3600 then "\($seconds / 60 | floor)m"
                       elif $seconds < 86400 then "\($seconds / 3600 | floor)h"
@@ -126,7 +144,10 @@ function rexls --description "List rex blocks with their process, status and las
             [(.session_label // "-" | tostring),
                 (flags(.window_active; .window_current) + (.window_id | id)),
                 (flags(.block_active; .block_current) + (.block_id | id)),
-                (.process // "-"), $title, (.status // "-"), (.last_activity | age)]
+                (.process // "-"), $title, (.status // "-"),
+                (if .status_updated_at then .status_updated_at | age
+                 elif .last_tty_write_at then "~" + (.last_tty_write_at | age)
+                 else "-" end)]
             | map(gsub("[[:space:]]"; " ")) | join("\t")'); or return
         set -a table "$line"
     end
