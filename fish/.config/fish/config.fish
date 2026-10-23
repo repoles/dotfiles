@@ -4,12 +4,12 @@ if status is-interactive
     set -g fish_greeting
 
     # https://fishshell.com/docs/current/interactive.html#syntax-highlighting-variables
-    set -g fish_color_command green
-    set -g fish_color_error red
-    set -g fish_color_param normal
-    set -g fish_color_cwd blue
-    set -g fish_color_comment brblack --italics
-    set -g fish_pager_color_progress black --background=cyan
+    # set -g fish_color_command green
+    # set -g fish_color_error red
+    # set -g fish_color_param normal
+    # set -g fish_color_cwd blue
+    # set -g fish_color_comment brblack --italics
+    # set -g fish_pager_color_progress black --background=cyan
 
     # --- Custom prompt settings ---
     set -g fish_transient_prompt 1
