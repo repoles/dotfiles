@@ -8,66 +8,6 @@
     "defaultMode": "default"
   },
   "hooks": {
-    "Notification": [
-      {
-        "matcher": "permission_prompt|worker_permission_prompt|idle_prompt|agent_needs_input|agent_completed",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/scripts/claude-tmux-notify.sh"
-          }
-        ]
-      }
-    ],
-    "PermissionRequest": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/scripts/agent-tmux-hook.sh waiting"
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/scripts/agent-tmux-hook.sh busy"
-          }
-        ]
-      }
-    ],
-    "PostToolUseFailure": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/scripts/agent-tmux-hook.sh error"
-          }
-        ]
-      }
-    ],
-    "SessionEnd": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/scripts/agent-tmux-hook.sh idle"
-          }
-        ]
-      },
-      {
-        "matcher": "clear|resume|logout|prompt_input_exit|bypass_permissions_disabled",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/scripts/agent-tmux-session.sh claude end"
-          }
-        ]
-      }
-    ],
     "SessionStart": [
       {
         "hooks": [
@@ -75,48 +15,6 @@
             "type": "command",
             "command": "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/memory-link.sh >/dev/null",
             "timeout": 15
-          },
-          {
-            "type": "command",
-            "command": "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/scripts/agent-tmux-hook.sh idle"
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/scripts/agent-tmux-hook.sh idle"
-          },
-          {
-            "type": "command",
-            "command": "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/scripts/agent-tmux-session.sh claude stop"
-          }
-        ]
-      }
-    ],
-    "StopFailure": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/scripts/agent-tmux-hook.sh error"
-          }
-        ]
-      }
-    ],
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/scripts/agent-tmux-hook.sh busy"
-          },
-          {
-            "type": "command",
-            "command": "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/scripts/agent-tmux-session.sh claude start"
           }
         ]
       }
