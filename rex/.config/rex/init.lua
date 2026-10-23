@@ -30,5 +30,19 @@ rex.action{
   run   = function(ctx, args) open_in_window(ctx, "codex") end,
 }
 
+-- Rex's clear leaves a screen of blank lines behind, and a
+-- second clear removes them, but only after a short pause
+rex.action{
+  name  = "clear",
+  title = "Clear Screen and Scrollback",
+  run   = function(ctx, args)
+    local terminal = "com.superlogical.terminal"
+    rex.block.call(terminal, "clear", {})
+    rex.exec({ "sleep", "0.2" })
+    rex.block.call(terminal, "clear", {})
+  end,
+}
+
 rex.bind("cmd+f1", "claude")
 rex.bind("cmd+f2", "codex")
+rex.bind("cmd+l", "clear")
