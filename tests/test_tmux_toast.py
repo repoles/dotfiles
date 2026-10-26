@@ -23,7 +23,7 @@ class TmuxToastTest(unittest.TestCase):
     def setUpClass(cls):
         cls.tmux = shutil.which('tmux')
         if not cls.tmux:
-            raise unittest.SkipTest('tmux 3.7+ is required')
+            raise unittest.SkipTest('tmux 3.8+ is required')
         cls.directory = tempfile.TemporaryDirectory(prefix='tmux-toast-test-')
         cls.addClassCleanup(cls.directory.cleanup)
         cls.socket = str(Path(cls.directory.name) / 'socket')
@@ -359,14 +359,17 @@ class TmuxToastTest(unittest.TestCase):
         subprocess.run(['sh', str(self.script), '-d', '30', 'first'],
                        env=self.env, capture_output=True, check=True)
         toast, = self.toast_panes()
-        # A user option answers for every pane once it is set anywhere above it.
-        self.command('set', '-g', '@toast', '1')
         worked_in = self.command('split-window', '-d', '-P', '-F', '#{pane_id}',
                                  'sleep', '120').stdout.strip()
+        # Sized border included, as tmux 3.8 measures it: a 10x2 pane.
         floating = self.command('new-pane', '-d', '-P', '-F', '#{pane_id}',
-                                '-x', '10', '-y', '2', '-X', '1', '-Y', '1',
+                                '-x', '12', '-y', '4', '-X', '0', '-Y', '0',
                                 'sleep', '120').stdout.strip()
         try:
+            # A user option answers for every pane once it is set anywhere
+            # above it. Set inside the try, so the cleanup always clears it:
+            # left behind, it marks every pane of the later tests a toast.
+            self.command('set', '-g', '@toast', '1')
             # Tall enough that the stack has to be dropped, so the sweep runs
             # at all: a toast that finds room above the last one kills nothing.
             subprocess.run(['sh', str(self.script), '-d', '30',
@@ -391,8 +394,9 @@ class TmuxToastTest(unittest.TestCase):
         before = set(temporary.glob('toast.*'))
         self.assert_toast(34, ['hello'], [' hello'])
         pane, = self.toast_panes()
+        # tmux 3.8 leaves the pid of a pane with no process empty, not 0.
         self.assertEqual(self.command('display-message', '-p', '-t', pane,
-                                      '#{pane_pid}').stdout.strip(), '0')
+                                      '#{pane_pid}').stdout.strip(), '')
         self.assertEqual(set(temporary.glob('toast.*')), before)
 
     def test_scheduling_failure_removes_created_pane(self):
