@@ -7,7 +7,7 @@
 # -o names the window the toast is about, which asks for it to be raised only
 # while the user is somewhere else; exit status 3 says it was held back.
 #
-# Needs tmux 3.7+ (the new-pane command). The pane is created detached so it
+# Needs tmux 3.8+ (the new-pane command, sized border included). The pane is created detached so it
 # never steals focus. It is anchored to the bottom right corner, and one raised
 # while another is up stacks above it; floating panes do not re-anchor on
 # resize, but a toast is short lived enough not to care.
@@ -239,14 +239,15 @@ if [ "$height" -gt "$((anchor - 5))" ]; then
   anchor=$((window_height + 1))
 fi
 
-# -x/-y size the content, so the border adds one cell on each side. The offsets
+# -x/-y/-X/-Y measure the box border included (since tmux 3.8), so the content
+# is two cells wider and taller than asked and starts one cell in. The offsets
 # leave a 2 column / 1 line margin, which reads as even given cell proportions.
 # -I fills the pane from stdin and runs no command in it, so the toast carries
 # no process and no file of its own: nothing is left to clean up after it.
 pane_id=$(printf '%s' "$text" | tmux new-pane -t "$window_id" -d -I -P -F '#{pane_id}' \
-  -x "$width" -y "$height" \
-  -X "$((window_width - width - 3))" \
-  -Y "$((anchor - height - 3))" \
+  -x "$((width + 2))" -y "$((height + 2))" \
+  -X "$((window_width - width - 4))" \
+  -Y "$((anchor - height - 4))" \
   -s "$style" -R "$style") || exit 1
 tmux set -p -t "$pane_id" @toast 1
 
