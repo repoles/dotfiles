@@ -2,9 +2,10 @@
 # agent-tmux-hook.sh - dispatch an agent event to the tmux integrations.
 # Usage: agent-tmux-hook.sh <event>
 #            Claude                          Codex
-#   busy     UserPromptSubmit, PostToolUse   UserPromptSubmit, PostToolUse, SessionStart
+#   busy     UserPromptSubmit, PostToolUse,  UserPromptSubmit, PostToolUse, SessionStart
+#            PostToolUseFailure
 #   waiting  PermissionRequest               PermissionRequest
-#   error    PostToolUseFailure, StopFailure -
+#   error    StopFailure                     -
 #   idle     Stop, SessionStart, SessionEnd  Stop, SessionEnd
 
 [ -n "$TMUX_PANE" ] || exit 0
