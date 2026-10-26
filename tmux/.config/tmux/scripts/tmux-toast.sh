@@ -1,11 +1,15 @@
 #!/bin/sh
 # tmux-toast.sh - show a transient notification in a tmux floating pane.
 # Usage: tmux-toast.sh [-l error|warn|ok|info] [-d seconds] [-w width]
-#                     [-s style] [-o window] line [line...]
+#                     [-s style] [-o window] [-t title] line [line...]
 # An explicit -s overrides -l regardless of option order. Without -w the text
 # is folded at a default measure and the box is then shrunk to what it holds.
 # -o names the window the toast is about, which asks for it to be raised only
 # while the user is somewhere else; exit status 3 says it was held back.
+# -t sets a title on the top border, which says where the toast comes from
+# without spending a row of the box on it. Without -w the box widens to hold
+# it, up to the default measure; a title that still does not fit is cut short
+# with an ellipsis.
 #
 # Needs tmux 3.8+ (the new-pane command, sized border included, and its -A).
 # The pane is created detached so it never steals focus. It is anchored to the
@@ -15,7 +19,7 @@
 
 die() { printf 'tmux-toast: %s\n' "$1" >&2; exit 2; }
 
-duration=4; width=; auto=1; level=info; style=; origin=
+duration=4; width=; auto=1; level=info; style=; origin=; title=
 # The widths a toast takes when none is asked for: the text is folded at the
 # first and the box is then shrunk to fit it, but never below the second. 42
 # columns is 40 of text once the padding on either side is taken out, which
@@ -24,10 +28,10 @@ duration=4; width=; auto=1; level=info; style=; origin=
 # as a sliver rather than as a card, and short ones coming out at a common
 # width also keep a stack of them from looking ragged.
 default_width=42; minimum_width=20
-while getopts d:w:s:l:o: option; do
+while getopts d:w:s:l:o:t: option; do
   case $option in
     d) duration=$OPTARG ;; s) style=$OPTARG ;; l) level=$OPTARG ;;
-    o) origin=$OPTARG ;;
+    o) origin=$OPTARG ;; t) title=$OPTARG ;;
     w) width=$OPTARG; auto= ;;
     ?) exit 2 ;;
   esac
@@ -166,30 +170,66 @@ newline='
 height=${rendered##*"$newline"}
 text=${rendered%"$newline"*}
 
-# Shrink the box onto the text unless a width was asked for. tmux is the
-# authority on how wide it draws a line, and #{w:} answers for a user option
-# without expanding its value, so a message carrying a #{...} of its own is
-# measured rather than evaluated. Each line is set and read back in one
-# command, and the option is named after the pid so two toasts raised at once
-# cannot read each other's lines. The column added to the widest of them is
-# the one the text stops before on the right; the left one is the padding the
-# text already carries.
+# The title is a single line on the border, so the breaks and tabs a message
+# may carry become spaces there, and the other control characters go the way
+# they go from the text.
+title=$(printf '%s' "$title" | LC_ALL=C tr '\t\n' '  ' |
+  LC_ALL=C tr -d '\001-\037\177')
+
+# tmux is the authority on how wide it draws a line, and #{w:} answers for a
+# user option without expanding its value, so a message carrying a #{...} of
+# its own is measured rather than evaluated. Each line is set and read back in
+# one command, and the option is named after the pid so two toasts raised at
+# once cannot read each other's lines.
+probe="@toast-measure-$$"
+measure() {
+  columns=$(tmux set -w -t "$window_id" "$probe" "$1" \
+    \; display-message -p -t "$window_id" "#{w:$probe}") || exit 1
+  case $columns in ''|*[!0-9]*) die "cannot measure the text" ;; esac
+}
+
+# Shrink the box onto the text unless a width was asked for. The column added
+# to the widest line is the one the text stops before on the right; the left
+# one is the padding the text already carries.
 if [ -n "$auto" ]; then
-  probe="@toast-measure-$$"
   natural=0
   while IFS= read -r line; do
-    columns=$(tmux set -w -t "$window_id" "$probe" "$line" \
-      \; display-message -p -t "$window_id" "#{w:$probe}") || exit 1
-    case $columns in ''|*[!0-9]*) die "cannot measure the text" ;; esac
+    measure "$line"
     [ "$columns" -le "$natural" ] || natural=$columns
   done <<MEASURE
 $text
 MEASURE
-  tmux set -wu -t "$window_id" "$probe" 2>/dev/null
   width=$((natural + 1))
+fi
+
+# The title is measured whatever the width, because one that does not fit has
+# to be cut short. On the border it starts after the corner and a stretch of
+# line two cells long and stops before the far corner, and a space stands on
+# either side of it, so it holds four columns fewer than the text. It widens
+# the box no further than the measure the text is folded at: a card sprawling
+# across the window to hold a long title is worse than the title cut short.
+title_width=0
+if [ -n "$title" ]; then
+  measure "$title"
+  title_width=$columns
+  if [ -n "$auto" ] && [ "$width" -lt "$((title_width + 4))" ]; then
+    width=$((title_width + 4))
+    [ "$width" -le "$default_width" ] || width=$default_width
+  fi
+fi
+tmux set -wu -t "$window_id" "$probe" 2>/dev/null
+
+if [ -n "$auto" ]; then
   [ "$width" -ge "$minimum_width" ] || width=$minimum_width
   [ "$width" -le "$max_width" ] || width=$max_width
 fi
+
+# #{=} puts its ellipsis after the columns it keeps, so a title cut short
+# keeps one fewer than it has room for. One that fits is left alone: cut at
+# the same count, it would lose its last column to the ellipsis for nothing.
+label='#{pane_title}'
+[ "$title_width" -le "$((width - 4))" ] ||
+  label="#{=/$((width - 5))/…:pane_title}"
 
 # The kill scheduled below runs in a shell, which needs tmux by path.
 tmux_bin=$(command -v tmux) || die "cannot find tmux"
@@ -249,12 +289,24 @@ fi
 # to raise the toast, undoing the user's layout for a passing message, and a
 # toast already up when the user zooms is hidden and stops reading as
 # floating, so the sweep above would miss it and land the next one on it.
+# -T expands its value as a format, which would run a #(...) in the title as a
+# shell command; doubling every # leaves the title to read as it was given.
 pane_id=$(printf '%s' "$text" | tmux new-pane -t "$window_id" -d -A -I -P -F '#{pane_id}' \
   -x "$((width + 2))" -y "$((height + 2))" \
   -X "$((window_width - width - 4))" \
   -Y "$((anchor - height - 4))" \
+  -T "$(printf '%s' "$title" | sed 's/#/##/g')" \
   -s "$style" -R "$style") || exit 1
-tmux set -p -t "$pane_id" @toast 1
+# The border status is set on the pane alone, so the user's own panes keep
+# whatever borders they had. It is drawn on the border row itself, so the box
+# keeps the height the text was folded to.
+if [ -n "$title" ]; then
+  tmux set -p -t "$pane_id" @toast 1 \
+    \; set -p -t "$pane_id" pane-border-status top \
+    \; set -p -t "$pane_id" pane-border-format " $label "
+else
+  tmux set -p -t "$pane_id" @toast 1
+fi
 
 # Removed from outside on purpose: a pane whose own command exits fires the
 # pane-exited hook, so a toast wired to that hook would retrigger itself.

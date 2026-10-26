@@ -7,7 +7,7 @@ if status is-interactive; and set -q TMUX
 
         # Named against the pane the command ran in rather than at display
         # time: the toast is raised in the window the user is watching, and
-        # the whole point of this line is to name the one they left behind.
+        # the whole point of its title is to name the one they left behind.
         set -l origin (tmux display-message -p -t $TMUX_PANE '[#S] #I:#W')
 
         set -l level ok
@@ -27,7 +27,7 @@ if status is-interactive; and set -q TMUX
         # they are on, which is the same thing the toast has to know to raise
         # itself where they will read it.
         "$XDG_CONFIG_HOME/tmux/scripts/tmux-toast.sh" -o $TMUX_PANE -l $level -d 8 \
-            "$symbol $short_cmd" "$origin ($duration)"
+            -t "$origin ($duration)" "$symbol $short_cmd"
 
         # Rung for the same failures the toast reports and only alongside one:
         # heard from across the room it says to come and look, and there is

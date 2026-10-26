@@ -28,7 +28,7 @@
 
 # Named against the pane the hook fired in rather than at display time: the
 # toast is raised in the window the user is watching, and the whole point of
-# this line is to say which other one is asking.
+# its title is to say which other one is asking.
 origin=$(tmux display-message -p -t "$TMUX_PANE" '[#S] #I:#W') || exit 1
 
 # Held whole so the two fields come from one read of stdin. They are asked for
@@ -69,7 +69,7 @@ esac
 # decide whether the user is somewhere else and so wants telling at all, since
 # answering that means knowing which window they are on, which is the same
 # thing the toast has to know to raise itself where they will read it.
-"$(dirname "$0")/tmux-toast.sh" -o "$TMUX_PANE" -l "$level" -d 8 "$message" "$origin"
+"$(dirname "$0")/tmux-toast.sh" -o "$TMUX_PANE" -l "$level" -d 8 -t "$origin" "$message"
 
 # 3 is the toast held back because the user is already there, which is this
 # hook working as intended; a hook exiting non-zero is reported as having

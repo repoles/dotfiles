@@ -134,8 +134,10 @@ class TmuxToastTest(unittest.TestCase):
             client.wait(5)
             os.close(master)
 
-    def assert_toast(self, width, lines, expected):
+    def assert_toast(self, width, lines, expected, title=None):
         asked = [] if width is None else ['-w', str(width)]
+        if title is not None:
+            asked += ['-t', title]
         subprocess.run(['sh', str(self.script), *asked, '-d', '30',
                         *lines], env=self.env, capture_output=True,
                        text=True, check=True)
@@ -291,6 +293,59 @@ class TmuxToastTest(unittest.TestCase):
     def test_measuring_the_text_leaves_no_option_behind(self):
         self.assert_toast(None, ['hello'], [' hello'])
         self.assertNotIn('toast-measure', self.command('show-options', '-w').stdout)
+
+    def border(self):
+        """The one toast up, as the title its border shows."""
+        pane, = self.toast_panes()
+        self.assertEqual(self.command('show', '-pv', '-t', pane,
+                                      'pane-border-status').stdout.strip(), 'top')
+        return self.command('display-message', '-p', '-t', pane,
+                            '#{E:pane-border-format}').stdout.rstrip('\n')
+
+    def test_a_title_is_shown_as_given(self):
+        # -T reads its value as a format, so these would come back as the pane
+        # id, a single # and whatever the shell command printed - having run it.
+        with tempfile.TemporaryDirectory(prefix='tmux-toast-title-') as directory:
+            ran = Path(directory) / 'ran'
+            title = '#{pane_id} ## #(touch %s)' % ran
+            self.assert_toast(None, ['hi'], [' hi'], title=title)
+            pane, = self.toast_panes()
+            self.assertEqual(self.command('display-message', '-p', '-t', pane,
+                                          '#{pane_title}').stdout.rstrip('\n'),
+                             title)
+            time.sleep(.3)
+            self.assertFalse(ran.exists(), 'the title ran a shell command')
+
+    def test_a_title_widens_the_box(self):
+        self.assert_toast(None, ['hi'], [' hi'], title='x' * 30)
+        self.assertEqual(self.border(), ' ' + 'x' * 30 + ' ')
+        self.assertIn('1 63 34', self.geometry())
+        self.assertNotIn('toast-measure', self.command('show-options', '-w').stdout)
+
+    def test_a_title_widens_the_box_no_further_than_the_default(self):
+        self.assert_toast(None, ['hi'], [' hi'], title='x' * 50)
+        self.assertEqual(self.border(), ' ' + 'x' * 37 + '… ')
+        self.assertIn('1 55 42', self.geometry())
+
+    def test_a_title_is_cut_to_an_asked_width(self):
+        # A 20 column box holds a 16 column title: one that fits is left
+        # whole, and one a column longer gives up two for the ellipsis.
+        for title, shown in (('x' * 16, 'x' * 16), ('x' * 17, 'x' * 15 + '…')):
+            with self.subTest(title=title):
+                self.assert_toast(20, ['hi'], [' hi'], title=title)
+                self.assertEqual(self.border(), ' ' + shown + ' ')
+                self.assertIn('1 77 20', self.geometry())
+                self.tearDown()
+
+    def test_a_title_is_one_line(self):
+        self.assert_toast(None, ['hi'], [' hi'], title='a\tb\nc\x1b[31md\x07')
+        self.assertEqual(self.border(), ' a b c[31md ')
+
+    def test_without_a_title_the_borders_are_left_alone(self):
+        self.assert_toast(None, ['hi'], [' hi'])
+        pane, = self.toast_panes()
+        self.assertEqual(self.command('show', '-pv', '-t', pane,
+                                      'pane-border-status').stdout, '')
 
     def test_valid_durations_expire(self):
         before = self.command('list-panes', '-F', '#{pane_id}').stdout
