@@ -33,7 +33,8 @@ class SelectorTestCase(unittest.TestCase):
                         XDG_STATE_HOME=str(self.path / 'state'), HOME=str(self.path),
                         SELECTOR_CLIENT='/dev/ttys-review', SELECTOR_SESSION='$1',
                         SELECTOR_PATH=str(self.repo / 'sub'))
-        for key in ['TMUX', 'TMUX_PANE', 'FZF_DEFAULT_OPTS', 'FZF_DEFAULT_OPTS_FILE']:
+        for key in ['TMUX', 'TMUX_PANE', 'FZF_DEFAULT_OPTS', 'FZF_DEFAULT_OPTS_FILE',
+                    'XDG_DATA_HOME', 'MISE_DATA_DIR']:
             self.env.pop(key, None)
 
     def executable(self, name, contents):
@@ -345,9 +346,14 @@ class AgentSessionResumeTest(SelectorTestCase):
         ])
 
     def test_agents_start_through_the_default_shell(self):
-        # fish puts mise's shims first; this stand-in marks the PATH the same way.
-        self.executable('marking-shell', '#!/bin/sh\nPATH="/shims:$PATH" exec /bin/sh "$@"\n')
-        self.executable('claude', '#!/bin/sh\necho "fake PATH ${PATH%%:*}"\nexec sleep 300\n')
+        # This stand-in marks the PATH the way the shell's startup would; start-agent.sh then
+        # puts mise's shims ahead of it.
+        self.executable('marking-shell', '#!/bin/sh\nPATH="/marked:$PATH" exec /bin/sh "$@"\n')
+        # Relative to HOME, so the line fits the pane.
+        self.executable('claude', '#!/bin/sh\nfirst=${PATH%%:*} rest=${PATH#*:}\n'
+                                  'echo "fake PATH ~${first#"$HOME"} ${rest%%:*}"\n'
+                                  'exec sleep 300\n')
+        expected = ['fake PATH ~/.local/share/mise/shims /marked']
         self.tmux('set', '-g', 'default-shell', str(self.bin / 'marking-shell'))
         # A respawned pane keeps the shell it was created with, so make the idle one under it.
         self.tmux('new-window', '-t', 'work:4', '-n', 'claude', 'sh')
@@ -357,8 +363,8 @@ class AgentSessionResumeTest(SelectorTestCase):
         result = self.run_selector('--resume', 'idle', 'gone')
 
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(self.agent_output('work:4'), ['fake PATH /shims'])
-        self.assertEqual(self.agent_output('closed:0'), ['fake PATH /shims'])
+        self.assertEqual(self.agent_output('work:4'), expected)
+        self.assertEqual(self.agent_output('closed:0'), expected)
 
     def test_a_pane_in_a_renamed_window_is_not_reused(self):
         self.record('moved', self.repo, NOW, window_index=1, window_name='other')
