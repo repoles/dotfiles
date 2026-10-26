@@ -7,10 +7,11 @@
 # -o names the window the toast is about, which asks for it to be raised only
 # while the user is somewhere else; exit status 3 says it was held back.
 #
-# Needs tmux 3.8+ (the new-pane command, sized border included). The pane is created detached so it
-# never steals focus. It is anchored to the bottom right corner, and one raised
-# while another is up stacks above it; floating panes do not re-anchor on
-# resize, but a toast is short lived enough not to care.
+# Needs tmux 3.8+ (the new-pane command, sized border included, and its -A).
+# The pane is created detached so it never steals focus. It is anchored to the
+# bottom right corner, and one raised while another is up stacks above it;
+# floating panes do not re-anchor on resize, but a toast is short lived enough
+# not to care.
 
 die() { printf 'tmux-toast: %s\n' "$1" >&2; exit 2; }
 
@@ -244,7 +245,11 @@ fi
 # leave a 2 column / 1 line margin, which reads as even given cell proportions.
 # -I fills the pane from stdin and runs no command in it, so the toast carries
 # no process and no file of its own: nothing is left to clean up after it.
-pane_id=$(printf '%s' "$text" | tmux new-pane -t "$window_id" -d -I -P -F '#{pane_id}' \
+# -A keeps the toast above a zoomed pane. Without it tmux unzooms the window
+# to raise the toast, undoing the user's layout for a passing message, and a
+# toast already up when the user zooms is hidden and stops reading as
+# floating, so the sweep above would miss it and land the next one on it.
+pane_id=$(printf '%s' "$text" | tmux new-pane -t "$window_id" -d -A -I -P -F '#{pane_id}' \
   -x "$((width + 2))" -y "$((height + 2))" \
   -X "$((window_width - width - 4))" \
   -Y "$((anchor - height - 4))" \

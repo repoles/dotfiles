@@ -438,6 +438,28 @@ class TmuxToastTest(unittest.TestCase):
         self.assertEqual(self.command('capture-pane', '-p', '-t', first).stdout,
                          ' first\n', 'the first toast lost its text')
 
+    def test_a_zoomed_window_stays_zoomed_and_keeps_its_stack(self):
+        # The first toast is up before the zoom and the second is raised into
+        # it: the zoom has to survive the second, and the first has to still
+        # read as floating for the second to stack above it.
+        self.assert_toast(34, ['first'], [' first'])
+        first, = self.toast_panes()
+        window = self.command('display-message', '-p', '#{window_id}').stdout.strip()
+        split = self.command('split-window', '-d', '-t', window, '-P', '-F',
+                             '#{pane_id}', 'sleep', '120').stdout.strip()
+        try:
+            self.command('resize-pane', '-Z', '-t', split)
+            subprocess.run(['sh', str(self.script), '-d', '30', 'second\nline'],
+                           env=self.env, capture_output=True, check=True)
+            self.assertEqual(self.command('display-message', '-p', '-t', window,
+                                          '#{window_zoomed_flag}').stdout.strip(),
+                             '1', 'the toast unzoomed the window')
+            second, = [pane for pane in self.toast_panes() if pane != first]
+            self.assertEqual(self.top(first), '37')
+            self.assertEqual(self.top(second), '32')
+        finally:
+            self.command('kill-pane', '-t', split)
+
     def test_concurrent_toasts_have_separate_positions(self):
         with tempfile.TemporaryDirectory(prefix='tmux-toast-concurrent-') as directory:
             wrapper = Path(directory) / 'tmux'
