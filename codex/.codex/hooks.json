@@ -1,12 +1,76 @@
 {
   "hooks": {
+    "PermissionRequest": [
+      {
+        "hooks": [
+          {
+            "command": "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/scripts/agent-tmux-hook.sh waiting",
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "command": "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/scripts/agent-tmux-hook.sh busy",
+            "type": "command"
+          }
+        ]
+      }
+    ],
     "SessionStart": [
       {
         "hooks": [
           {
-            "type": "command",
-            "command": "/bin/sh -c 'rex __internal session-start --agent codex --feature-session-naming=false 2>/dev/null || true'",
-            "timeout": 5
+            "command": "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/scripts/agent-tmux-hook.sh busy",
+            "type": "command"
+          }
+        ],
+        "matcher": "startup|resume"
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "command": "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/scripts/agent-tmux-hook.sh idle",
+            "timeout": 3,
+            "type": "command"
+          },
+          {
+            "command": "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/scripts/agent-tmux-session.sh codex end",
+            "timeout": 3,
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "command": "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/scripts/agent-tmux-hook.sh idle",
+            "type": "command"
+          },
+          {
+            "command": "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/scripts/agent-tmux-session.sh codex stop",
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "command": "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/scripts/agent-tmux-hook.sh busy",
+            "type": "command"
+          },
+          {
+            "command": "${XDG_CONFIG_HOME:-$HOME/.config}/tmux/scripts/agent-tmux-session.sh codex start",
+            "type": "command"
           }
         ]
       }
