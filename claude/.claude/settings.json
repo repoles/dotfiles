@@ -142,5 +142,6 @@
   "tui": "fullscreen",
   "remoteControlAtStartup": true,
   "inputNeededNotifEnabled": true,
-  "agentPushNotifEnabled": true
+  "agentPushNotifEnabled": true,
+  "idleCompaction": false
 }
