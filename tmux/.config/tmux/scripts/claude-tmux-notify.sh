@@ -69,7 +69,7 @@ esac
 # decide whether the user is somewhere else and so wants telling at all, since
 # answering that means knowing which window they are on, which is the same
 # thing the toast has to know to raise itself where they will read it.
-"$(dirname "$0")/tmux-toast.sh" -o "$TMUX_PANE" -l "$level" -d 8 -t "$origin" "$message"
+"$(dirname "$0")/tmux-toast.sh" -o "$TMUX_PANE" -l "$level" -d 15 -t "$origin" "$message"
 
 # 3 is the toast held back because the user is already there, which is this
 # hook working as intended; a hook exiting non-zero is reported as having

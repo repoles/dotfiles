@@ -26,7 +26,7 @@ if status is-interactive; and set -q TMUX
         # wants telling at all, since answering that means knowing which window
         # they are on, which is the same thing the toast has to know to raise
         # itself where they will read it.
-        "$XDG_CONFIG_HOME/tmux/scripts/tmux-toast.sh" -o $TMUX_PANE -l $level -d 8 \
+        "$XDG_CONFIG_HOME/tmux/scripts/tmux-toast.sh" -o $TMUX_PANE -l $level -d 15 \
             -t "$origin ($duration)" "$symbol $short_cmd"
 
         # Rung for the same failures the toast reports and only alongside one:
