@@ -124,7 +124,8 @@
     ]
   },
   "enabledPlugins": {
-    "basecamp-cli@37signals": true
+    "basecamp-cli@37signals": true,
+    "cowork-plugin-management@synced": false
   },
   "extraKnownMarketplaces": {
     "37signals": {
@@ -144,5 +145,12 @@
   "remoteControlAtStartup": true,
   "inputNeededNotifEnabled": true,
   "agentPushNotifEnabled": true,
-  "idleCompaction": false
+  "idleCompaction": false,
+  "skillOverrides": {
+    "anthropic-skills:docx": "off",
+    "anthropic-skills:google-workspace": "off",
+    "anthropic-skills:pptx": "off",
+    "anthropic-skills:import-memory": "off",
+    "anthropic-skills:morning": "off"
+  }
 }
