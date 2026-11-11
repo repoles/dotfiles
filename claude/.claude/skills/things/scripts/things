@@ -1,0 +1,699 @@
+#!/usr/bin/env python3
+"""things — read and write Things 3 from the command line.
+
+    things today                         # the Today list, This Evening included
+    things upcoming --days 14
+    things project "Atualização RDS"     # by name (accent/case-insensitive) or uuid
+    things search "stopwords" --json
+    things add "Ligar para a Cemig" --when today --list Personal
+    things complete <uuid> [<uuid> ...]
+
+Reads go straight to Things' SQLite database, opened read-only. Writes never touch the
+database: they go through the official URL scheme (things:///json), and the script then
+polls the database until the change shows up, so a write that Things silently dropped
+is reported as a failure instead of passing for success.
+
+Every read command takes --json. Run `things <command> --help` for the options.
+"""
+
+import argparse
+import datetime as dt
+import glob
+import json
+import os
+import sqlite3
+import subprocess
+import sys
+import time
+import unicodedata
+import urllib.parse
+
+CONTAINER = "~/Library/Group Containers/JLMPQHK86H.com.culturedcode.ThingsMac"
+
+TYPES = {0: "to-do", 1: "project", 2: "heading"}
+STATUSES = {0: "open", 2: "canceled", 3: "completed"}
+BOXES = {"open": "[ ]", "completed": "[x]", "canceled": "[-]"}
+
+
+def die(message, code=1):
+    print(f"things: {message}", file=sys.stderr)
+    sys.exit(code)
+
+
+# ---------- Database ----------
+
+def db_path():
+    if os.environ.get("THINGS_DB"):
+        return os.environ["THINGS_DB"]
+    pattern = os.path.join(os.path.expanduser(CONTAINER), "ThingsData-*",
+                           "Things Database.thingsdatabase", "main.sqlite")
+    hits = glob.glob(pattern)
+    if not hits:
+        die(f"no Things database matches {pattern} — is Things 3 installed? "
+            "Point $THINGS_DB at main.sqlite to override")
+    return max(hits, key=os.path.getmtime)
+
+
+def connect():
+    path = db_path()
+    # mode=ro, not immutable=1: Things keeps recent writes in the WAL, and immutable
+    # would read around them.
+    uri = "file:" + urllib.parse.quote(path) + "?mode=ro"
+    try:
+        con = sqlite3.connect(uri, uri=True)
+        con.execute("SELECT 1 FROM TMTask LIMIT 1")
+    except sqlite3.Error as e:
+        die(f"cannot open the Things database read-only ({e}); the terminal may need "
+            "permission to read other apps' data (System Settings → Privacy & Security)")
+    con.row_factory = sqlite3.Row
+    return con
+
+
+# Things stores calendar dates as one integer: year << 16 | month << 12 | day << 7.
+def pack(d):
+    return d.year << 16 | d.month << 12 | d.day << 7
+
+
+def unpack(v):
+    return dt.date(v >> 16, (v >> 12) & 15, (v >> 7) & 31) if v else None
+
+
+# Reminder times are hour << 26 | minute << 20.
+def clock(v):
+    return f"{v >> 26:02d}:{(v >> 20) & 63:02d}" if v else None
+
+
+def stamp(v):
+    return dt.datetime.fromtimestamp(v).strftime("%Y-%m-%d %H:%M") if v else None
+
+
+def iso(d):
+    return d.isoformat() if d else None
+
+
+def fold(s):
+    s = unicodedata.normalize("NFKD", s or "")
+    return "".join(c for c in s if not unicodedata.combining(c)).casefold().strip()
+
+
+# Every list view starts here: to-dos and projects with their area/project/heading
+# resolved, minus trashed items, items under a trashed parent, and repeating templates
+# (the hidden rules that spawn instances, not tasks anyone works on).
+BASE = """
+SELECT t.uuid, t.type, t.status, t.title, t.notes, t.start, t.startDate, t.startBucket,
+       t.deadline, t.reminderTime, t.creationDate, t.userModificationDate, t.stopDate,
+       t.checklistItemsCount, t.openChecklistItemsCount, t.openUntrashedLeafActionsCount,
+       t.rt1_repeatingTemplate IS NOT NULL AS repeating,
+       p.uuid AS project_uuid, p.title AS project, p."index" AS project_idx,
+       h.uuid AS heading_uuid, h.title AS heading, h."index" AS heading_idx,
+       a.uuid AS area_uuid, a.title AS area, a."index" AS area_idx
+FROM TMTask t
+LEFT JOIN TMTask h ON h.uuid = t.heading
+LEFT JOIN TMTask p ON p.uuid = COALESCE(t.project, h.project)
+LEFT JOIN TMArea a ON a.uuid = COALESCE(t.area, p.area)
+WHERE t.type IN (0, 1) AND t.trashed = 0 AND t.rt1_recurrenceRule IS NULL
+  AND (p.uuid IS NULL OR p.trashed = 0) AND (h.uuid IS NULL OR h.trashed = 0)
+"""
+
+OPEN = " AND t.status = 0 AND (p.uuid IS NULL OR p.status = 0)"
+
+
+def fetch(con, where="", params=(), order=""):
+    rows = con.execute(BASE + where + (" ORDER BY " + order if order else ""), params).fetchall()
+    return records(con, rows)
+
+
+def records(con, rows):
+    tags = {}
+    ids = [r["uuid"] for r in rows]
+    for i in range(0, len(ids), 500):
+        chunk = ids[i:i + 500]
+        for t in con.execute(
+                f"""SELECT tt.tasks, tg.title FROM TMTaskTag tt JOIN TMTag tg ON tg.uuid = tt.tags
+                    WHERE tt.tasks IN ({",".join("?" * len(chunk))}) ORDER BY tg."index" """, chunk):
+            tags.setdefault(t[0], []).append(t[1])
+
+    today = pack(dt.date.today())
+    out = []
+    for r in rows:
+        start_date = r["startDate"]
+        if r["status"] != 0:
+            where = "logbook"
+        elif r["start"] == 0:
+            where = "inbox"
+        elif r["start"] == 1:
+            where = "today" if start_date and start_date <= today else "anytime"
+        elif start_date:
+            where = "today" if start_date <= today else "upcoming"
+        else:
+            where = "someday"
+        rec = {
+            "uuid": r["uuid"],
+            "type": TYPES[r["type"]],
+            "title": r["title"],
+            "status": STATUSES.get(r["status"], str(r["status"])),
+            "list": where,
+            "evening": r["startBucket"] == 1,
+            "start_date": iso(unpack(start_date)),
+            "deadline": iso(unpack(r["deadline"])),
+            "reminder": clock(r["reminderTime"]),
+            "area": r["area"],
+            "project": r["project"],
+            "heading": r["heading"],
+            "tags": tags.get(r["uuid"], []),
+            "checklist": {"total": r["checklistItemsCount"],
+                          "done": r["checklistItemsCount"] - r["openChecklistItemsCount"]},
+            "repeating": bool(r["repeating"]),
+            "notes": r["notes"] or "",
+            "created": stamp(r["creationDate"]),
+            "modified": stamp(r["userModificationDate"]),
+            "finished": stamp(r["stopDate"]),
+            "area_uuid": r["area_uuid"],
+            "project_uuid": r["project_uuid"],
+            "heading_uuid": r["heading_uuid"],
+        }
+        if r["type"] == 1:
+            rec["open_tasks"] = r["openUntrashedLeafActionsCount"]
+        # Sort keys for grouping; dropped before JSON output.
+        rec["_sort"] = (r["area_idx"] is not None, r["area_idx"] or 0,
+                        r["project_idx"] is not None, r["project_idx"] or 0,
+                        r["heading_idx"] is not None, r["heading_idx"] or 0)
+        out.append(rec)
+    return out
+
+
+# ---------- Name resolution ----------
+
+def resolve(con, kind, needle):
+    """Project, area or tag by uuid, exact name, or unique substring — case and accents ignored."""
+    if kind == "project":
+        rows = con.execute("SELECT uuid, title, status FROM TMTask WHERE type = 1 AND trashed = 0 "
+                           "AND rt1_recurrenceRule IS NULL ORDER BY status").fetchall()
+    elif kind == "area":
+        rows = con.execute('SELECT uuid, title, 0 AS status FROM TMArea ORDER BY "index"').fetchall()
+    elif kind == "list":  # where a new to-do can go: an open project or an area
+        return resolve_list(con, needle)
+    else:
+        rows = con.execute('SELECT uuid, title, 0 AS status FROM TMTag ORDER BY "index"').fetchall()
+
+    for r in rows:
+        if r["uuid"] == needle:
+            return r
+    f = fold(needle)
+    for test in (lambda t: fold(t) == f, lambda t: f in fold(t)):
+        hits = [r for r in rows if test(r["title"])]
+        open_hits = [r for r in hits if r["status"] == 0]
+        if len(open_hits) == 1:
+            return open_hits[0]
+        if len(hits) == 1:
+            return hits[0]
+        if hits:
+            names = "\n  ".join(f'{r["title"]}  ‹{r["uuid"]}›' for r in (open_hits or hits)[:20])
+            die(f"{kind} '{needle}' is ambiguous — pass one of these uuids:\n  {names}")
+    die(f"no {kind} matches '{needle}'")
+
+
+def resolve_list(con, needle):
+    projects = con.execute("SELECT uuid, title, 'project' AS kind FROM TMTask "
+                           "WHERE type = 1 AND trashed = 0 AND status = 0 AND rt1_recurrenceRule IS NULL").fetchall()
+    areas = con.execute("SELECT uuid, title, 'area' AS kind FROM TMArea").fetchall()
+    rows = projects + areas
+    for r in rows:
+        if r["uuid"] == needle:
+            return r
+    f = fold(needle)
+    for test in (lambda t: fold(t) == f, lambda t: f in fold(t)):
+        hits = [r for r in rows if test(r["title"])]
+        if len(hits) == 1:
+            return hits[0]
+        if hits:
+            names = "\n  ".join(f'{r["kind"]}: {r["title"]}  ‹{r["uuid"]}›' for r in hits[:20])
+            die(f"'{needle}' matches several projects/areas — pass one of these uuids:\n  {names}")
+    die(f"no open project or area matches '{needle}'")
+
+
+# ---------- Output ----------
+
+def describe(rec, date_key=None):
+    bits = []
+    today = dt.date.today().isoformat()
+    if rec["type"] == "project":
+        bits.append(f'{rec.get("open_tasks", 0)} open')
+    if rec["evening"] and rec["list"] == "today":
+        bits.append("evening")
+    if rec["start_date"] and rec["list"] in ("today", "upcoming") and date_key != "start_date":
+        bits.append(f'start {rec["start_date"]}')
+    if rec["deadline"] and date_key != "deadline":
+        flag = " OVERDUE" if rec["deadline"] < today and rec["status"] == "open" else \
+               " TODAY" if rec["deadline"] == today and rec["status"] == "open" else ""
+        bits.append(f'deadline {rec["deadline"]}{flag}')
+    if rec["reminder"]:
+        bits.append(f'reminder {rec["reminder"]}')
+    if rec["tags"]:
+        bits.append(" ".join("#" + t for t in rec["tags"]))
+    if rec["checklist"]["total"]:
+        bits.append(f'checklist {rec["checklist"]["done"]}/{rec["checklist"]["total"]}')
+    if rec["repeating"]:
+        bits.append("repeats")
+    if rec["notes"]:
+        bits.append("notes")
+    if rec["finished"] and date_key != "finished":
+        bits.append(f'{rec["status"]} {rec["finished"]}')
+    box = BOXES.get(rec["status"], "[?]")
+    kind = "project: " if rec["type"] == "project" else ""
+    tail = "  · " + " · ".join(bits) if bits else ""
+    return f'{box} {kind}{rec["title"]}{tail}  ‹{rec["uuid"]}›'
+
+
+def context_label(rec):
+    parts = [rec["area"] or "(no area)"]
+    if rec["project"]:
+        parts.append(rec["project"])
+    if rec["heading"]:
+        parts.append(rec["heading"])
+    return " › ".join(parts)
+
+
+def emit(recs, args, group="context", date_key=None, header=None):
+    if args.json:
+        print(json.dumps([{k: v for k, v in r.items() if not k.startswith("_")} for r in recs],
+                         ensure_ascii=False, indent=2))
+        return
+    if header:
+        print(header)
+    if not recs:
+        print("(nothing)")
+        return
+    if group == "date":
+        groups = {}
+        for r in recs:
+            key = (r.get(date_key) or "")[:10] or "(no date)"
+            groups.setdefault(key, []).append(r)
+        for key, items in groups.items():
+            print(f"\n{key}")
+            for r in items:
+                print(f"  {describe(r, date_key)}  — {context_label(r)}")
+    else:
+        groups = {}
+        for r in sorted(recs, key=lambda r: r["_sort"]):  # stable: keeps the query's order inside a group
+            groups.setdefault(context_label(r), []).append(r)
+        for key, items in groups.items():
+            print(f"\n{key}")
+            for r in items:
+                print(f"  {describe(r)}")
+    print(f"\n{len(recs)} item(s)")
+
+
+# ---------- Read commands ----------
+
+def cmd_today(con, args):
+    t = pack(dt.date.today())
+    recs = fetch(con, OPEN + """ AND (
+          (t.start IN (1, 2) AND t.startDate IS NOT NULL AND t.startDate <= ?)
+       OR (t.startDate IS NULL AND t.deadline IS NOT NULL AND t.deadline <= ?
+           AND t.deadlineSuppressionDate IS NULL))""",
+                 (t, t), "t.startBucket, t.todayIndex")
+    emit(recs, args)
+
+
+def cmd_inbox(con, args):
+    emit(fetch(con, OPEN + " AND t.start = 0", (), 't."index"'), args)
+
+
+def cmd_anytime(con, args):
+    emit(fetch(con, OPEN + " AND t.start = 1 AND (p.uuid IS NULL OR p.start = 1)", (), 't."index"'), args)
+
+
+def cmd_someday(con, args):
+    emit(fetch(con, OPEN + " AND t.start = 2 AND t.startDate IS NULL", (), 't."index"'), args)
+
+
+def cmd_upcoming(con, args):
+    today = dt.date.today()
+    lo, hi = pack(today), pack(today + dt.timedelta(days=args.days))
+    recs = fetch(con, OPEN + " AND t.start = 2 AND t.startDate > ? AND t.startDate <= ?",
+                 (lo, hi), "t.startDate, t.todayIndex")
+    # Repeating to-dos only exist as a template until Things creates the next instance,
+    # so the template's next date is what Upcoming shows for them.
+    rows = con.execute(BASE.replace("AND t.rt1_recurrenceRule IS NULL", "AND t.rt1_recurrenceRule IS NOT NULL")
+                       + """ AND t.status = 0 AND t.rt1_instanceCreationPaused = 0
+                             AND t.rt1_nextInstanceStartDate > ? AND t.rt1_nextInstanceStartDate <= ?""",
+                       (lo, hi)).fetchall()
+    nxt = {r["uuid"]: r for r in con.execute(
+        "SELECT uuid, rt1_nextInstanceStartDate FROM TMTask WHERE rt1_recurrenceRule IS NOT NULL")}
+    for rec in records(con, rows):
+        # A template's own deadline is a placeholder (4001-01-01); the real one is set
+        # on each instance as it is created.
+        rec.update(list="upcoming", repeating=True, deadline=None,
+                   start_date=iso(unpack(nxt[rec["uuid"]]["rt1_nextInstanceStartDate"])))
+        rec["template"] = True
+        recs.append(rec)
+    recs.sort(key=lambda r: r["start_date"])
+    emit(recs, args, group="date", date_key="start_date")
+
+
+def cmd_deadlines(con, args):
+    hi = pack(dt.date.today() + dt.timedelta(days=args.days))
+    recs = fetch(con, OPEN + " AND t.deadline IS NOT NULL AND t.deadline <= ?", (hi,), "t.deadline")
+    emit(recs, args, group="date", date_key="deadline")
+
+
+def cmd_logbook(con, args):
+    since = time.time() - args.days * 86400
+    recs = fetch(con, " AND t.status IN (2, 3) AND t.stopDate >= ?", (since,), "t.stopDate DESC")
+    emit(recs, args, group="date", date_key="finished")
+
+
+def cmd_projects(con, args):
+    where, params = OPEN + " AND t.type = 1", ()
+    if args.area:
+        where += " AND a.uuid = ?"
+        params = (resolve(con, "area", args.area)["uuid"],)
+    emit(fetch(con, where, params, 't."index"'), args)
+
+
+def cmd_areas(con, args):
+    rows = con.execute("""
+        SELECT a.uuid, a.title, a.visible,
+          (SELECT count(*) FROM TMTask p WHERE p.area = a.uuid AND p.type = 1 AND p.status = 0 AND p.trashed = 0) AS projects,
+          (SELECT count(*) FROM TMTask t WHERE t.area = a.uuid AND t.type = 0 AND t.status = 0 AND t.trashed = 0
+             AND t.rt1_recurrenceRule IS NULL) AS loose_todos
+        FROM TMArea a ORDER BY a."index" """).fetchall()
+    data = [dict(r) for r in rows]
+    if args.json:
+        print(json.dumps(data, ensure_ascii=False, indent=2))
+        return
+    for r in data:
+        print(f'{r["title"]}  · {r["projects"]} open project(s) · {r["loose_todos"]} loose to-do(s)  ‹{r["uuid"]}›')
+
+
+def cmd_tags(con, args):
+    rows = con.execute("""
+        SELECT g.uuid, g.title, g.shortcut, parent.title AS parent,
+          (SELECT count(*) FROM TMTaskTag tt JOIN TMTask t ON t.uuid = tt.tasks
+           WHERE tt.tags = g.uuid AND t.status = 0 AND t.trashed = 0 AND t.rt1_recurrenceRule IS NULL) AS open_items
+        FROM TMTag g LEFT JOIN TMTag parent ON parent.uuid = g.parent
+        ORDER BY g."index" """).fetchall()
+    data = [dict(r) for r in rows]
+    if args.json:
+        print(json.dumps(data, ensure_ascii=False, indent=2))
+        return
+    for r in data:
+        under = f' (under {r["parent"]})' if r["parent"] else ""
+        print(f'#{r["title"]}{under}  · {r["open_items"]} open  ‹{r["uuid"]}›')
+
+
+def cmd_project(con, args):
+    p = resolve(con, "project", args.name)
+    where = " AND t.type = 0 AND p.uuid = ?" + ("" if args.all else " AND t.status = 0")
+    recs = fetch(con, where, (p["uuid"],), 'h."index" IS NOT NULL, h."index", t.status, t."index"')
+    head = fetch(con, " AND t.uuid = ?", (p["uuid"],))[0]
+    if args.json:
+        head = {k: v for k, v in head.items() if not k.startswith("_")}
+        head["items"] = [{k: v for k, v in r.items() if not k.startswith("_")} for r in recs]
+        print(json.dumps(head, ensure_ascii=False, indent=2))
+        return
+    print(describe(head) + f'  — {head["area"] or "(no area)"}')
+    if head["notes"]:
+        print("\n" + head["notes"])
+    current = object()
+    for r in recs:
+        if r["heading"] != current:
+            current = r["heading"]
+            print(f"\n{current or '(no heading)'}")
+        print(f"  {describe(r)}")
+    print(f"\n{len(recs)} item(s)")
+
+
+def cmd_area(con, args):
+    a = resolve(con, "area", args.name)
+    where = " AND a.uuid = ? AND (t.type = 1 OR p.uuid IS NULL)" + ("" if args.all else " AND t.status = 0")
+    emit(fetch(con, where, (a["uuid"],), 't.type DESC, t."index"'), args, header=a["title"])
+
+
+def cmd_tag(con, args):
+    g = resolve(con, "tag", args.name)
+    where = (" AND t.uuid IN (SELECT tasks FROM TMTaskTag WHERE tags = ?)"
+             + ("" if args.all else OPEN))
+    emit(fetch(con, where, (g["uuid"],), 't."index"'), args, header="#" + g["title"])
+
+
+def cmd_search(con, args):
+    f = fold(args.text)
+    recs = fetch(con, "" if args.all else OPEN, (), 't."index"')
+    hits = [r for r in recs if f in fold(r["title"]) or (args.notes and f in fold(r["notes"]))]
+    emit(hits, args)
+
+
+def cmd_show(con, args):
+    out = []
+    for uuid in args.uuids:
+        rows = con.execute(BASE.replace("AND t.rt1_recurrenceRule IS NULL", "") + " AND t.uuid = ?",
+                           (uuid,)).fetchall()
+        if not rows:
+            die(f"no to-do or project with uuid {uuid} (trashed items are not shown)")
+        rec = records(con, rows)[0]
+        rec["checklist_items"] = [
+            {"title": c["title"], "done": c["status"] != 0}
+            for c in con.execute('SELECT title, status FROM TMChecklistItem WHERE task = ? ORDER BY "index"', (uuid,))]
+        rec["url"] = f"things:///show?id={uuid}"
+        out.append(rec)
+    if args.json:
+        print(json.dumps([{k: v for k, v in r.items() if not k.startswith("_")} for r in out],
+                         ensure_ascii=False, indent=2))
+        return
+    for rec in out:
+        print(describe(rec))
+        for label, key in (("type", "type"), ("status", "status"), ("list", "list"), ("area", "area"),
+                           ("project", "project"), ("heading", "heading"), ("start", "start_date"),
+                           ("deadline", "deadline"), ("reminder", "reminder"), ("created", "created"),
+                           ("modified", "modified"), ("finished", "finished"), ("url", "url")):
+            if rec.get(key):
+                print(f"  {label}: {rec[key]}")
+        if rec["tags"]:
+            print(f'  tags: {", ".join(rec["tags"])}')
+        if rec["notes"]:
+            print("  notes:\n    " + rec["notes"].replace("\n", "\n    "))
+        if rec["checklist_items"]:
+            print("  checklist:")
+            for c in rec["checklist_items"]:
+                print(f'    {"[x]" if c["done"] else "[ ]"} {c["title"]}')
+        print()
+
+
+# ---------- Writes ----------
+
+def auth_token(con):
+    token = os.environ.get("THINGS_AUTH_TOKEN") or \
+        con.execute("SELECT uriSchemeAuthenticationToken FROM TMSettings").fetchone()[0]
+    if not token:
+        die("Things has no URL-scheme auth token — turn on Settings → General → "
+            "Enable Things URLs, then retry")
+    return token
+
+
+def fire(con, ops):
+    query = urllib.parse.urlencode({
+        "data": json.dumps(ops, ensure_ascii=False),
+        "reveal": "false",
+        "auth-token": auth_token(con),
+    }, quote_via=urllib.parse.quote)
+    # -g keeps Things in the background (it is launched if it isn't running).
+    subprocess.run(["open", "-g", "things:///json?" + query], check=True)
+
+
+def wait_for(check):
+    deadline = time.time() + float(os.environ.get("THINGS_WRITE_TIMEOUT", 15))
+    while time.time() < deadline:
+        result = check()
+        if result:
+            return result
+        time.sleep(0.4)
+    return None
+
+
+def check_tags(con, names):
+    known = {fold(r[0]): r[0] for r in con.execute("SELECT title FROM TMTag")}
+    out = []
+    for n in names:
+        if fold(n) not in known:
+            die(f"tag '{n}' does not exist in Things — the URL scheme would silently drop it. "
+                "Create it in the app first, or leave it out")
+        out.append(known[fold(n)])
+    return out
+
+
+def split_tags(s):
+    return [t.strip() for t in s.split(",") if t.strip()]
+
+
+def cmd_add(con, args):
+    attrs = {"title": args.title}
+    if args.notes:
+        attrs["notes"] = args.notes
+    if args.when:
+        attrs["when"] = args.when
+    if args.deadline:
+        attrs["deadline"] = args.deadline
+    if args.tags:
+        attrs["tags"] = check_tags(con, split_tags(args.tags))
+    if args.list:
+        target = resolve(con, "list", args.list)
+        if args.project and target["kind"] != "area":
+            die("a project can only go in an area")
+        attrs["area-id" if args.project else "list-id"] = target["uuid"]
+    if args.heading:
+        if not args.list:
+            die("--heading needs --list naming the project")
+        attrs["heading"] = args.heading
+    if args.checklist:
+        if args.project:
+            die("projects have no checklist; add to-dos to the project instead")
+        attrs["checklist-items"] = [{"type": "checklist-item", "attributes": {"title": c}}
+                                    for c in args.checklist]
+
+    since = time.time() - 2
+    fire(con, [{"type": "project" if args.project else "to-do", "attributes": attrs}])
+    found = wait_for(lambda: con.execute(
+        "SELECT uuid FROM TMTask WHERE title = ? AND creationDate >= ? AND trashed = 0 "
+        "ORDER BY creationDate DESC LIMIT 1", (args.title, since)).fetchone())
+    if not found:
+        die("Things did not record the new item in time — check that Things URLs are enabled "
+            "and that Things isn't showing a dialog")
+    args.uuids = [found[0]]
+    cmd_show(con, args)
+
+
+def cmd_update(con, args):
+    attrs = {}
+    for key, attr in (("title", "title"), ("notes", "notes"), ("append_notes", "append-notes"),
+                      ("prepend_notes", "prepend-notes"), ("when", "when")):
+        if getattr(args, key) is not None:
+            attrs[attr] = getattr(args, key)
+    if args.deadline is not None:
+        attrs["deadline"] = "" if args.deadline == "none" else args.deadline
+    if args.tags is not None:
+        attrs["tags"] = check_tags(con, split_tags(args.tags))
+    if args.add_tags:
+        attrs["add-tags"] = check_tags(con, split_tags(args.add_tags))
+    if args.list:
+        attrs["list-id"] = resolve(con, "list", args.list)["uuid"]
+    if args.heading:
+        attrs["heading"] = args.heading
+    if args.append_checklist:
+        attrs["append-checklist-items"] = [{"type": "checklist-item", "attributes": {"title": c}}
+                                           for c in args.append_checklist]
+    if args.complete:
+        attrs["completed"] = True
+    if args.cancel:
+        attrs["canceled"] = True
+    if args.reopen:
+        attrs["completed"] = False
+    if not attrs:
+        die("nothing to change — pass at least one option (see --help)")
+
+    before = {}
+    ops = []
+    for uuid in args.uuids:
+        row = con.execute("SELECT type, title, status, userModificationDate FROM TMTask "
+                          "WHERE uuid = ? AND trashed = 0", (uuid,)).fetchone()
+        if not row or row["type"] not in (0, 1):
+            die(f"no to-do or project with uuid {uuid}")
+        before[uuid] = row
+        ops.append({"type": TYPES[row["type"]], "operation": "update", "id": uuid, "attributes": attrs})
+
+    fire(con, ops)
+
+    def changed():
+        now = {r[0]: r[1] for r in con.execute(
+            f"SELECT uuid, userModificationDate FROM TMTask WHERE uuid IN ({','.join('?' * len(before))})",
+            list(before))}
+        return all(now.get(u) != b["userModificationDate"] for u, b in before.items()) and now
+
+    wait_for(changed)
+    failed = []
+    for uuid, b in before.items():
+        row = con.execute("SELECT status, userModificationDate FROM TMTask WHERE uuid = ?", (uuid,)).fetchone()
+        ok = row["userModificationDate"] != b["userModificationDate"]
+        status = STATUSES.get(row["status"], row["status"])
+        print(f'{"updated  " if ok else "UNCHANGED"} {b["title"]}  · now {status}  ‹{uuid}›')
+        if not ok:
+            failed.append(uuid)
+    if failed:
+        die(f"{len(failed)} item(s) show no change in time — check that Things URLs are enabled "
+            "and the auth token is current")
+
+
+# ---------- CLI ----------
+
+def main():
+    common = argparse.ArgumentParser(add_help=False)
+    common.add_argument("--json", action="store_true", help="machine-readable output")
+
+    ap = argparse.ArgumentParser(prog="things", description=__doc__.split("\n\n")[0])
+    sub = ap.add_subparsers(dest="command", required=True, metavar="command")
+
+    def command(name, fn, help_text):
+        p = sub.add_parser(name, parents=[common], help=help_text, description=help_text)
+        p.set_defaults(fn=fn)
+        return p
+
+    command("today", cmd_today, "the Today list, This Evening included")
+    command("inbox", cmd_inbox, "the Inbox")
+    command("anytime", cmd_anytime, "everything in Anytime (Today items included)")
+    command("someday", cmd_someday, "everything in Someday")
+    command("upcoming", cmd_upcoming, "scheduled items and the next repeat of repeating to-dos") \
+        .add_argument("--days", type=int, default=14, help="how far ahead (default 14)")
+    command("deadlines", cmd_deadlines, "open items with a deadline, overdue first") \
+        .add_argument("--days", type=int, default=7, help="include deadlines up to N days ahead (default 7)")
+    command("logbook", cmd_logbook, "completed and canceled items") \
+        .add_argument("--days", type=int, default=7, help="how far back (default 7)")
+    command("projects", cmd_projects, "open projects, by area") \
+        .add_argument("--area", help="only this area (name or uuid)")
+    command("areas", cmd_areas, "areas with their open project and to-do counts")
+    command("tags", cmd_tags, "tags with their open item counts")
+    for name, fn, what in (("project", cmd_project, "one project's to-dos, by heading"),
+                           ("area", cmd_area, "one area's projects and loose to-dos"),
+                           ("tag", cmd_tag, "items carrying one tag")):
+        p = command(name, fn, what)
+        p.add_argument("name", help="name (case/accent-insensitive, substring ok) or uuid")
+        p.add_argument("--all", action="store_true", help="include completed and canceled items")
+    p = command("search", cmd_search, "find items by title (and notes with --notes)")
+    p.add_argument("text")
+    p.add_argument("--notes", action="store_true", help="search notes too")
+    p.add_argument("--all", action="store_true", help="include completed and canceled items")
+    command("show", cmd_show, "full detail: notes, checklist, dates, tags") \
+        .add_argument("uuids", nargs="+", metavar="uuid")
+
+    p = command("add", cmd_add, "create a to-do (or a project with --project)")
+    p.add_argument("title")
+    p.add_argument("--notes")
+    p.add_argument("--when", help="today | evening | tomorrow | anytime | someday | YYYY-MM-DD[@HH:MM]")
+    p.add_argument("--deadline", help="YYYY-MM-DD")
+    p.add_argument("--list", help="project or area (name or uuid); default is the Inbox")
+    p.add_argument("--heading", help="heading title inside the --list project")
+    p.add_argument("--tags", help="comma-separated; each must already exist")
+    p.add_argument("--checklist", action="append", metavar="ITEM", help="repeatable")
+    p.add_argument("--project", action="store_true", help="create a project instead of a to-do")
+
+    for name, help_text in (("update", "change one or more to-dos/projects"),
+                            ("complete", "mark one or more to-dos/projects completed")):
+        p = command(name, cmd_update, help_text)
+        p.add_argument("uuids", nargs="+", metavar="uuid")
+        for flag in ("--title", "--notes", "--append-notes", "--prepend-notes", "--tags", "--add-tags",
+                     "--list", "--heading"):
+            p.add_argument(flag, default=None)
+        p.add_argument("--when", default=None, help="today | evening | tomorrow | anytime | someday | YYYY-MM-DD[@HH:MM]")
+        p.add_argument("--deadline", default=None, help="YYYY-MM-DD, or 'none' to clear")
+        p.add_argument("--append-checklist", action="append", metavar="ITEM")
+        state = p.add_mutually_exclusive_group()
+        state.add_argument("--complete", action="store_true", default=(name == "complete"))
+        state.add_argument("--cancel", action="store_true")
+        state.add_argument("--reopen", action="store_true", help="mark open again")
+
+    args = ap.parse_args()
+    args.fn(connect(), args)
+
+
+if __name__ == "__main__":
+    main()
