@@ -1,9 +1,10 @@
 #!/bin/sh
-# Point every project's Claude Code auto memory at the synced folder.
+# Point Claude Code's auto memory at the synced folder.
 #
 # Claude Code keeps auto memory in ~/.claude/projects/<project>/memory/ and never
-# shares it between machines. This replaces each of those directories with a
-# symlink into iCloud Drive, so both machines read and write the same notes.
+# shares it between machines. Run as a SessionStart hook, this replaces the
+# session's memory directory with a symlink into iCloud Drive, so both machines
+# read and write the same notes.
 #
 # Idempotent: safe to run on every session start.
 
@@ -50,12 +51,22 @@ link_project() {
 	ln -s "$target" "$link"
 }
 
-for dir in "$PROJECTS_DIR"/*/; do
-	[ -d "$dir" ] || continue
-	link_project "$(basename "$dir")"
-done
+# The session's project, read from the hook's JSON on stdin. Claude Code keys
+# auto memory to the main checkout of the git repository, so sessions in a
+# worktree or a subdirectory use the main checkout's memory. Project folders are
+# named after that path, with every character other than a letter or digit
+# turned into "-".
+cwd=$(sed -n 's/.*"cwd" *: *"\([^"]*\)".*/\1/p' | head -n 1)
+if [ -n "$cwd" ]; then
+	if common=$(git -C "$cwd" rev-parse --path-format=absolute --git-common-dir 2>/dev/null); then
+		cwd=$(dirname "$common")
+	fi
+	link_project "$(printf '%s' "$cwd" | sed 's/[^A-Za-z0-9]/-/g')"
+fi
 
-# Projects that so far only exist on the other machine.
+# Projects synced from the other machine. Claude Code loads memory before this
+# hook runs, so linking them ahead of time lets their first session here
+# already see those notes.
 for dir in "$SYNC_DIR"/*/; do
 	[ -d "$dir" ] || continue
 	link_project "$(basename "$dir")"
